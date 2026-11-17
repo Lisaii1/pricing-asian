@@ -546,3 +546,11 @@ def test_page_count_reader_on_a_minimal_pdf(tmp_path):
     p = tmp_path / "x.pdf"
     p.write_bytes(raw)
     assert pb.pdf_page_count(p) == 2
+
+
+def test_grid_part_c_oral_defence_is_not_applicable():
+    """Pas de soutenance prévue : dans la grille, la ligne de la soutenance est « sans objet »."""
+    for path in (ROOT / "docs" / "templates" / "CONFORMITE.md", ROOT / "docs" / "CONFORMITE.md"):
+        part_c = path.read_text(encoding="utf-8").split("## C. Ce qui reste à faire", 1)[1]
+        lines = [x for x in part_c.split("\n- ") if "soutenance" in x]
+        assert len(lines) == 1 and "sans objet" in lines[0], path.name

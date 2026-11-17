@@ -92,5 +92,6 @@ Ce que le sujet ne demandait pas. Ce qui dépasse le cours est signalé « hors 
 - **Mail de constitution du groupe** (08 novembre) : confirmer qu'il est bien parti.
 - **Relire puis envoyer le paquet de rendu** avant le 22 novembre 2026 : rapport PDF, code, tests,
   résultats (CSV, figures, classeur Excel) et notice, dans une archive zip.
-- **Relecture par le groupe** du texte de l'oral, du dossier et de cette grille, puis répétition
-  chronométrée de la soutenance.
+- **Relecture par le groupe** du texte de l'oral, du dossier et de cette grille.
+- **Répétition chronométrée de la soutenance** : sans objet (pas de soutenance prévue : l'oral
+  sert à comprendre et à défendre le projet si le professeur pose des questions).

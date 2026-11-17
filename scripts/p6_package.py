@@ -334,6 +334,8 @@ def build(out_root: Path = OUT_ROOT) -> tuple[Path, Path]:
 # --- paquet pour l'équipe (interne au groupe, jamais rendu au professeur) ------------------------
 
 EQUIPE = "Dossier_Equipe_Pricing_Asiatique"
+NO_ORAL_DEFENCE = ("(pas de soutenance prévue : l'oral sert à comprendre et à "
+                   "défendre le projet si le professeur pose des questions)")
 GITHUB = "https://github.com/Lisaii1/pricing-asian.git"      # dépôt privé : accès sur invitation
 
 
@@ -363,7 +365,7 @@ def lisez_moi_equipe_html(n_tests: int) -> str:
     rows = [
         ("1_Dossier_Groupe.pdf", "tout ce qu'on a fait, étape par étape, et pourquoi ; à lire en "
                                  "premier (sommaire cliquable, glossaire à la fin)"),
-        ("2_Oral.pdf", "les fiches pour apprendre la soutenance : une par partie (figure, chiffre à "
+        ("2_Oral.pdf", f"les fiches d'oral {NO_ORAL_DEFENCE} : une par partie (figure, chiffre à "
                        "retenir, phrases à dire), 20 questions probables, les 10 chiffres par cœur"),
         ("3_Conformite.pdf", "le sujet exigence par exigence : fait ou partiel, où, la preuve ; nos "
                              "ajouts avec deux phrases d'oral chacun ; ce qui reste à faire"),
@@ -399,7 +401,7 @@ def lisez_moi_equipe_html(n_tests: int) -> str:
         "à lire en premier</span><span>ECE Paris · ING4 Finance</span></div>"
         "<h1>L'option asiatique pricée par Monte-Carlo</h1>"
         f"<p>Projet Pricing Monte-Carlo, énoncé 2. Rendu le {pg.esc(date)}. Ce dossier rassemble "
-        "tout ce qu'il faut pour comprendre le projet et préparer la soutenance, sans rien "
+        f"tout ce qu'il faut pour comprendre le projet {pg.esc(NO_ORAL_DEFENCE)}, sans rien "
         "installer.</p>"
         "<h2>Ce que contient ce dossier, dans l'ordre de lecture</h2><table><tbody>"
         + "".join(f"<tr><td>{pg.esc(n)}</td><td>{pg.esc(w)}</td></tr>" for n, w in rows)

@@ -188,5 +188,22 @@ def test_equipe_readme_one_page_github_steps_and_no_tooling_word(equipe):
         assert name in flat, name
 
 
+def test_equipe_readme_says_there_is_no_oral_defence():
+    """Pas de soutenance prévue : chaque mention de la soutenance est la phrase qui le dit."""
+    html = pk.lisez_moi_equipe_html(704)
+    import p6_pdf_groupe as pg
+    note = pg.esc(pk.NO_ORAL_DEFENCE)
+    assert html.count(note) == 2
+    assert html.replace(note, "").lower().count("soutenance") == 0
+
+
+def test_equipe_package_holds_the_final_report():
+    """4_Rapport_rendu.pdf du paquet équipe est le PDF final (renvoi au LISEZMOI)."""
+    built = ROOT / "rendu" / pk.EQUIPE / "4_Rapport_rendu.pdf"
+    if not built.exists():
+        pytest.skip("paquet équipe non construit")
+    assert built.read_bytes() == pk.REPORT.read_bytes()
+
+
 def test_count_tests_reads_the_pytest_collection():
     assert pk.count_tests() > 700
