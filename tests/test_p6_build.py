@@ -409,6 +409,26 @@ def test_conformite_cites_code_and_files_that_exist(conformite):
                                                      ROOT / "data" / "raw")), csv_name
 
 
+@needs_conformite
+@pytest.mark.parametrize("doc", ["docs/DOSSIER_GROUPE.md", "docs/ORAL.md"])
+def test_dossier_and_oral_link_to_the_grid_at_the_top(doc):
+    head = "\n".join((ROOT / doc).read_text(encoding="utf-8").splitlines()[:12])
+    assert "](CONFORMITE.md)" in head
+    assert "docs/CONFORMITE.md" in (ROOT / "docs/DOSSIER_GROUPE.md").read_text(encoding="utf-8")
+
+
+@needs_conformite
+def test_oral_has_the_one_minute_section_on_what_we_did_beyond():
+    text = (ROOT / "docs/ORAL.md").read_text(encoding="utf-8")
+    m = re.search(r"^## Ce qu'on a fait en plus, en 1 minute\n(.*?)^## ", text, re.M | re.S)
+    assert m, "section « Ce qu'on a fait en plus, en 1 minute » absente"
+    spoken = " ".join(re.findall(r"«(.*?)»", m.group(1), re.S))
+    words = len(re.findall(r"\w+", spoken))
+    assert 110 <= words <= 155, words                 # environ une minute à 140 mots par minute
+    assert "| Ce qu'on a fait en plus | 1 min |" in text      # ligne du déroulé
+    assert len(re.findall(r"^## .*en plus", text, re.M)) == 1
+
+
 def test_conformite_fields_read_independently(fields):
     rows = _rows("p4_grid_cv.csv")
     strikes = sorted({float(r["K"]) for r in rows})

@@ -2,6 +2,10 @@
 
 Projet Pricing Monte-Carlo, ING4 Finance, ECE Paris (A. W. Sanoussi Mani). Énoncé 2. Rendu le {{date_rendu}}.
 
+**Grille de conformité au sujet : [CONFORMITE.md](CONFORMITE.md).** Exigence par exigence : ce que le
+sujet demande (cité mot pour mot), ce qui est fait et sa preuve, ce qu'on a fait en plus, ce qui reste
+à faire. Comme l'oral, elle ne cite pas nos étapes de travail : on peut la montrer au professeur.
+
 Ce dossier explique ce qu'on a fait, dans l'ordre, et ce que ça a donné. Il suffit de le lire pour
 pouvoir en parler. C'est un document interne au groupe : il cite nos étapes de travail (P1 à P6) et
 dit qui a pris chaque décision. Le rapport PDF et le texte de l'oral (`docs/ORAL.md`) sont écrits
@@ -491,6 +495,12 @@ Ce dossier, le texte de l'oral et le rapport PDF. Les trois sont des gabarits re
 décimal vient d'un champ. Décision de Loup (17/11 à 19:19) : le rapport et l'oral ne mentionnent pas
 nos outils de travail et sont écrits à la première personne du pluriel.
 
+Puis P6b : la grille de conformité `docs/CONFORMITE.md` (même mécanique de gabarit). Elle relit le
+sujet phrase par phrase, donne un statut sans complaisance à chaque exigence et la preuve (test, CSV,
+page du rapport), liste ce qu'on a fait en plus avec deux phrases prêtes pour l'oral, et ce qui reste
+à faire. Un test vérifie que chaque citation se retrouve dans le texte du PDF du sujet, et que chaque
+test, fonction et CSV cités existent.
+
 ---
 
 ## 3. Les 6 coquilles du cours
@@ -714,7 +724,8 @@ Durées relevées sur la machine de Loup pendant le projet (parfois chargée, do
 | `docs/2026-S1_ProjetPricing.pdf` | le sujet |
 | `docs/DOSSIER_GROUPE.md` | ce dossier |
 | `docs/ORAL.md` | le texte de la soutenance et les questions probables |
-| `docs/templates/` | les gabarits du dossier et de l'oral (c'est eux qu'on modifie) |
+| `docs/CONFORMITE.md` | la grille de conformité au sujet : exigences, statuts, preuves, ajouts, reste à faire |
+| `docs/templates/` | les gabarits du dossier, de l'oral et de la grille (c'est eux qu'on modifie) |
 | `docs/maquettes/` | les maquettes graphiques, dont celle retenue par Loup |
 | `rapport/` | le gabarit du rapport, le rapport en HTML et le PDF rendu |
 | `src/pricer/rng.py` | le générateur congruentiel (LCG) |

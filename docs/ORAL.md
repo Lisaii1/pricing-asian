@@ -2,9 +2,12 @@
 
 Projet Pricing Monte-Carlo, énoncé 2. ECE Paris, ING4 Finance. Rendu le 22 novembre 2026.
 
+Grille de conformité au sujet, exigence par exigence, avec ce que nous avons fait en plus :
+[CONFORMITE.md](CONFORMITE.md).
+
 Ce texte suit les quatre questions du sujet, puis présente le cas réel et ce que nous avons fait en
 plus. Il tient en 8 à 10 minutes. Pour chaque partie : la figure à montrer, les phrases à dire, et le
-chiffre à retenir. Les durées du tableau donnent 9 minutes 40 au total. La seconde moitié du
+chiffre à retenir. Les durées du tableau donnent 9 minutes 55 au total. La seconde moitié du
 document prépare les questions.
 
 Tous les chiffres viennent de nos fichiers de résultats. Le prix d'une option est toujours donné avec
@@ -18,7 +21,7 @@ sa marge d'erreur.
 | Q3, la réduction de variance | 1 min 50 | figure 5, tableau 1 |
 | Q4, le gain de temps et de précision | 1 min 30 | figures 4 et 3 |
 | Le cas réel EUR/USD | 1 min 40 | figure 6, tableau 2 |
-| Ce que nous avons fait en plus | 45 s | aucune |
+| Ce qu'on a fait en plus | 1 min | aucune |
 | Conclusion | 20 s | aucune |
 
 ---
@@ -211,19 +214,21 @@ euro, soit 1,76 % du cours, contre 2,98 % pour l'européen.
 
 ---
 
-## Ce que nous avons fait en plus (45 secondes)
+## Ce qu'on a fait en plus, en 1 minute
 
-**Ce qu'on montre.** Rien de nouveau : on reste sur le tableau 2.
+**Ce qu'on montre.** Rien de nouveau : on reste sur le tableau 2. La liste complète, avec la preuve
+de chaque point, est dans la partie B de la grille de conformité ([CONFORMITE.md](CONFORMITE.md)).
 
 **Ce qu'on dit.**
 
-« Au-delà des quatre questions, nous avons fait cinq choses. Nous avons refait les exercices du cours
-sur l'option asiatique et sur les variables antithétiques : la valeur de référence est dans notre
-intervalle de confiance à 99 % dans 56 cas sur 56. Nous avons comparé les
-cinq méthodes de génération de normales à l'intérieur du pricer : elles donnent le même prix. Nous
-avons mesuré l'effet de la fréquence d'observation et calculé les sensibilités du prix. Nous avons
-cherché le biais que peut créer l'estimation de β, sans le détecter. Enfin, tout est reproductible :
-même graine, même prix, et plusieurs centaines de tests automatiques.
+« Au-delà des quatre questions, voici ce que nous avons ajouté. Pour l'aléa, nous avons codé les cinq
+façons du cours de fabriquer une loi normale : dans le pricer, elles donnent le même prix, à moins de
+1,07 écart-type. Pour la réduction de variance, nous avons comparé trois façons de
+choisir β et cherché le biais de son estimation, sans le détecter sur 2 000 répétitions.
+Nous avons refait les exercices du cours : la valeur de référence est dans notre intervalle à 99 %
+dans 56 cas sur 56. Nous avons calculé les sensibilités du prix, et vérifié
+la convention de chaque taux de marché à sa source. Enfin, tout est reproductible : même graine,
+même prix au bit près, et plusieurs centaines de tests automatiques.
 
 En codant les formules, nous avons aussi relevé six coquilles dans les slides. Nous les tenons à
 votre disposition. »

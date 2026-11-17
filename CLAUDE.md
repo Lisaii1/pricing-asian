@@ -145,6 +145,12 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
   2 pages A4, figures 1, 2, 4, 3 de `results/figures/`, tableaux 1 et 2 en HTML depuis les CSV ;
   figures 5 et 6 réservées à l'oral ; PDF produit par Chrome en mode headless.
 
+- 17/11/2026, P6b : `docs/CONFORMITE.md` est un gabarit de `scripts/p6_build.py` comme le dossier et
+  l'oral, traité comme un document rendu (liée depuis l'oral) : aucun mot de l'outillage (testé). Les
+  citations du sujet sont vérifiées dans le texte du PDF du sujet (pdftotext). Les tests se lancent avec
+  `.venv\Scripts\python.exe -m pytest` : l'interpréteur `python` du système (Anaconda, NumPy 1.26)
+  fait échouer deux tests bit à bit.
+
 ## Coquilles du cours relevées (citées au rapport final)
 1. Slide 9 : « c = 0 ».
 2. Slide 23 (Marsaglia polaire) : « V = −2U − 1 », lire V = 2U − 1.
@@ -160,4 +166,7 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
   P5b fait (5 commits) : prompt `prompts/2026-11-17-p5b-figures-excel.md`.
   P6 fait (4 commits) : prompt `prompts/2026-11-17-p6-dossier-oral-rapport-v2.md` ; dossier
   `docs/DOSSIER_GROUPE.md`, oral `docs/ORAL.md`, rapport `rapport/Rapport_Pricing_Asiatique.pdf`.
+  P6b fait (2 commits) : prompt `prompts/2026-11-17-p6b-conformite.md` ; grille de conformité au sujet
+  `docs/CONFORMITE.md` (15 exigences : 11 faites, 4 partielles ; 19 ajouts ; 7 points restants),
+  liée en tête du dossier et de l'oral ; section d'oral « Ce qu'on a fait en plus, en 1 minute ».
 - Prochain : relecture de Loup et du groupe, soutenance.
