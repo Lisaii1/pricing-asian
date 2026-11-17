@@ -110,3 +110,65 @@ def test_c_pytest_passes_inside_the_package(built):
     out = done.stdout.decode("utf-8", errors="replace")
     assert done.returncode == 0, out[-3000:]
     assert re.search(r"\d+ passed", out) and "failed" not in out.strip().splitlines()[-1]
+
+
+# --- paquet pour l'équipe (--equipe) ---------------------------------------------------------------
+
+EQUIPE_ORDER = ["0_LISEZ-MOI_EQUIPE.pdf", "1_Dossier_Groupe.pdf", "2_Oral.pdf", "3_Conformite.pdf",
+                "4_Rapport_rendu.pdf", "5_Resultats.xlsx", "figures"]
+
+
+@pytest.fixture(scope="module")
+def equipe(tmp_path_factory):
+    if pk.pb.find_browser() is None:
+        pytest.skip("ni Chrome ni Edge : LISEZ-MOI non produit")
+    out = tmp_path_factory.mktemp("equipe")
+    return out, *pk.build_equipe(out, n_tests=704)
+
+
+def test_equipe_content_and_reading_order(equipe):
+    out, pkg, archive = equipe
+    assert sorted(p.name for p in out.iterdir()) == [pk.EQUIPE, f"{pk.EQUIPE}.zip"]  # rien d'autre
+    assert sorted(p.name for p in pkg.iterdir()) == EQUIPE_ORDER
+    figs = sorted(p.name for p in (pkg / "figures").iterdir())
+    assert figs == sorted(p.name for p in pk.RENDU_FIGS.glob("*.png")) and len(figs) == 8
+    for name, src in pk.equipe_files():
+        assert (pkg / name).read_bytes() == src.read_bytes(), name
+    assert pk.REPORT in [s for _n, s in pk.equipe_files()]          # le PDF rendu, tel quel
+
+
+def test_equipe_zip_opens_and_holds_exactly_the_folder(equipe):
+    _out, pkg, archive = equipe
+    with zipfile.ZipFile(archive) as z:
+        assert z.testzip() is None
+        names = sorted(z.namelist())
+    assert names == sorted(f"{pk.EQUIPE}/{p.relative_to(pkg).as_posix()}"
+                           for p in pkg.rglob("*") if p.is_file())
+    listing = pk.equipe_listing(pkg, archive)
+    size = f"{archive.stat().st_size:,}".replace(",", " ")
+    assert listing.splitlines()[-1] == f"{archive.name} : {size} octets"     # taille rapportée
+    assert listing.splitlines()[0].startswith("0_LISEZ-MOI_EQUIPE.pdf") and ", 1 p.)" in listing
+
+
+def test_equipe_readme_one_page_github_steps_and_no_tooling_word(equipe):
+    _out, pkg, _archive = equipe
+    readme = pkg / "0_LISEZ-MOI_EQUIPE.pdf"
+    assert pk.pb.pdf_page_count(readme) == 1
+    try:
+        texts = {n: pk.pb.pdf_text(pkg / n) for n in ("0_LISEZ-MOI_EQUIPE.pdf", "2_Oral.pdf",
+                                                       "3_Conformite.pdf")}
+    except FileNotFoundError:
+        pytest.skip("pdftotext introuvable")
+    for name, text in texts.items():
+        assert pk.forbidden_hits(text) == [], name
+    flat = re.sub(r"\s+", " ", texts["0_LISEZ-MOI_EQUIPE.pdf"])
+    for step in ("Accepter l'invitation reçue par mail", f"git clone {pk.GITHUB}", "cd pricing-asian",
+                 "python -m venv .venv", r".venv\Scripts\pip install -r requirements.txt",
+                 r".venv\Scripts\python -m pytest -q", "704 passed", f"{pk.NAME}.zip"):
+        assert step in flat, step
+    for name in EQUIPE_ORDER[1:]:                         # il ne se cite pas lui-même
+        assert name in flat, name
+
+
+def test_count_tests_reads_the_pytest_collection():
+    assert pk.count_tests() > 700

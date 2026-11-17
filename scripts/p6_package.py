@@ -21,6 +21,12 @@ texte, les noms de fichiers, le texte des PDF et les cellules du classeur ; (b) 
 donne la même sortie.
 
 Usage : .venv/Scripts/python.exe scripts/p6_package.py [--pytest]
+
+Paquet pour l'équipe (interne au groupe, jamais rendu) : --equipe écrit seulement
+rendu/Dossier_Equipe_Pricing_Asiatique/ puis son .zip : 0_LISEZ-MOI_EQUIPE.pdf (une page : contenu
+et ordre de lecture, ce qu'on rend au professeur, le dépôt GitHub pas à pas), 1_Dossier_Groupe.pdf,
+2_Oral.pdf, 3_Conformite.pdf (docs/pdf/), 4_Rapport_rendu.pdf, 5_Resultats.xlsx, figures/ (mode
+rendu). Le LISEZ-MOI, l'oral et la grille sont sans mot de l'outillage ; le dossier peut en citer.
 """
 from __future__ import annotations
 
@@ -301,6 +307,138 @@ def build(out_root: Path = OUT_ROOT) -> tuple[Path, Path]:
     return pkg, archive
 
 
+# --- paquet pour l'équipe (interne au groupe, jamais rendu au professeur) ------------------------
+
+EQUIPE = "Dossier_Equipe_Pricing_Asiatique"
+GITHUB = "https://github.com/Lisaii1/pricing-asian.git"      # dépôt privé : accès sur invitation
+
+
+def equipe_files() -> list[tuple[str, Path]]:
+    """(nom dans le paquet, fichier du dépôt), dans l'ordre de lecture ; le LISEZ-MOI est écrit à
+    part. Les PDF du groupe viennent de docs/pdf/ (p6_build.py --pdf-groupe)."""
+    import p6_pdf_groupe as pg
+    return [("1_Dossier_Groupe.pdf", pg.DOSSIER_PDF), ("2_Oral.pdf", pg.ORAL_PDF),
+            ("3_Conformite.pdf", pg.CONF_PDF), ("4_Rapport_rendu.pdf", REPORT),
+            ("5_Resultats.xlsx", WORKBOOK)]
+
+
+def count_tests() -> int:
+    """Nombre de tests que pytest trouve dans le dépôt (collecte seule, rien n'est exécuté)."""
+    done = subprocess.run([sys.executable, "-m", "pytest", "--collect-only", "-q",
+                           "-p", "no:cacheprovider"], cwd=ROOT, capture_output=True, timeout=600,
+                          env={**os.environ, "PYTHONIOENCODING": "utf-8"})
+    out = done.stdout.decode("utf-8", errors="replace")
+    return int(re.search(r"(\d+) tests? collected", out).group(1))
+
+
+def lisez_moi_equipe_html(n_tests: int) -> str:
+    """Une page : contenu et ordre de lecture, ce qu'on rend au professeur, le dépôt GitHub."""
+    import p6_pdf_groupe as pg
+    date = pb.fields()["date_rendu"].text
+    py = re.search(r"\(Python (\d+\.\d+)", (ROOT / "requirements.txt").read_text(encoding="utf-8"))
+    rows = [
+        ("1_Dossier_Groupe.pdf", "tout ce qu'on a fait, étape par étape, et pourquoi ; à lire en "
+                                 "premier (sommaire cliquable, glossaire à la fin)"),
+        ("2_Oral.pdf", "les fiches pour apprendre la soutenance : une par partie (figure, chiffre à "
+                       "retenir, phrases à dire), 20 questions probables, les 10 chiffres par cœur"),
+        ("3_Conformite.pdf", "le sujet exigence par exigence : fait ou partiel, où, la preuve ; nos "
+                             "ajouts avec deux phrases d'oral chacun ; ce qui reste à faire"),
+        ("4_Rapport_rendu.pdf", "le rapport tel qu'il sera rendu (page de garde et 2 pages)"),
+        ("5_Resultats.xlsx", "le classeur de résultats remis au professeur (onglet « Synthèse »)"),
+        ("figures/", "les figures et tableaux du rapport, en PNG"),
+    ]
+    steps = [
+        ("Accepter l'invitation reçue par mail", "accès au dépôt privé sur GitHub"),
+        (f"git clone {GITHUB}", ""),
+        ("cd pricing-asian", ""),
+        ("python -m venv .venv", f"Python {py.group(1) if py else '3'}, une seule fois"),
+        (r".venv\Scripts\pip install -r requirements.txt", "versions exactes, une seule fois"),
+        (r".venv\Scripts\python -m pytest -q", "lance tous les tests, environ une minute"),
+    ]
+    css = """
+.one{padding:0 14mm}
+.one h1{font:800 30px/1.1 var(--sans);letter-spacing:-.02em;margin:8px 0 4px}
+.one h2{font:600 10px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--a1);
+  margin:7mm 0 2.5mm}
+.one p{font-size:12px;margin:0 0 2mm}
+.one td{font-size:11.5px;padding:5px 8px}
+.one td:first-child{font-family:var(--mono);color:var(--a1);white-space:nowrap}
+.one ol{margin:0;padding-left:22px}
+.one li{font-size:12px;margin:0 0 2.2mm}
+.one li code{font-size:11.5px}
+.one li span{color:var(--sub);font-size:11px}
+.see{border:1.5px solid var(--a1);border-radius:9px;padding:8px 12px;margin-top:3mm;
+  background:rgba(0,255,163,.07);font-size:12px}
+"""
+    body = (
+        '<section class="one"><div class="eyebrow"><span><b>●</b>&nbsp; Dossier de l\'équipe · '
+        "à lire en premier</span><span>ECE Paris · ING4 Finance</span></div>"
+        "<h1>L'option asiatique pricée par Monte-Carlo</h1>"
+        f"<p>Projet Pricing Monte-Carlo, énoncé 2. Rendu le {pg.esc(date)}. Ce dossier rassemble "
+        "tout ce qu'il faut pour comprendre le projet et préparer la soutenance, sans rien "
+        "installer.</p>"
+        "<h2>Ce que contient ce dossier, dans l'ordre de lecture</h2><table><tbody>"
+        + "".join(f"<tr><td>{pg.esc(n)}</td><td>{pg.esc(w)}</td></tr>" for n, w in rows)
+        + "</tbody></table>"
+        "<h2>Ce qu'on rend au professeur</h2>"
+        f"<p>Une archive <code>{NAME}.zip</code> : le rapport PDF (page de garde et 2 pages), le "
+        "code Python complet avec ses tests, les données de marché brutes, les résultats (fichiers "
+        "CSV, figures, classeur Excel) et une notice d'installation. Le dossier, les fiches d'oral "
+        "et la grille sont nos documents de travail : ils ne font pas partie du rendu.</p>"
+        "<h2>Pour tout voir en détail : GitHub</h2>"
+        "<p>Le code, les résultats et l'historique de chaque modification sont sur GitHub. Dans un "
+        "terminal Windows (PowerShell), une fois l'invitation acceptée :</p><ol>"
+        + "".join(f"<li><code>{pg.esc(c)}</code>{' <span>— ' + pg.esc(w) + '</span>' if w else ''}"
+                  "</li>" if i else f"<li><b>{pg.esc(c)}</b> <span>— {pg.esc(w)}</span></li>"
+                  for i, (c, w) in enumerate(steps))
+        + "</ol>"
+        f'<div class="see"><b>Ce qu\'on doit voir :</b> des lignes de points, puis une dernière '
+        f"ligne <code>{n_tests} passed</code>, sans aucun <code>failed</code>. Si un outil manque "
+        "sur la machine (par exemple pdftotext, livré avec Git pour Windows), quelques tests "
+        "s'affichent <code>skipped</code> : c'est prévu.</div></section>")
+    return pg.page("Dossier de l'équipe", "Dossier de l'équipe · lisez-moi", css, body)
+
+
+def build_equipe(out_root: Path = OUT_ROOT, n_tests: int | None = None) -> tuple[Path, Path]:
+    """Écrit out_root/Dossier_Equipe_Pricing_Asiatique/ et son .zip (le paquet de rendu au
+    professeur n'est pas touché)."""
+    pkg = out_root / EQUIPE
+    if pkg.exists():
+        shutil.rmtree(pkg)
+    pkg.mkdir(parents=True)
+    for name, src in equipe_files():
+        _copy(src, pkg / name)
+    for p in sorted(RENDU_FIGS.glob("*.png")):
+        _copy(p, pkg / "figures" / p.name)
+    html = pkg.parent / f"{EQUIPE}_lisez-moi.html"
+    html.write_text(lisez_moi_equipe_html(count_tests() if n_tests is None else n_tests),
+                    encoding="utf-8")
+    try:
+        pb.build_pdf(html, pkg / "0_LISEZ-MOI_EQUIPE.pdf")
+    finally:
+        html.unlink()
+    archive = out_root / f"{EQUIPE}.zip"
+    with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as z:
+        for p in sorted(pkg.rglob("*")):
+            if p.is_file():
+                z.write(p, f"{EQUIPE}/{p.relative_to(pkg).as_posix()}")
+    return pkg, archive
+
+
+def equipe_listing(pkg: Path, archive: Path) -> str:
+    """Contenu dans l'ordre, nombre de pages des PDF, taille de chaque fichier et de l'archive."""
+    def size(p: Path) -> str:
+        return f"{p.stat().st_size:,}".replace(",", " ") + " octets"
+
+    lines = []
+    for p in sorted(pkg.rglob("*")):
+        if p.is_file():
+            pages = f", {pb.pdf_page_count(p)} p." if p.suffix == ".pdf" else ""
+            lines.append(f"{p.relative_to(pkg).as_posix()}  ({size(p)}{pages})")
+    lines.append(f"{archive.name} : {size(archive)}")
+    return "\n".join(lines)
+
+
 # --- contrôles -----------------------------------------------------------------------------------
 
 def forbidden_hits(text: str) -> list[str]:
@@ -380,8 +518,18 @@ def verify(pkg: Path, with_pytest: bool = False) -> dict:
 def main(argv=None) -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--pytest", action="store_true", help="lance aussi pytest dans le paquet")
+    parser.add_argument("--equipe", action="store_true",
+                        help="écrit seulement le paquet pour l'équipe (le rendu n'est pas touché)")
     args = parser.parse_args(argv)
     sys.stdout.reconfigure(encoding="utf-8")
+    if args.equipe:
+        pkg, archive = build_equipe()
+        print(f"écrit {pkg.relative_to(ROOT)} et {archive.relative_to(ROOT)}")
+        print(equipe_listing(pkg, archive))
+        hits = [f"{n} : {h}" for n in ("0_LISEZ-MOI_EQUIPE.pdf", "2_Oral.pdf", "3_Conformite.pdf")
+                for h in forbidden_hits(pb.pdf_text(pkg / n))]
+        print(f"mots de l'outillage (LISEZ-MOI, oral, grille) : {hits}")
+        return
     pkg, archive = build()
     files = [p for p in pkg.rglob("*") if p.is_file()]
     print(f"écrit {pkg.relative_to(ROOT)} ({len(files)} fichiers) et {archive.relative_to(ROOT)} "
