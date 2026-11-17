@@ -1,0 +1,2 @@
+# Relevés bruts : octets conservés tels que reçus (aucune conversion de fin de ligne)
+data/raw/** -text
