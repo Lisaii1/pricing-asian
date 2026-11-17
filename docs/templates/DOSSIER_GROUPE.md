@@ -649,8 +649,9 @@ Les figures sont dans `results/figures/` (PNG et PDF). Elles sont produites par
   bout.
 - **Lecture du cours.** Le PDF du cours est en images : les formules ont été lues dans le texte
   extrait d'une version « draft ».
-- **Figures.** Les figures portent une ligne de source courte avec le nom du fichier CSV. La figure 5
-  porte la mention « P3 », notre nom d'étape : à savoir si on la projette à l'oral.
+- **Figures.** Les figures de travail (`results/figures/`) portent une ligne de source courte avec
+  le nom du fichier CSV ; celles du mode rendu (`results/figures/rendu/`, rapport, oral, paquet)
+  disent la source en clair, sans nom de fichier, et donnent les gains à l'ordre de grandeur.
 
 ---
 

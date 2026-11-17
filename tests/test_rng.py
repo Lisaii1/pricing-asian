@@ -193,7 +193,7 @@ def test_uniform_moments_and_ks():
     assert abs(ac1) < 5 / np.sqrt(n)
 
 
-# --- saut exact public et balayage par paquets (P5a, étape 0 : flux disjoints) -----------------
+# --- saut exact public et balayage par paquets (flux disjoints) -----------------
 
 def test_state_after_equals_sequential_generation():
     from pricer.rng import state_after

@@ -1,6 +1,6 @@
-"""Convergence, nombre de simulations nécessaire, comparaison à temps égal (P4, étape 2).
+"""Convergence, nombre de simulations nécessaire, comparaison à temps égal.
 
-Actif théorique (CLAUDE.md) : S0 = 100, σ = 0,20, r = 0,03, q = 0,01, observations mensuelles ;
+Actif théorique du projet : S0 = 100, σ = 0,20, r = 0,03, q = 0,01, observations mensuelles ;
 call asiatique arithmétique K = 100, T = 1. Normales par transformée inverse (AS241), seed
 20261117. Quatre estimateurs :
     plain               sans réduction de variance

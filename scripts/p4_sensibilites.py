@@ -1,17 +1,17 @@
-"""Sensibilités de l'estimateur (P4, étape 3) : biais de β, méthode d'aléa, fréquence
+"""Sensibilités de l'estimateur : biais de β, méthode d'aléa, fréquence
 d'observation, grille K × T refaite avec le contrôle.
 
-Actif théorique (CLAUDE.md) : S0 = 100, σ = 0,20, r = 0,03, q = 0,01, contrôle géométrique avec
+Actif théorique du projet : S0 = 100, σ = 0,20, r = 0,03, q = 0,01, contrôle géométrique avec
 b optimal (slide 50) sauf mention contraire. IC à 95 % (z = Φ^{-1}(0,975) par AS241).
 
 1. Biais de β (results/p4_beta_bias.csv, détail par seed dans p4_beta_bias_runs.csv) : call
-   K = 100, T = 1, mensuel ; N = 1 000 trajectoires, 2 000 runs (500 en P4/P5a ; 2 000 depuis P5b,
-   étape 1, pour trancher le biais du mode pilot), contrôle
+   K = 100, T = 1, mensuel ; N = 1 000 trajectoires, 2 000 runs (500 dans une première
+   mesure, portés à 2 000 pour trancher le biais du mode pilot), contrôle
    « optimal » (b estimé sur l'échantillon, biais d'ordre 1/N) et « pilot » (b estimé sur 10 000
    trajectoires préalables, sans biais). Biais = moyenne des 2 000 prix − référence (contrôle à
    N = 4 000 000 sur un flux disjoint, voir ci-dessous), exprimé en écarts-types de la moyenne
    (sd_of_mean = s_prix/√2 000) et en écart-type combiné √(sd_of_mean² + se_ref²).
-   Flux disjoints (P5a, étape 0 ; avant : seeds 20261117 + i, dont 1 à 15 paires de fenêtres se
+   Flux disjoints (avant : seeds 20261117 + i, dont 1 à 15 paires de fenêtres se
    recouvraient) : un seul flux LCG parti de x0 = 20261117, découpé bout à bout par le saut exact de
    pricer.rng (state_after) : le run i démarre à l'état a^(i·M)·x0 mod m, M = uniformes consommées
    par run (12 × 1 000 en optimal, 12 × 11 000 en pilot, vérifié run par run), et utilise les
@@ -28,7 +28,7 @@ b optimal (slide 50) sauf mention contraire. IC à 95 % (z = Φ^{-1}(0,975) par 
 3. Fréquence (results/p4_frequency.csv) : n_obs ∈ {1, 4, 12, 52, 252} dates sur T = 1, K = 100,
    call et put, N = 200 000, contrôle : asiatique arithmétique (MC), géométrique exact (formule
    discrète), limite géométrique continue (σ_G² = σ²T/3, hors cours) et européen BS.
-4. Grille de P2 refaite avec le contrôle (results/p4_grid_cv.csv) : K ∈ {80, …, 120},
+4. Grille sans contrôle refaite avec le contrôle (results/p4_grid_cv.csv) : K ∈ {80, …, 120},
    T ∈ {0,25 ; 0,5 ; 1 ; 2}, call et put, mensuel, N = 200 000 : ratio asiatique / européen BS
    et son IC (IC du prix divisé par le prix BS, exact) ; prix sans contrôle de results/p2_grid.csv
    repris pour comparaison.
@@ -65,7 +65,7 @@ SEED = 20261117
 RNG = "inverse"
 K0, T0 = 100.0, 1.0
 
-N_BIAS, N_SEEDS = 1_000, 2_000      # 500 en P4/P5a
+N_BIAS, N_SEEDS = 1_000, 2_000      # 500 dans la première mesure
 N_PILOT = 10_000            # défaut de price_asian
 N_BIAS_REF = 4_000_000
 SCAN_CHUNK = 1_000_000
@@ -261,7 +261,7 @@ def frequency():
 
 def grid_cv():
     with P2_GRID.open(encoding="utf-8") as f:
-        p2 = {(float(r["K"]), float(r["T"]), r["option"]): r for r in csv.DictReader(f)}
+        plain_grid = {(float(r["K"]), float(r["T"]), r["option"]): r for r in csv.DictReader(f)}
     rows = []
     for T in GRID_MATURITIES:
         for K in GRID_STRIKES:
@@ -269,7 +269,7 @@ def grid_cv():
                 x = price_asian(**PARAMS, K=K, T=T, option=option, obs="monthly",
                                 n_paths=N_GRID, seed=SEED, rng_method=RNG, control="geometric")
                 bs = bs_price(**PARAMS, K=K, T=T, option=option)
-                old = p2[(K, T, option)]
+                old = plain_grid[(K, T, option)]
                 rows.append({"K": K, "T": T, "option": option, **PARAMS, "obs": "monthly",
                              "n_obs": x.n_obs, "n_paths": N_GRID, "seed": SEED,
                              "rng_method": RNG, "control": "geometric", "price": x.price,

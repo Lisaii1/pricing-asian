@@ -20,7 +20,7 @@ from pricer.paths import gbm_paths
 SEED = 20261117
 BASE = dict(S0=100.0, K=100.0, sigma=0.20, r=0.03, T=1.0, q=0.01)
 
-MC_CASES = [  # 3 jeux, dont q > 0 (les mêmes qu'en P2)
+MC_CASES = [  # 3 jeux, dont q > 0 (les mêmes que pour la grille de comparaison)
     dict(S0=100.0, K=100.0, sigma=0.20, r=0.03, T=1.0, q=0.01),
     dict(S0=42.0, K=40.0, sigma=0.20, r=0.10, T=0.5, q=0.0),
     dict(S0=100.0, K=120.0, sigma=0.35, r=0.05, T=2.0, q=0.04),

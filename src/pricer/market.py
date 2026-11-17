@@ -1,4 +1,4 @@
-"""Données de marché de l'actif réel EUR/USD (P5a) : lecture, taux continus, volatilité historique.
+"""Données de marché de l'actif réel EUR/USD : lecture, taux continus, volatilité historique.
 
 Actif : taux de change EUR/USD, S = prix d'un euro en dollars. Modèle de Garman-Kohlhagen (hors
 cours ; c'est le modèle de Black-Scholes avec dividende continu du cours, slide 61) :
@@ -28,7 +28,7 @@ from pathlib import Path
 
 import numpy as np
 
-# Convention des rendements de la courbe par du Trésor américain (P5b, Q2) : « bond-equivalent »,
+# Convention des rendements de la courbe par du Trésor américain : « bond-equivalent »,
 # intérêts semestriels, APY = (1 + i/2)² − 1, donc r = 2·ln(1 + y/2) en continu. Sources (lues le
 # 17/11/2026) :
 #   FAQ du Trésor : https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics/interest-rates-frequently-asked-questions

@@ -145,7 +145,7 @@ def test_two_paths_is_one_pair_and_cannot_give_a_variance():
 def test_course_form_one_minus_u_is_minus_z_for_the_inverse_method():
     """Slide 52 : Y = F^{-1}(1 − U). Pour N(0, 1), Φ^{-1}(1 − U) = −Φ^{-1}(U).
     Tolérance 1e−9 : arrondi de 1 − U (≤ 1,1e−16) amplifié par 1/φ(z) (φ(5) ≈ 1,5e−6 ⇒ 7e−11),
-    plus l'imparité d'AS241 à 1e−11 près (mesurée en P1)."""
+    plus l'imparité d'AS241 à 1e−11 près (mesurée sur le générateur)."""
     u = LCG(SEED).uniforms(120_000)
     z, z_anti = ppnd16(u), ppnd16(1.0 - u)
     assert np.max(np.abs(z_anti + z)) < 1e-9
@@ -264,7 +264,7 @@ def test_combination_beats_antithetic_alone(case, option):
 
 @pytest.mark.parametrize("case,option", [(MC_CASES[1], "call"), (MC_CASES[2], "put")])
 def test_combination_is_worse_than_control_alone_for_in_the_money_options(case, option):
-    """Constat mesuré, contraire à l'attente « combinaison < chacun des deux » du prompt P3.
+    """Constat mesuré, contraire à l'attente de départ « combinaison < chacun des deux ».
 
     Le contrôle laisse le résidu e = Y − bX ≈ e^{−rT}(A − G) quand l'option finit dans la
     monnaie. A − G mesure la dispersion de la trajectoire : c'est une fonction presque paire

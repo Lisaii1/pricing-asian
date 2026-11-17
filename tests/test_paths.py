@@ -24,7 +24,7 @@ def _all_paths(**kw) -> np.ndarray:
 
 # --- dates d'observation -----------------------------------------------------------------
 
-def test_frequencies_are_the_prompt_table():
+def test_frequencies_are_the_documented_table():
     assert FREQUENCIES == {"daily": 252, "weekly": 52, "monthly": 12, "quarterly": 4}
 
 
@@ -73,7 +73,7 @@ def test_n_obs_invalid_values_raise(bad):
     ("daily", 0.001, 1),        # 0,252 → 0, ramené au minimum 1
 ])
 def test_n_obs_frequency_rounds_half_up_with_minimum_one(freq, T_, expected):
-    """Décision P2-Q2 (17/11/2026) : n_obs = arrondi classique de f·T (demi vers le haut),
+    """Choix du 17/11/2026 : n_obs = arrondi classique de f·T (demi vers le haut),
     minimum 1."""
     assert n_obs_from(freq, T_) == expected
     assert len(obs_dates(T_, freq)) == expected

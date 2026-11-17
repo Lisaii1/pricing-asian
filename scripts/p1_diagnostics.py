@@ -1,4 +1,4 @@
-"""Diagnostic P1 des générateurs de normales.
+"""Diagnostic des générateurs de normales.
 
 Pour chaque méthode : temps pour 10^6 normales (médiane de 5 runs), moments, test de
 Kolmogorov-Smirnov, autocorrélation lag 1, taux d'acceptation, uniformes consommées

@@ -67,8 +67,8 @@ def test_dividend_lowers_call_raises_put():
     c0 = bs_price(100, 100, 0.2, 0.03, 1.0, 0.0, option="call")
     c1 = bs_price(100, 100, 0.2, 0.03, 1.0, 0.02, option="call")
     p0 = bs_price(100, 100, 0.2, 0.03, 1.0, 0.0, option="put")
-    p1 = bs_price(100, 100, 0.2, 0.03, 1.0, 0.02, option="put")
-    assert c1 < c0 and p1 > p0
+    put_q = bs_price(100, 100, 0.2, 0.03, 1.0, 0.02, option="put")
+    assert c1 < c0 and put_q > p0
 
 
 def test_zero_vol_limit_is_discounted_forward_intrinsic():

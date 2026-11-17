@@ -1,6 +1,6 @@
-"""Relevés officiels pour l'actif réel EUR/USD (P5a, étape 1).
+"""Relevés officiels pour l'actif réel EUR/USD.
 
-Sources (seules URL permises par le prompt P5a) :
+Sources (seules URL utilisées) :
   - BCE, API SDMX sans clé (documentation : https://data.ecb.europa.eu/help/api/overview ; point
     d'accès des données https://data-api.ecb.europa.eu/service/data/{flux}/{clé}) :
       EXR/D.USD.EUR.SP00.A                fixing de référence BCE EUR/USD (USD pour 1 EUR), journalier
@@ -15,7 +15,7 @@ HTTP, sha256, octets) ; la réponse est enregistrée brute (octets reçus, sans 
 data/raw/ avant tout usage. Une source qui ne répond pas est notée « absent » : aucune valeur de
 remplacement. La clé de chaque série est vérifiée sur la réponse réelle (colonne KEY = clé demandée).
 Puis data/raw/MANIFEST.md est régénéré (tous les fichiers de data/raw/, dont les deux relevés Alpha
-Vantage de Cowork, et le journal des appels).
+Vantage, et le journal des appels).
 
 Usage : .venv/Scripts/python.exe scripts/p5_fetch.py            (appels réseau + MANIFEST)
         .venv/Scripts/python.exe scripts/p5_fetch.py --manifest (MANIFEST seul, sans réseau)
@@ -47,17 +47,17 @@ TREASURY_YEAR = 2026
 TREASURY_URL = ("https://home.treasury.gov/resource-center/data-chart-center/interest-rates/"
                 f"daily-treasury-rates.csv/{TREASURY_YEAR}/all?type=daily_treasury_yield_curve"
                 f"&field_tdr_date_value={TREASURY_YEAR}&page&_format=csv")
-USER_AGENT = "pricing-asian-p5-fetch/1.0 (Python urllib)"     # générique, aucune donnée personnelle
+USER_AGENT = "pricing-asian-fetch/1.0 (Python urllib)"     # générique, aucune donnée personnelle
 TIMEOUT = 60
 LOG_FIELDS = ["source", "url", "requested_at_local", "requested_at_utc", "status", "http_status",
               "error", "file", "sha256", "bytes", "key_check"]
 
-# Relevés déposés par Cowork (17/11/2026, outil Alpha Vantage) : URL et heure non relevées.
-COWORK = {
+# Relevés Alpha Vantage (17/11/2026, API FX_DAILY et TREASURY_YIELD) : URL et heure non relevées.
+ALPHA_VANTAGE_FILES = {
     "2026-11-17_alphavantage_FX_DAILY_EURUSD_full.csv":
-        ("Alpha Vantage FX_DAILY EUR/USD (Cowork)", "timestamp"),
+        ("Alpha Vantage, API FX_DAILY, EUR/USD", "timestamp"),
     "2026-11-17_alphavantage_TREASURY_YIELD_3month_daily_sample.csv":
-        ("Alpha Vantage TREASURY_YIELD 3 mois (Cowork)", "timestamp"),
+        ("Alpha Vantage, API TREASURY_YIELD, 3 mois", "timestamp"),
 }
 
 
@@ -170,16 +170,16 @@ def write_manifest() -> None:
             continue
         rel = f"data/raw/{path.name}"
         d = _describe(path)
-        if path.name in COWORK:
-            source, url, when = COWORK[path.name][0], "outil Alpha Vantage de Cowork, URL non relevée", \
-                "2026-11-17 (Cowork, heure non relevée)"
+        if path.name in ALPHA_VANTAGE_FILES:
+            source, url, when = ALPHA_VANTAGE_FILES[path.name][0], "API Alpha Vantage, URL non relevée", \
+                "2026-11-17 (heure non relevée)"
         elif rel in by_file:
             e = by_file[rel]
             source, url, when = e["source"], e["url"], e["requested_at_local"]
             if e["sha256"] != d["sha256"]:
                 raise RuntimeError(f"{rel} : sha256 du fichier ≠ sha256 relevé à l'appel")
         else:
-            raise RuntimeError(f"{rel} : fichier sans appel journalisé ni dépôt Cowork connu")
+            raise RuntimeError(f"{rel} : fichier sans appel journalisé ni relevé Alpha Vantage connu")
         rows.append(f"| `{rel}` | {source} | {url} | {when} | `{d['sha256']}` | {d['lines']} | "
                     f"{d['first']} | {d['last']} | `{d['column']}` | ok |")
     for e in log:

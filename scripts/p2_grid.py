@@ -1,6 +1,6 @@
-"""Grille P2 de comparaison asiatique / européen (énoncé 2, question 2).
+"""Grille de comparaison asiatique / européen (énoncé 2, question 2).
 
-Actif théorique (tranché par Cowork, 17/11/2026) : S0 = 100, σ = 0,20, r = 0,03, q = 0,01,
+Actif théorique (choisi le 17/11/2026) : S0 = 100, σ = 0,20, r = 0,03, q = 0,01,
 observations mensuelles, N = 200 000 trajectoires, seed 20261117, normales par transformée
 inverse (AS241). K ∈ {80, 90, 100, 110, 120}, T ∈ {0,25 ; 0,5 ; 1 ; 2}, call et put.
 

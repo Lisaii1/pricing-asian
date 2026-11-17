@@ -1,4 +1,4 @@
-"""Sensibilités de l'estimateur (P4, étape 3) : biais de β, méthode d'aléa, fréquence
+"""Sensibilités de l'estimateur : biais de β, méthode d'aléa, fréquence
 d'observation, grille K × T avec contrôle.
 
 Ajouts testés dans src/ :
@@ -24,7 +24,7 @@ from pricer.normals import normals
 from pricer.paths import RNG_METHODS, NormalStream
 
 SEED = 20261117
-N_RUNS_BIAS = 2_000          # P5b, étape 1 (500 en P4/P5a)
+N_RUNS_BIAS = 2_000          # 500 dans la première mesure
 BASE = dict(S0=100.0, K=100.0, sigma=0.20, r=0.03, T=1.0, q=0.01)
 MODEL = dict(S0=100.0, sigma=0.25, r=0.05, T=1.5, q=0.02)
 RESULTS = Path(__file__).resolve().parents[1] / "results"
@@ -118,7 +118,7 @@ def test_beta_bias_csv():
         sd_mean = prices.std(ddof=1) / math.sqrt(N_RUNS_BIAS)
         assert float(r["sd_of_mean"]) == pytest.approx(sd_mean, rel=1e-10)
         assert float(r["bias"]) == pytest.approx(prices.mean() - float(r["ref_price"]), abs=1e-14)
-    # seeds : saut exact sur un flux unique (P5a, étape 0), voir
+    # seeds : saut exact sur un flux unique, voir
     # test_beta_bias_runs_use_disjoint_jumped_streams
 
 
@@ -172,7 +172,7 @@ def test_grid_cv_csv():
         assert float(r["ratio_ci_high"]) == pytest.approx(float(r["ci_high"]) / bs, rel=1e-12)
 
 
-# --- P5a étape 0, P5b étape 1 : 2 000 runs sur flux LCG disjoints (saut exact) --------------------------------
+# --- 2 000 runs sur flux LCG disjoints (saut exact) --------------------------------
 
 def test_beta_bias_runs_use_disjoint_jumped_streams():
     """Run i démarre à l'état a^(i·M)·x0 mod m, M = uniformes consommées par run ; la référence

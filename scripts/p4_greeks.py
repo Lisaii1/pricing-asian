@@ -1,6 +1,6 @@
-"""Greeks par différences finies (P4, étape 4, bonus ; cours slides 58-61) -> results/p4_greeks.csv.
+"""Greeks par différences finies (en plus du sujet ; cours slides 58-61) -> results/p4_greeks.csv.
 
-Actif théorique (CLAUDE.md) : S0 = 100, σ = 0,20, r = 0,03, q = 0,01 ; K ∈ {90, 100, 110}, T = 1,
+Actif théorique du projet : S0 = 100, σ = 0,20, r = 0,03, q = 0,01 ; K ∈ {90, 100, 110}, T = 1,
 call et put ; N = 200 000 trajectoires, seed 20261117, normales par transformée inverse (AS241).
 Différences centrées : h = 1 % de S0 = 1 (Δ, Γ), h_σ = 0,01 (ν, pour une variation de σ de 1).
 

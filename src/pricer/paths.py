@@ -30,7 +30,7 @@ from pricer.rng import LCG
 
 FREQUENCIES = {"daily": 252, "weekly": 52, "monthly": 12, "quarterly": 4}
 # Méthodes de normales du flux : celles de pricer.normals, plus la transformée inverse avec
-# Φ^{-1} de Hastings (slide 24 ; normals(..., precision="hastings")), pour comparer en P4.
+# Φ^{-1} de Hastings (slide 24 ; normals(..., precision="hastings")), pour comparer les méthodes.
 RNG_METHODS = METHODS + ("inverse_hastings",)
 DEFAULT_BATCH = 50_000
 _PAIR_METHODS = ("box_muller", "polar")   # produisent les normales deux par deux
@@ -56,7 +56,7 @@ def n_obs_from(obs, T) -> int:
 
     Arrondi classique, demi vers le haut : ⌊f·T + 1/2⌋ (pas le round() de Python, qui arrondit
     au pair : 0,5 → 0 et 2,5 → 2), avec un minimum de 1 observation. Seul T ≤ 0 est une erreur
-    (décision du 17/11/2026, CLAUDE.md).
+    (choix du 17/11/2026).
     """
     if isinstance(obs, str):
         if obs not in FREQUENCIES:

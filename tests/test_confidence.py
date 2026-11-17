@@ -1,4 +1,4 @@
-"""Niveau de confiance de l'IC et corrélation antithétique (P4, étape 0).
+"""Niveau de confiance de l'IC et corrélation antithétique.
 
 IC symétrique au niveau c (slides 48-49 ; exercice des slides 77 et 81 : IC à 95 % et à 99 %) :
     [prix − z·s/√N ; prix + z·s/√N],  z = Φ^{-1}((1 + c)/2),

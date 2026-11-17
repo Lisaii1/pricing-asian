@@ -1,8 +1,8 @@
-"""Relevés bruts de data/raw/ (P5a, étape 1) : le MANIFEST décrit exactement les fichiers présents.
+"""Relevés bruts de data/raw/ : le MANIFEST décrit exactement les fichiers présents.
 
 Pour chaque ligne du tableau de data/raw/MANIFEST.md : le fichier existe, son sha256 et son nombre de
 lignes sont ceux écrits, la première et la dernière date écrites sont bien les dates extrêmes du
-fichier. Les deux relevés Alpha Vantage de Cowork y figurent avec leurs sha256 connus. Une source qui
+fichier. Les deux relevés Alpha Vantage y figurent avec leurs sha256 connus. Une source qui
 n'a pas répondu est listée « absent », sans fichier. Le journal de tous les appels réseau
 (data/raw/fetch_log.csv) est repris dans le MANIFEST.
 """

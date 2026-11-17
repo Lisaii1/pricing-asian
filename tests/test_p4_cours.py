@@ -1,9 +1,9 @@
-"""Exercices du cours reproduits (P4, étape 1) : slides 77 (asiatique, contrôle géométrique) et 78
+"""Exercices du cours reproduits : slides 77 (asiatique, contrôle géométrique) et 78
 (européen, antithétique). Les tests portent sur les CSV versionnés de results/ produits par
 scripts/p4_cours.py : cohérence avec les formules fermées, reproductibilité d'une ligne, couverture
 des IC à 99 %.
 
-Couverture (prompt P4) : la référence (prix exact BS pour le slide 78, contrôle à N = 4 000 000 pour
+Couverture (critère fixé à l'avance) : la référence (prix exact BS pour le slide 78, contrôle à N = 4 000 000 pour
 le slide 77) doit tomber dans l'IC à 99 % de l'estimateur dans au moins 97 % des cases. Si ce n'est
 pas le cas, on le rapporte ; on n'ajuste rien.
 """

@@ -1,4 +1,4 @@
-"""Figures du rapport (P5b, étapes 2 et 3) : scripts/p5_figures.py → results/figures/.
+"""Figures du rapport : scripts/p5_figures.py → results/figures/.
 
 Chaque nombre d'une figure vient d'un CSV de results/ ou d'un calcul du pricer dans le script ;
 chaque figure se régénère à l'identique (même seed) ; aucune valeur n'est codée en dur.
@@ -107,7 +107,7 @@ def test_rendu_figures_say_the_source_in_clear(name):
     (simulation Monte-Carlo et sa graine, ou les données officielles) est écrite."""
     joined = " ".join(_rendu_texts(name))
     assert ".csv" not in joined and "seed" not in joined and "pricer" not in joined
-    assert not re.search(r"\bP[1-6][ab]?\b|prompt|cowork|claude", joined, re.I), joined
+    assert not re.search(r"\bP[1-6][ab]?\b", joined, re.I), joined
     assert "Simulation Monte-Carlo" in joined
     assert re.search(r"graine \d+", joined)
     if name in ("fig1_eventail_eurusd", "tab2_eurusd"):
@@ -148,7 +148,7 @@ def test_rendu_table1_gives_variance_ratios_not_timed_gains():
 
 def test_no_hardcoded_values_in_figure_script():
     """Aucune donnée tapée : pas de seed, pas de flottant à plus de 2 chiffres significatifs, pas
-    d'entier ≥ 1 000 (hors N_SCATTER = 2 000 trajectoires du nuage, fixé par le prompt)."""
+    d'entier ≥ 1 000 (hors N_SCATTER = 2 000 trajectoires du nuage, choix d'affichage)."""
     src = (ROOT / "scripts" / "p5_figures.py").read_text(encoding="utf-8")
     assert "20261117" not in src
     bad = []

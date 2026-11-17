@@ -1,4 +1,4 @@
-"""Calibration de l'actif réel EUR/USD (P5a, étape 2) → results/p5_market.csv.
+"""Calibration de l'actif réel EUR/USD → results/p5_market.csv.
 
 Entrées : relevés bruts de data/raw/ (voir data/raw/MANIFEST.md), aucun appel réseau.
   S0     dernier fixing de référence BCE EUR/USD (USD pour 1 EUR, 14 h 15 CET), date écrite.
@@ -6,12 +6,12 @@ Entrées : relevés bruts de data/raw/ (voir data/raw/MANIFEST.md), aucun appel 
          (251 rendements), × √252 ; même calcul sur les 252 dernières clôtures Alpha Vantage.
   r      USD (domestique) : Trésor américain 1 an (« 1 Yr ») au plus tard à la date de S0. Rendement
          de la courbe par, « bond-equivalent », intérêts semestriels (FAQ du Trésor ; Fed FEDS
-         2006-28 éq. (4)) : r = 2·ln(1 + y/2) (P5b, réponse Q2 ; sources dans pricer.market).
-         Variante ln(1 + y) (convention de P5a) écrite pour comparaison.
+         2006-28 éq. (4)) : r = 2·ln(1 + y/2) (sources dans pricer.market).
+         Variante ln(1 + y) (base annuelle) écrite pour comparaison.
   q      EUR (étranger, joue le dividende, Garman-Kohlhagen) : BCE, courbe AAA zone euro, taux spot
          1 an au plus tard à la date de S0. La réponse BCE le dit « continuous compounding »
-         (colonne TITLE_COMPL) : q = y, sans conversion. La variante ln(1 + y) du prompt est écrite
-         pour comparaison (écart avec le prompt, rapporté).
+         (colonne TITLE_COMPL) : q = y, sans conversion. La variante ln(1 + y) est écrite
+         pour comparaison.
   Pour comparaison seulement : €STR (BCE, au jour le jour) et bons du Trésor 3 mois (Alpha Vantage),
   en % tels que publiés.
   Contrôle croisé : fixing BCE − clôture Alpha Vantage du même jour, 252 derniers jours communs.
@@ -74,7 +74,7 @@ def calibrate() -> dict:
         "2·ln(1 + y/2), y = 1 Yr / 100 (bond-equivalent, semestriel)",
         f"y = {y_r} % ; sources (lues le 17/11/2026) : " + " ; ".join(TREASURY_SOURCES))
     put("r_usd_annual_alt", to_continuous(y_r / 100, "annual"), "continu, par an", d_r,
-        UST.name, "ln(1 + y)", "comparaison : convention de P5a, non retenue")
+        UST.name, "ln(1 + y)", "comparaison : base annuelle, non retenue")
     put("y_usd_1y_pct", y_r, "% publié", d_r, UST.name, "tel que publié", "")
 
     compl = _ecb_title_compl(YC)
@@ -83,8 +83,8 @@ def calibrate() -> dict:
     d_q, y_q = last_on_or_before(read_series(YC, "TIME_PERIOD", "OBS_VALUE"), d0)
     put("q_eur", to_continuous(y_q / 100, "continuous"), "continu, par an", d_q, YC.name,
         "y / 100 (déjà continu)", "TITLE_COMPL BCE : « continuous compounding »")
-    put("q_eur_ln1py_prompt", to_continuous(y_q / 100, "annual"), "continu, par an", d_q, YC.name,
-        "ln(1 + y)", "comparaison : convention du prompt, non retenue")
+    put("q_eur_ln1py_variante", to_continuous(y_q / 100, "annual"), "continu, par an", d_q, YC.name,
+        "ln(1 + y)", "comparaison : conversion ln(1 + y), non retenue")
     put("y_eur_1y_pct", y_q, "% publié", d_q, YC.name, "tel que publié", "")
 
     d_e, y_e = last_on_or_before(read_series(ESTR, "TIME_PERIOD", "OBS_VALUE"), d0)
@@ -92,7 +92,7 @@ def calibrate() -> dict:
         "comparaison seulement (taux au jour le jour)")
     d_t, y_t = last_on_or_before(read_series(AV_3M, "timestamp", "value"), d0)
     put("ust_3m_pct", y_t, "% publié", d_t, AV_3M.name, "tel que publié",
-        "comparaison seulement (Alpha Vantage, Cowork)")
+        "comparaison seulement (Alpha Vantage)")
 
     r, q = rows["r_usd"]["value"], rows["q_eur"]["value"]
     put("forward_1y", S0 * math.exp(r - q), "USD pour 1 EUR", d0, "calcul",

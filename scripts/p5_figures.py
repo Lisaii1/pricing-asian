@@ -1,4 +1,4 @@
-"""Figures du rapport (P5b, étapes 2 et 3) → results/figures/<nom>.png (300 dpi) et .pdf (vectoriel).
+"""Figures du rapport → results/figures/<nom>.png (300 dpi) et .pdf (vectoriel).
 
 Style Plasma de la maquette validée (pricer.plotstyle). Chaque nombre vient d'un CSV de results/ ou
 d'un calcul du pricer fait ici ; aucune valeur n'est tapée (test : tests/test_p5_figures.py).
@@ -22,7 +22,7 @@ fig4_convergence       results/p4_convergence.csv : demi-largeur d'IC à 95 % me
                        p4_n_required.csv). Couleur = contrôle ou non, anneau = antithétique.
 fig5_nuage_payoffs     2 000 trajectoires mensuelles du pricer (paramètres, K, T = 1 et seed de la
                        ligne call T = 1 de p3_vr_atm.csv) : payoff actualisé arithmétique contre
-                       géométrique ; corrélation calculée ici, celle de P3 (N = 200 000) rappelée.
+                       géométrique ; corrélation calculée ici, celle de l'estimation complète (N = 200 000) rappelée.
 fig6_eurusd_sigma      results/p5_eurusd_sensitivity.csv, K = S0 : prix asiatique (MC) et européen
                        (BS) en % de S0 contre σ de 4 % à 8 %, call et put ; σ mesuré marqué.
 tab1_estimateurs       results/p3_vr_atm.csv, T = 1 : 5 estimateurs, call et put, prix, demi-IC
@@ -76,7 +76,7 @@ FIG1_PX = (534, 300)
 HIST_X = 0.76               # bord gauche des histogrammes de la figure 1 (fraction)
 Q_TAIL = 1e-3              # quantiles de S(T) qui bornent l'axe de la figure 1
 
-# Choix d'affichage fixés par le prompt P5b (pas des résultats)
+# Choix d'affichage (pas des résultats)
 N_FAN_SHOWN = 200          # trajectoires dessinées dans l'éventail
 N_SCATTER = 2_000          # trajectoires du nuage de la figure 5
 
@@ -422,7 +422,7 @@ def fig5_scatter(d: dict | None = None, rendu: bool = False):
     mono = dict(fontfamily=ps.FONT_MONO)
     fig.text(0.12, 0.9, f"corrélation {ps.fmt_num(d['corr'], 4)}", color=P["ink"], fontsize=9,
              **mono)
-    ref = "estimation complète" if rendu else "P3"
+    ref = "estimation complète"
     fig.text(0.12, 0.84, f"N = {ps.fmt_int(d['n'])} · {ref} avec N = {ps.fmt_int(d['n_p3'])} : "
              f"{ps.fmt_num(d['corr_p3'], 4)}", color=P["sub"], fontsize=6.5, **mono)
     case = f"S0 = K = {ps.fmt_num(d['K'], 0)}, T = {_fr_T(d['T'])}, mensuel"

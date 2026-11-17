@@ -1,7 +1,7 @@
-"""Calibration EUR/USD (P5a, étape 2) : results/p5_market.csv recalculé depuis les relevés bruts.
+"""Calibration EUR/USD : results/p5_market.csv recalculé depuis les relevés bruts.
 
 S0 = dernier fixing BCE ; σ = historique 252 fixings (BCE et Alpha Vantage) ; r = Trésor 1 an,
-base semestrielle « bond-equivalent » : r = 2·ln(1 + y/2) (P5b, Q2 ; ln(1 + y) en comparaison) ; q = BCE AAA spot 1 an, déjà en composition continue (métadonnée TITLE_COMPL de la
+base semestrielle « bond-equivalent » : r = 2·ln(1 + y/2) (ln(1 + y) en comparaison) ; q = BCE AAA spot 1 an, déjà en composition continue (métadonnée TITLE_COMPL de la
 réponse BCE : « continuous compounding »), donc q = y ; contrôle croisé BCE / Alpha Vantage.
 """
 from __future__ import annotations
@@ -55,7 +55,7 @@ def test_r_is_treasury_1y_semiannual_on_or_before_s0_date():
     # sources de la convention écrites dans le CSV
     assert "home.treasury.gov" in rows["r_usd"]["note"]
     assert "federalreserve.gov/pubs/feds/2006/200628" in rows["r_usd"]["note"]
-    # variante ln(1 + y) (P5a) gardée en ligne de comparaison
+    # variante ln(1 + y) (base annuelle) gardée en ligne de comparaison
     assert float(rows["r_usd_annual_alt"]["value"]) == pytest.approx(math.log1p(y / 100), rel=1e-15)
     assert "r_usd_semiannual_alt" not in rows
 
@@ -66,8 +66,8 @@ def test_q_is_ecb_aaa_1y_spot_already_continuous():
     d, y = last_on_or_before(read_series(YC, "TIME_PERIOD", "OBS_VALUE"), d0)
     assert rows["q_eur"]["date"] == d.isoformat()
     assert float(rows["q_eur"]["value"]) == pytest.approx(y / 100, rel=1e-15)
-    # variante du prompt (ln(1 + y)), gardée pour comparaison
-    assert float(rows["q_eur_ln1py_prompt"]["value"]) == pytest.approx(math.log1p(y / 100))
+    # variante ln(1 + y) de q, gardée pour comparaison
+    assert float(rows["q_eur_ln1py_variante"]["value"]) == pytest.approx(math.log1p(y / 100))
 
 
 def test_forward_and_cross_check():

@@ -1,4 +1,4 @@
-"""Convergence, nombre de simulations nécessaire, comparaison à temps égal (P4, étape 2).
+"""Convergence, nombre de simulations nécessaire, comparaison à temps égal.
 
 Fonctions d'analyse de scripts/p4_convergence.py testées sur des cas synthétiques exacts, puis
 cohérence des CSV versionnés (results/p4_convergence.csv, p4_convergence_slopes.csv,

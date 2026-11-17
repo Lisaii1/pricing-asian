@@ -3,7 +3,7 @@
 Contrainte du sujet : les normales sont produites uniquement par les méthodes du cours
 (LCG + transformée inverse / Box-Muller / acceptation-rejet). Ce test échoue dès qu'un
 fichier de src/ mentionne numpy.random, le module random de la bibliothèque standard
-ou une méthode .rvs( de scipy.stats, ni n'importe SciPy (CLAUDE.md : SciPy permis dans tests/ et
+ou une méthode .rvs( de scipy.stats, ni n'importe SciPy (règle du projet : SciPy permis dans tests/ et
 scripts/ seulement ; Φ est codée sans SciPy dans src/).
 """
 from __future__ import annotations

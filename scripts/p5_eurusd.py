@@ -1,6 +1,6 @@
-"""Cas réel EUR/USD (P5a, étape 3) → results/p5_eurusd.csv et results/p5_eurusd_sensitivity.csv.
+"""Cas réel EUR/USD → results/p5_eurusd.csv et results/p5_eurusd_sensitivity.csv.
 
-Cas (décision de Loup, 17/11/2026) : entreprise française qui encaisse des USD chaque mois pendant
+Cas (choisi par le groupe le 17/11/2026) : entreprise française qui encaisse des USD chaque mois pendant
 1 an et couvre son taux moyen. Elle perd si l'euro monte (ses USD valent moins d'euros) : elle
 achète un call asiatique sur EUR/USD (moyenne arithmétique de 12 fixings mensuels, T = 1).
 

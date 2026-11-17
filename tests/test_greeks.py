@@ -1,4 +1,4 @@
-"""Greeks par différences finies (P4, étape 4 ; cours, slides 58-61).
+"""Greeks par différences finies (cours, slides 58-61).
 
 Différences centrées (slide 60, biais en h²·h'''/6) :
     Δ = [P(S0 + h) − P(S0 − h)]/(2h),  Γ = [P(S0 + h) − 2P(S0) + P(S0 − h)]/h²,

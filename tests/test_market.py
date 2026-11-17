@@ -1,4 +1,4 @@
-"""Données de marché de l'actif réel EUR/USD (P5a, étape 2) : pricer.market.
+"""Données de marché de l'actif réel EUR/USD : pricer.market.
 
 Lecture des séries brutes (valeurs manquantes = absentes, jamais 0), conversion des taux en taux
 continus, volatilité historique annualisée, contrôle croisé de deux séries de cours.

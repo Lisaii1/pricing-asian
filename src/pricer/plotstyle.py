@@ -1,7 +1,7 @@
-"""Style « Plasma » des figures du rapport (P5b, étape 2), repris de la maquette validée par Loup.
+"""Style « Plasma » des figures du rapport, repris de la maquette retenue par le groupe.
 
-Maquette : docs/maquettes/2026-11-17-maquette-F-nuit-profonde.html (Loup, 17/11/2026, 15:21 :
-« Plasma validé pour moi »). Fond noir profond #030306, lueurs floues en arrière-plan, aucune boîte
+Maquette « nuit profonde », palette Plasma, retenue par le groupe le 17/11/2026.
+Fond noir profond #030306, lueurs floues en arrière-plan, aucune boîte
 grise (axes transparents, sans cadre), grille en pointillés discrets, texte clair.
 
 Polices : la maquette utilise Inter et JetBrains Mono (Google Fonts), absentes de cette machine ; on
@@ -85,7 +85,7 @@ def fmt_sig(v: float) -> str:
 
 
 def fmt_err(v: float) -> str:
-    """Écart-type ou demi-largeur d'IC (réponse Q5, P5b) : arrondi à 10^-4, sauf sous 10^-4 :
+    """Écart-type ou demi-largeur d'IC (convention du projet) : arrondi à 10^-4, sauf sous 10^-4 :
     notation scientifique à 2 chiffres significatifs, « 4,2 × 10⁻⁷ »."""
     v = float(v)
     if v == 0 or abs(v) >= 1e-4:

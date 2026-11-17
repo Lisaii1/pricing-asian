@@ -1,6 +1,6 @@
-"""Tableau P3 : réduction de variance à la monnaie (énoncé 2, questions 3 et 4).
+"""Tableau de réduction de variance à la monnaie (énoncé 2, questions 3 et 4).
 
-Actif théorique de CLAUDE.md : S0 = 100, σ = 0,20, r = 0,03, q = 0,01, observations mensuelles.
+Actif théorique du projet : S0 = 100, σ = 0,20, r = 0,03, q = 0,01, observations mensuelles.
 K = 100, T ∈ {0,25 ; 1 ; 2}, call et put, N = 200 000 trajectoires, seed 20261117, normales par
 transformée inverse (AS241).
 

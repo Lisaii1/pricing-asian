@@ -1,7 +1,7 @@
-"""Style Plasma des figures (P5b, étape 2) : pricer.plotstyle.
+"""Style Plasma des figures : pricer.plotstyle.
 
-Palette et fond repris de la maquette validée par Loup (docs/maquettes/…-maquette-F-nuit-profonde.html,
-« Plasma validé pour moi », 17/11/2026), polices Windows installées, formats français, lueurs
+Palette et fond repris de la maquette « nuit profonde » retenue par le groupe
+(17/11/2026), polices Windows installées, formats français, lueurs
 gaussiennes en arrière-plan, axes sans boîte, sorties PNG 300 dpi et PDF vectoriel reproductibles.
 """
 from __future__ import annotations
@@ -28,6 +28,7 @@ def _css_vars(selector_line: str) -> dict:
     return dict(re.findall(r"--(\w+):(#[0-9a-fA-F]{6})", selector_line))
 
 
+@pytest.mark.skipif(not MAQUETTE.exists(), reason="maquette de travail non livrée avec le code")
 def test_palette_matches_validated_maquette():
     lines = MAQUETTE.read_text(encoding="utf-8").splitlines()
     root = _css_vars(next(l for l in lines if l.startswith(":root{")))
@@ -58,7 +59,7 @@ def test_french_number_formats():
 
 
 def test_error_format_is_scientific_below_1e_4():
-    # réponse Q5 (P5b) : écarts-types et demi-largeurs sous 10^-4 en scientifique, 2 chiffres
+    # convention du projet : écarts-types et demi-largeurs sous 10^-4 en scientifique, 2 chiffres
     assert ps.fmt_err(4.2e-7) == "4,2 × 10⁻⁷"
     assert ps.fmt_err(2.4672e-07) == "2,5 × 10⁻⁷"
     assert ps.fmt_err(9.96e-5) == "1,0 × 10⁻⁴"

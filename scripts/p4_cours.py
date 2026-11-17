@@ -1,4 +1,4 @@
-"""Exercices du cours reproduits (P4, étape 1) : slides 77 et 78 de PricingMonteCarlo_2026.
+"""Exercices du cours reproduits : slides 77 et 78 de PricingMonteCarlo_2026.
 
 Slide 77 (variable de contrôle, asiatique) : S0 = 50, T = 1/4, σ = 20 %, r = 3 %, q = 0, fixing
 journalier, call et put sur moyenne arithmétique, contrôle = option sur moyenne géométrique,
@@ -18,7 +18,7 @@ K ∈ {30, 40, 50, 60, 70}. Lignes du slide : Price Exact, Price MC, Price Ctr. 
 Slide 78 (variables antithétiques, européen) : S0 = 100, T = 1, σ = 30 %, r = 5 %, q = 7 %,
 N ∈ {1 000 ; 10 000 ; 100 000}, K ∈ {90, 100, 110}, call et put. Lignes du slide : Price Exact,
 Price MC, Variance MC, Price Anti., Variance Anti., Correl.
-    S_T simulé en un pas (obs = 1, slide 43 ; décision P2 Q3). MC et antithétique avec la même seed à
+    S_T simulé en un pas (obs = 1, slide 43). MC et antithétique avec la même seed à
     N égal : l'antithétique utilise les N/2 premiers tirages de la MC et leurs opposés.
     « Variance » : deux lectures possibles, les deux sont écrites :
       mc_variance        s² des N payoffs actualisés (variance empirique en 1/(N − 1), slide 49)

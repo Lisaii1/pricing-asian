@@ -1,4 +1,4 @@
-"""Cas réel EUR/USD (P5a, étape 3) : cohérence de results/p5_eurusd.csv et p5_eurusd_sensitivity.csv.
+"""Cas réel EUR/USD : cohérence de results/p5_eurusd.csv et p5_eurusd_sensitivity.csv.
 
 Paramètres repris de results/p5_market.csv ; call et put asiatiques, K = S0 et K = forward 1 an,
 T = 1, mensuel, N = 200 000, seed 20261117, contrôle géométrique (β optimal) + antithétique ;
