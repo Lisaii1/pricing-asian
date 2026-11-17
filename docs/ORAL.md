@@ -410,3 +410,13 @@ Peu de choses, et elles sont signalées comme telles dans le code. La formule de
 L'exemple d'acceptation-rejet pour la loi normale, que le cours ne donne pas. L'estimation de β sur
 un échantillon séparé, qui nous a servi à étudier le biais. La limite de la moyenne géométrique quand
 les observations deviennent continues. Tout le reste suit les notations et les formules du cours.
+
+### 20. Sur l'exercice du slide 78, vos prix antithétiques sont au-dessus de la valeur exacte. Pourquoi ?
+
+Avec 100 000 trajectoires, nos prix antithétiques sont entre +1,68 et
++1,83 écart-type au-dessus de la formule, pour le call comme pour le put. La valeur
+exacte reste dans notre intervalle de confiance à 99 %. La cause est dans le tirage : les 50 000
+premières normales de notre graine ont une variance de 1,0105 au lieu de 1. L'antithétique
+annule les écarts sur les moments impairs, pas un écart sur la variance, et une variance un peu forte
+pousse le call et le put vers le haut. Nous avons gardé cette graine : en changer pour mieux tomber
+aurait été de l'ajustement.

@@ -15,6 +15,7 @@ import re
 import subprocess
 import sys
 import tokenize
+import zlib
 from pathlib import Path
 
 import pytest
@@ -233,7 +234,7 @@ def test_template_fields_are_known(out, fields):
 def test_output_is_regenerated_identically(out, rendered):
     text, _used = rendered[out]
     assert (ROOT / out).read_text(encoding="utf-8") == text
-    assert "{{" not in text and "}}" not in text
+    assert "{{" not in text and not pb.PLACEHOLDER.search(text)      # « }} » existe dans le CSS
 
 
 @pytest.mark.parametrize("out", OUTPUTS)
@@ -343,6 +344,26 @@ def test_pdf_text_has_the_names_no_tooling_word_and_the_figures_of_the_html():
     f = pb.fields()
     for name in ("vr_call_T1_ctrl_prix", "fx_spot_call_prix", "ratio_call_K100_T1_4"):
         assert f[name].text in flat, name          # le PDF est bien celui du rapport.html courant
+
+
+@needs_report
+def test_pdf_prints_the_dark_background_and_the_four_figures():
+    """« Fonds imprimés » : chaque page commence par un rectangle plein #030306 de la taille de la
+    page (794 × 1123 px), et le PDF contient les 4 figures retenues (images)."""
+    raw = pb.PDF.read_bytes()
+    pages = 0
+    for m in re.finditer(rb"stream\r?\n", raw):
+        try:
+            data = zlib.decompress(raw[m.end():raw.find(b"endstream", m.end())])
+        except zlib.error:
+            continue
+        if re.match(rb"[^B]*?\.0118 \.0118 \.0235 rg\s+(?:/\w+ gs\s+)?0 0 794 1123 re\s+f\b", data):
+            pages += 1
+    assert pages == 3
+    assert len(re.findall(rb"/Subtype\s*/Image", raw)) == 4
+    html = (ROOT / "rapport/rapport.html").read_text(encoding="utf-8")
+    assert re.findall(r'src="\.\./results/figures/(\w+)\.png"', html) == [
+        "fig1_eventail_eurusd", "fig2_disques_ratio", "fig4_convergence", "fig3_gain_efficacite"]
 
 
 def test_page_count_reader_on_a_minimal_pdf(tmp_path):

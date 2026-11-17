@@ -53,6 +53,7 @@ PDF = ROOT / "rapport" / "Rapport_Pricing_Asiatique.pdf"
 DOCUMENTS = {                                   # fichier produit → gabarit
     "docs/DOSSIER_GROUPE.md": "docs/templates/DOSSIER_GROUPE.md",
     "docs/ORAL.md": "docs/templates/ORAL.md",
+    "rapport/rapport.html": "rapport/rapport_template.html",
 }
 INTERNAL = ("docs/DOSSIER_GROUPE.md",)          # document interne au groupe
 RENDUS = tuple(out for out in DOCUMENTS if out not in INTERNAL)   # rendus au professeur
@@ -486,6 +487,8 @@ def _p4_sensitivities(f: _Fields) -> None:
     f.cell("ratio_put_K120_T025_ic_haut", P4, file, "ratio_ci_high", **at)
     vr = _col(rows, "variance_ratio")
     f.put("grid_n", fmt_int(len(rows)), f"{file} · nombre de lignes")
+    f.put("grid_n_sous", fmt_int(sum(v < 1 for v in _col(rows, "ratio"))),
+          f"{file} · lignes où ratio < 1")
     f.put("grid_ratiovar_min", fmt_int(min(vr)), f"{file} · min de variance_ratio (40 cases)")
     f.put("grid_ratiovar_max", fmt_int(max(vr)), f"{file} · max de variance_ratio (40 cases)")
     f.put("grid_div_se_min", fmt_int(math.sqrt(min(vr))), f"{file} · √(min de variance_ratio)")
