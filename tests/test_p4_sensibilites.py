@@ -121,6 +121,21 @@ def test_beta_bias_csv():
     assert seeds == list(range(SEED, SEED + 500))
 
 
+def test_p4_csv_values_have_no_numpy_repr():
+    """repr(np.float64) écrit « np.float64(…) » (NumPy 2) : aucune cellule ne doit en contenir."""
+    bad = [(p.name, k) for p in sorted(RESULTS.glob("p4_*.csv"))
+           for r in _rows(p.name) for k, v in r.items() if v and v.startswith("np.")]
+    assert bad == []
+
+
+def test_beta_bias_ratios_are_bias_over_spreads():
+    for r in _rows("p4_beta_bias.csv"):
+        sd, ref_se = float(r["sd_of_mean"]), float(r["ref_std_error"])
+        assert float(r["bias_in_sd_of_mean"]) == pytest.approx(float(r["bias"]) / sd, rel=1e-12)
+        assert float(r["bias_in_combined_se"]) == pytest.approx(
+            float(r["bias"]) / math.hypot(sd, ref_se), rel=1e-12)
+
+
 def test_rng_methods_csv():
     rows = _rows("p4_rng_methods.csv")
     assert {r["rng_method"] for r in rows} == set(RNG_METHODS)

@@ -105,7 +105,8 @@ def _write(path: Path, fields, rows) -> None:
         w = csv.DictWriter(f, fieldnames=fields)
         w.writeheader()
         for row in rows:
-            w.writerow({k: (repr(v) if isinstance(v, float) else v) for k, v in row.items()})
+            w.writerow({k: (repr(float(v)) if isinstance(v, float) else v)   # np.float64 -> float
+                        for k, v in row.items()})
 
 
 # --- 1. biais de β --------------------------------------------------------------------------------
