@@ -72,11 +72,12 @@ RERUN = [
 ]
 SCRIPTS = [s for s, *_ in RERUN]
 EXCLUDED_TESTS = ("test_p5_excel.py", "test_p6_build.py", "test_p6_excel_prof.py",
-                  "test_p6_package.py")
+                  "test_p6_package.py", "test_p6_pdf_groupe.py")
 EXCLUDED_PARTS = {"reports", "prompts", "docs", ".venv", ".git", "historique", "__pycache__",
                   ".pytest_cache", "rapport"}
 EXCLUDED_NAMES = {"CLAUDE.md", "AGENTS.md", "pricing_asian_resultats.xlsx", "p5_excel.py",
-                  "p6_build.py", "p6_excel_prof.py", "p6_package.py", *EXCLUDED_TESTS}
+                  "p6_build.py", "p6_excel_prof.py", "p6_package.py", "p6_pdf_groupe.py",
+                  *EXCLUDED_TESTS}
 FORBIDDEN = [re.compile(p.pattern, re.I) for p in pb.FORBIDDEN] + [
     re.compile(r"d[ée]cision de loup", re.I), re.compile(r"agents\.md", re.I),
     re.compile(r"\blots?\s+p\d", re.I), re.compile(r"\bQ[5-9]\b")]

@@ -22,6 +22,8 @@ deux mesures de temps et le biais mesuré sur 500 runs.
 Usage :
     python scripts/p6_build.py            écrit les .md et le .html
     python scripts/p6_build.py --pdf      écrit aussi le PDF (Chrome ou Edge, mode headless)
+    python scripts/p6_build.py --pdf-groupe   écrit aussi les PDF de travail du groupe (docs/pdf/ :
+                                          oral, grille, dossier ; scripts/p6_pdf_groupe.py)
     python scripts/p6_build.py --list     liste les champs utilisés par document, avec leur source
 
 Aucun calcul de prix, aucun appel réseau, aucune dépendance nouvelle.
@@ -68,6 +70,10 @@ HISTORY = [                                     # (fichier de results/historique
 GROUP = ["Zoe HUBERT", "Arthur LOURENCO", "Matthieu DEHNEL", "Pierre DUPLESSIS",
          "Charlotte PONTCHATEAU", "Thomas GALLOIS", "Sacha BEAUQUESNES",   # Loup, 17/11/2026
          "Loup FLORENTIN"]                      # Loup, 17/11/2026, 20:13 ; dernier sur la page
+
+ORATEURS = {                                   # qui parle à chaque partie de l'oral : à remplir par
+    part: "[à attribuer]"                      # le groupe (le champ reste visible d'ici là)
+    for part in ("ouverture", "q1", "q2", "q3", "q4", "eurusd", "plus", "conclusion")}
 
 PLACEHOLDER = re.compile(r"\{\{\s*([A-Za-z0-9_]+)\s*\}\}")
 DECIMAL = re.compile(r"\d+[.,]\d+")
@@ -710,6 +716,8 @@ def _decisions(f: _Fields) -> None:
 
     for i, name in enumerate(GROUP, start=1):
         f.put(f"membre_{i}", name, "noms du groupe donnés par Loup le 17/11/2026 (p6_build.GROUP)")
+    for part, who in ORATEURS.items():
+        f.put(f"orateur_{part}", who, "p6_build.ORATEURS (répartition de l'oral, à remplir)")
 
 
 @functools.lru_cache(maxsize=None)
@@ -870,6 +878,8 @@ def listing() -> str:
 def main(argv=None) -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--pdf", action="store_true", help="produit aussi le PDF du rapport")
+    parser.add_argument("--pdf-groupe", action="store_true",
+                        help="produit aussi les PDF de travail du groupe (docs/pdf/)")
     parser.add_argument("--list", action="store_true", help="liste les champs utilisés")
     parser.add_argument("--all-fields", action="store_true", help="liste tous les champs")
     args = parser.parse_args(argv)
@@ -886,6 +896,10 @@ def main(argv=None) -> None:
     if args.pdf:
         pdf, browser = build_pdf()
         print(f"écrit {pdf.relative_to(ROOT)} · {pdf_page_count(pdf)} pages · navigateur : {browser}")
+    if args.pdf_groupe:
+        import p6_pdf_groupe                    # mise en page des PDF du groupe (aucun calcul)
+        for pdf in p6_pdf_groupe.build_all():
+            print(f"écrit {pdf.relative_to(ROOT)} · {pdf_page_count(pdf)} pages")
 
 
 if __name__ == "__main__":

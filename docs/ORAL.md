@@ -6,40 +6,47 @@ Grille de conformité au sujet, exigence par exigence, avec ce que nous avons fa
 [CONFORMITE.md](CONFORMITE.md).
 
 Ce texte suit les quatre questions du sujet, puis présente le cas réel et ce que nous avons fait en
-plus. Il tient en 8 à 10 minutes. Pour chaque partie : la figure à montrer, les phrases à dire, et le
-chiffre à retenir. Les durées du tableau donnent 9 minutes 55 au total. La seconde moitié du
-document prépare les questions.
+plus. Il tient en 8 à 10 minutes. Pour chaque partie : qui parle, la figure à montrer, les phrases à
+dire (en quelques points, mots-clés en gras), le chiffre à retenir et les questions qui peuvent
+suivre. Les durées du tableau donnent 9 minutes 55 au total. La seconde moitié du document prépare
+les questions, et la dernière section rassemble les 10 chiffres à connaître par cœur.
 
 Tous les chiffres viennent de nos fichiers de résultats. Le prix d'une option est toujours donné avec
 sa marge d'erreur.
 
-| Partie | Durée | Figure |
-|---|---|---|
-| Ouverture | 40 s | aucune |
-| Q1, le pricer | 1 min 40 | figure 1 |
-| Q2, la comparaison avec l'européenne | 1 min 15 | figure 2 |
-| Q3, la réduction de variance | 1 min 50 | figure 5, tableau 1 |
-| Q4, le gain de temps et de précision | 1 min 30 | figures 4 et 3 |
-| Le cas réel EUR/USD | 1 min 40 | figure 6, tableau 2 |
-| Ce qu'on a fait en plus | 1 min | aucune |
-| Conclusion | 20 s | aucune |
+| Partie | Durée | Figure | Qui parle |
+|---|---|---|---|
+| Ouverture | 40 s | aucune | [à attribuer] |
+| Q1, le pricer | 1 min 40 | figure 1 | [à attribuer] |
+| Q2, la comparaison avec l'européenne | 1 min 15 | figure 2 | [à attribuer] |
+| Q3, la réduction de variance | 1 min 50 | figure 5, tableau 1 | [à attribuer] |
+| Q4, le gain de temps et de précision | 1 min 30 | figures 4 et 3 | [à attribuer] |
+| Le cas réel EUR/USD | 1 min 40 | figure 6, tableau 2 | [à attribuer] |
+| Ce qu'on a fait en plus | 1 min | aucune | [à attribuer] |
+| Conclusion | 20 s | aucune | [à attribuer] |
 
 ---
 
 ## Ouverture (40 secondes)
 
+**Qui parle.** [à attribuer]
+
 **Ce qu'on dit.**
 
-« Nous avons traité l'énoncé 2 : le prix d'une option asiatique par Monte-Carlo. Une option asiatique
-paie sur la moyenne des cours relevés pendant la vie de l'option, et non sur le cours final. Nous
-allons répondre aux quatre questions du sujet dans l'ordre : le pricer, la comparaison avec l'option
-européenne, la réduction de variance, puis le gain de temps et de précision. Nous finirons par un cas
-réel : la couverture de change d'un exportateur sur l'EUR/USD. Tout est codé en Python, et tous les
-nombres aléatoires sont fabriqués par nos soins avec les méthodes du cours. »
+- « Nous avons traité l'**énoncé 2** : le prix d'une **option asiatique** par **Monte-Carlo**. Une
+  option asiatique paie sur la **moyenne des cours** relevés pendant la vie de l'option, et non sur le
+  cours final. »
+- « Nous allons répondre aux **quatre questions** du sujet dans l'ordre : le pricer, la comparaison
+  avec l'option européenne, la réduction de variance, puis le gain de temps et de précision. Nous
+  finirons par un **cas réel** : la couverture de change d'un exportateur sur l'**EUR/USD**. »
+- « Tout est codé en **Python**, et tous les nombres aléatoires sont **fabriqués par nos soins** avec
+  les méthodes du cours. »
 
 ---
 
 ## Q1 — Le pricer (1 minute 40)
+
+**Qui parle.** [à attribuer]
 
 **Ce qu'on montre.** La figure 1 : des trajectoires simulées, et à droite la répartition du cours
 final et celle de la moyenne.
@@ -48,35 +55,34 @@ final et celle de la moyenne.
 
 **Ce qu'on dit.**
 
-« Notre pricer est une fonction, `price_asian`. Elle prend les paramètres généraux, S0, K, σ, r, T, q,
-et le paramètre propre à l'asiatique : la fréquence d'observation du cours.
-
-Elle travaille en trois temps. D'abord l'aléa. Nous partons d'un générateur congruentiel linéaire,
-celui de Park-Miller, qui produit des nombres uniformes. Nous les transformons en nombres de loi
-normale par la transformée inverse. Nous avons aussi codé Box-Muller, la méthode polaire et
-l'acceptation-rejet, pour les comparer.
-
-Ensuite les trajectoires. Sous Black-Scholes, le cours se simule sans erreur d'une date d'observation
-à la suivante. Nous ne simulons donc que les dates dont nous avons besoin.
-
-Enfin l'estimateur. Sur chaque trajectoire nous calculons la moyenne des cours, puis le gain de
-l'option, que nous actualisons. Le prix est la moyenne de ces gains. Nous le rendons toujours avec
-son écart-type et son intervalle de confiance à 95 %.
-
-Sur la figure, une trajectoire est en blanc avec ses douze relevés mensuels. À droite, la moyenne est
-moins dispersée que le cours final. C'est toute l'histoire de l'option asiatique.
-
-Comment savons-nous que le pricer est juste ? Nous avons pricé l'option européenne avec le même
-simulateur, et nous l'avons comparée à la formule de Black-Scholes sur 40 cas. La formule tombe
-dans notre intervalle de confiance 40 fois sur 40. »
+- « Notre pricer est **une fonction, `price_asian`**. Elle prend les paramètres généraux, S0, K, σ,
+  r, T, q, et le paramètre propre à l'asiatique : la **fréquence d'observation** du cours. »
+- « Elle travaille en trois temps. D'abord **l'aléa**. Nous partons d'un **générateur congruentiel
+  linéaire**, celui de Park-Miller, qui produit des nombres uniformes. Nous les transformons en
+  nombres de loi normale par la **transformée inverse**. Nous avons aussi codé Box-Muller, la méthode
+  polaire et l'acceptation-rejet, pour les comparer. »
+- « Ensuite **les trajectoires**. Sous Black-Scholes, le cours se simule **sans erreur** d'une date
+  d'observation à la suivante. Nous ne simulons donc que les dates dont nous avons besoin. Enfin
+  **l'estimateur**. Sur chaque trajectoire nous calculons la moyenne des cours, puis le gain de
+  l'option, que nous actualisons. Le prix est la moyenne de ces gains. Nous le rendons toujours avec
+  son **écart-type** et son **intervalle de confiance à 95 %**. »
+- « Sur la figure, une trajectoire est en blanc avec ses douze relevés mensuels. À droite, **la
+  moyenne est moins dispersée que le cours final**. C'est toute l'histoire de l'option asiatique. »
+- « Comment savons-nous que le pricer est juste ? Nous avons pricé l'option européenne avec le même
+  simulateur, et nous l'avons comparée à la **formule de Black-Scholes** sur 40 cas. La formule
+  tombe dans notre intervalle de confiance **40 fois sur 40**. »
 
 **Le chiffre à retenir.** Call asiatique à la monnaie, 1 an, observations mensuelles :
 5,3242 ± 0,0009 (S0 = K = 100, σ = 20 %,
 r = 3 %, q = 1 %, N = 200 000).
 
+**Si on vous demande…** questions 2 et 3, plus bas.
+
 ---
 
 ## Q2 — La comparaison avec l'option européenne (1 minute 15)
+
+**Qui parle.** [à attribuer]
 
 **Ce qu'on montre.** La figure 2 : le prix asiatique divisé par le prix européen, pour 5 strikes et
 4 maturités. Plus le disque est gros, plus l'asiatique est en dessous.
@@ -85,27 +91,29 @@ r = 3 %, q = 1 %, N = 200 000).
 
 **Ce qu'on dit.**
 
-« Nous avons comparé les deux options sur une grille de cinq strikes et quatre maturités, pour le call
-et pour le put. L'asiatique est presque toujours moins chère que l'européenne. À la monnaie, à un an,
-le call asiatique vaut 5,3242 et le call européen 8,8273 : l'asiatique vaut
-0,60 fois l'européenne.
-
-Deux effets se lisent sur la figure. Le premier : l'écart grandit avec la maturité. Le ratio passe de
-0,72 à trois mois à 0,58 à deux ans. Le second : l'écart est
-beaucoup plus fort hors de la monnaie. Pour le call de strike 120, le ratio tombe à
-0,20. Pour finir dans la monnaie, il ne suffit pas que le cours final dépasse le
-strike : il faut que la moyenne le dépasse. À l'inverse, pour une option très dans la monnaie, les
-deux prix sont proches : 0,92 au strike 80.
-
-L'explication est la même partout : une moyenne varie moins qu'un cours final. Moins d'incertitude,
-donc moins de valeur pour l'option. »
+- « Nous avons comparé les deux options sur une grille de **cinq strikes et quatre maturités**, pour
+  le call et pour le put. L'asiatique est **presque toujours moins chère** que l'européenne. À la
+  monnaie, à un an, le call asiatique vaut 5,3242 et le call européen
+  8,8273 : l'asiatique vaut **0,60 fois l'européenne**. »
+- « Deux effets se lisent sur la figure. Le premier : **l'écart grandit avec la maturité**. Le ratio
+  passe de 0,72 à trois mois à 0,58 à deux ans. »
+- « Le second : l'écart est **beaucoup plus fort hors de la monnaie**. Pour le call de strike 120, le
+  ratio tombe à 0,20. Pour finir dans la monnaie, il ne suffit pas que le cours
+  final dépasse le strike : **il faut que la moyenne le dépasse**. À l'inverse, pour une option très
+  dans la monnaie, les deux prix sont proches : 0,92 au strike 80. »
+- « L'explication est la même partout : **une moyenne varie moins qu'un cours final**. Moins
+  d'incertitude, donc moins de valeur pour l'option. »
 
 **Le chiffre à retenir.** À la monnaie, à 1 an, l'asiatique vaut 0,60 fois
 l'européenne : 40 % de moins.
 
+**Si on vous demande…** questions 8 et 9, plus bas.
+
 ---
 
 ## Q3 — La réduction de variance (1 minute 50)
+
+**Qui parle.** [à attribuer]
 
 **Ce qu'on montre.** La figure 5 (chaque point est une trajectoire : gain géométrique en abscisse,
 gain arithmétique en ordonnée), puis le tableau 1.
@@ -116,36 +124,36 @@ gain arithmétique en ordonnée), puis le tableau 1.
 
 **Ce qu'on dit.**
 
-« Le sujet demande une variable de contrôle : l'option sur moyenne géométrique. La moyenne
-géométrique ressemble beaucoup à la moyenne arithmétique, et l'option sur moyenne géométrique
-a un prix exact, par formule fermée. Sur chaque trajectoire, nous calculons donc les deux gains. Nous
-savons de combien notre simulation se trompe sur l'option géométrique, puisque nous connaissons son
-vrai prix. Nous utilisons cette erreur pour corriger le prix de l'option arithmétique.
-
-La figure montre pourquoi cela marche si bien : les deux gains sont presque alignés. Leur corrélation
-vaut 0,9996.
-
-Le coefficient de correction, β, est celui du cours : la covariance divisée par la variance. Nous
-l'estimons sur l'échantillon, ce qui fait mieux que le fixer à 1 : la variance est divisée par 1 384 au lieu de
-630.
-
-Le tableau résume cinq estimateurs sur le même cas. Tous donnent le même prix, à leur marge d'erreur
-près. Mais la marge passe de 0,0350 sans réduction à 0,0009 avec le
-contrôle, pour le même nombre de trajectoires.
-
-Nous avons aussi testé les variables antithétiques du cours. Seules, elles divisent la variance par
-un peu moins de deux. Ajoutées au contrôle, elles n'améliorent presque plus la variance. Nous ne
-l'attendions pas. L'explication : une fois le contrôle appliqué, ce qui
-reste du gain est presque le même pour une trajectoire et pour sa jumelle. En revanche la combinaison
-demande deux fois moins de nombres aléatoires. Elle gagne donc du temps. »
+- « Le sujet demande une **variable de contrôle** : l'option sur **moyenne géométrique**. La moyenne
+  géométrique ressemble beaucoup à la moyenne arithmétique, et l'option sur moyenne géométrique a un
+  **prix exact, par formule fermée**. Sur chaque trajectoire, nous calculons donc les deux gains. Nous
+  savons de combien notre simulation se trompe sur l'option géométrique, puisque nous connaissons son
+  vrai prix. Nous utilisons **cette erreur pour corriger** le prix de l'option arithmétique. »
+- « La figure montre pourquoi cela marche si bien : les deux gains sont **presque alignés**. Leur
+  corrélation vaut **0,9996**. »
+- « Le coefficient de correction, **β**, est celui du cours : la **covariance divisée par la
+  variance**. Nous l'estimons sur l'échantillon, ce qui fait mieux que le fixer à 1 : la variance est
+  divisée par **1 384** au lieu de 630. »
+- « Le tableau résume **cinq estimateurs** sur le même cas. Tous donnent le même prix, à leur marge
+  d'erreur près. Mais la marge passe de 0,0350 sans réduction à
+  **0,0009** avec le contrôle, pour le même nombre de trajectoires. »
+- « Nous avons aussi testé les **variables antithétiques** du cours. Seules, elles divisent la
+  variance par un peu moins de deux. Ajoutées au contrôle, elles **n'améliorent presque plus la
+  variance**. Nous ne l'attendions pas. L'explication : une fois le contrôle appliqué, ce qui reste du
+  gain est presque le même pour une trajectoire et pour sa jumelle. En revanche la combinaison demande
+  **deux fois moins de nombres aléatoires**. Elle gagne donc du temps. »
 
 **Le chiffre à retenir.** Avec la variable de contrôle géométrique, la variance est divisée par
 1 384 (call, 1 an), et par 667 à 5 359 selon la
 maturité.
 
+**Si on vous demande…** questions 5 et 7, plus bas.
+
 ---
 
 ## Q4 — Le gain de temps et de précision (1 minute 30)
+
+**Qui parle.** [à attribuer]
 
 **Ce qu'on montre.** La figure 4 (marge d'erreur en fonction du nombre de trajectoires), puis la
 figure 3 (gain d'efficacité par méthode).
@@ -156,31 +164,33 @@ figure 3 (gain d'efficacité par méthode).
 
 **Ce qu'on dit.**
 
-« Nous avons mesuré la précision de deux façons. La première : la marge d'erreur en fonction du
-nombre de trajectoires. En échelles logarithmiques, nous obtenons quatre droites parallèles, de pente
-−0,50. C'est le théorème central limite : l'erreur diminue comme un sur racine de N,
-quelle que soit la méthode. La réduction de variance ne change pas la pente. Elle abaisse la droite.
-
-Concrètement, pour connaître le prix à plus ou moins 0,01, il faut 2 447 439
-trajectoires sans réduction de variance. Avec le contrôle, il en faut 1 748.
-
-La seconde façon tient compte du temps de calcul. Nous définissons l'efficacité comme la variance
-multipliée par le temps. Le contrôle coûte un peu plus cher par trajectoire, mais il gagne environ un
-facteur 1 400 en efficacité. Avec les antithétiques en plus, environ
-2 400. Nous donnons ces gains à l'ordre de grandeur, parce qu'un temps de
-calcul dépend de la machine : entre deux mesures, le même gain a varié de −15 % à
-+37 %.
-
-À temps égal, le résultat est le même. En 8 secondes, la marge d'erreur est de
-0,0075 sans réduction. Avec le contrôle et les antithétiques, elle est environ
-49 fois plus petite. »
+- « Nous avons mesuré la précision de deux façons. La première : la **marge d'erreur en fonction du
+  nombre de trajectoires**. En échelles logarithmiques, nous obtenons **quatre droites parallèles, de
+  pente −0,50**. C'est le **théorème central limite** : l'erreur diminue comme un sur racine
+  de N, quelle que soit la méthode. La réduction de variance ne change pas la pente. Elle **abaisse la
+  droite**. »
+- « Concrètement, pour connaître le prix à plus ou moins 0,01, il faut **2 447 439**
+  trajectoires sans réduction de variance. Avec le contrôle, il en faut **1 748**. »
+- « La seconde façon tient compte du **temps de calcul**. Nous définissons l'**efficacité** comme la
+  variance multipliée par le temps. Le contrôle coûte un peu plus cher par trajectoire, mais il gagne
+  **environ un facteur 1 400** en efficacité. Avec les antithétiques en plus,
+  environ 2 400. Nous donnons ces gains à l'**ordre de grandeur**, parce
+  qu'un temps de calcul dépend de la machine : entre deux mesures, le même gain a varié de
+  −15 % à +37 %. »
+- « **À temps égal**, le résultat est le même. En 8 secondes, la marge d'erreur est de
+  0,0075 sans réduction. Avec le contrôle et les antithétiques, elle est **environ
+  49 fois plus petite**. »
 
 **Le chiffre à retenir.** Pour une marge de ±0,01 : 2 447 439 trajectoires sans
 réduction, 1 748 avec le contrôle. Environ 1 400 fois moins.
 
+**Si on vous demande…** questions 11 et 13, plus bas.
+
 ---
 
 ## Le cas réel : EUR/USD (1 minute 40)
+
+**Qui parle.** [à attribuer]
 
 **Ce qu'on montre.** La figure 6 (prix selon la volatilité), puis le tableau 2.
 
@@ -190,62 +200,71 @@ réduction, 1 748 avec le contrôle. Environ 1 400 fois moins.
 
 **Ce qu'on dit.**
 
-« Après la validation sur un actif théorique, nous passons à un actif réel : le taux de change
-EUR/USD. Nous l'avons choisi parce que l'option asiatique y a un usage concret. Un exportateur français encaisse des dollars chaque mois pendant un an. Ce qui compte pour
-lui, c'est le taux de change moyen de l'année, pas celui d'un jour donné. Il se couvre donc avec un
-call asiatique sur l'EUR/USD, avec douze observations mensuelles.
-
-Pour le change, le modèle de Black-Scholes garde la même forme : le taux d'intérêt en dollars joue le
-rôle de r, le taux en euros celui du dividende q. Nous avons calibré le modèle sur des données
-officielles du 17 novembre 2026 : le fixing de la BCE pour le cours, 1,0989 ; un an de fixings pour
-la volatilité, 5,56 % ; le Trésor américain pour le taux dollar, 4,57 % ; la courbe de
-la BCE pour le taux euro, 2,99 %.
-
-Le call asiatique à la monnaie vaut 0,0193 dollar par euro, soit 1,76 %
-du cours. Le call européen équivalent vaut 2,98 %. Pour un million de dollars
-encaissé chaque mois, la prime de l'option asiatique est d'environ 191 979 euros.
-
-Nous ne connaissons pas la volatilité future. Nous donnons donc le prix pour des volatilités de
-4 % à 8 % : le call asiatique coûte entre 1,41 % et
-2,32 % du cours. »
+- « Après la validation sur un actif théorique, nous passons à un **actif réel** : le taux de change
+  **EUR/USD**. Nous l'avons choisi parce que l'option asiatique y a un usage concret. Un
+  **exportateur français** encaisse des dollars chaque mois pendant un an. Ce qui compte pour lui,
+  c'est le **taux de change moyen** de l'année, pas celui d'un jour donné. Il se couvre donc avec un
+  **call asiatique** sur l'EUR/USD, avec douze observations mensuelles. »
+- « Pour le change, le modèle de Black-Scholes garde la même forme : le **taux d'intérêt en dollars
+  joue le rôle de r**, le **taux en euros celui du dividende q**. Nous avons calibré le modèle sur des
+  **données officielles** du 17 novembre 2026 : le fixing de la BCE pour le cours, 1,0989 ; un an de
+  fixings pour la volatilité, 5,56 % ; le Trésor américain pour le taux dollar,
+  4,57 % ; la courbe de la BCE pour le taux euro, 2,99 %. »
+- « Le call asiatique à la monnaie vaut **0,0193 dollar par euro**, soit
+  **1,76 % du cours**. Le call européen équivalent vaut 2,98 %. Pour un
+  million de dollars encaissé chaque mois, la prime de l'option asiatique est d'environ
+  191 979 euros. »
+- « Nous ne connaissons pas la **volatilité future**. Nous donnons donc le prix pour des volatilités
+  de 4 % à 8 % : le call asiatique coûte entre 1,41 %
+  et 2,32 % du cours. »
 
 **Le chiffre à retenir.** Call asiatique EUR/USD à la monnaie, 1 an : 0,0193 USD par
 euro, soit 1,76 % du cours, contre 2,98 % pour l'européen.
 
+**Si on vous demande…** questions 10 et 16, plus bas.
+
 ---
 
 ## Ce qu'on a fait en plus, en 1 minute
+
+**Qui parle.** [à attribuer]
 
 **Ce qu'on montre.** Rien de nouveau : on reste sur le tableau 2. La liste complète, avec la preuve
 de chaque point, est dans la partie B de la grille de conformité ([CONFORMITE.md](CONFORMITE.md)).
 
 **Ce qu'on dit.**
 
-« Au-delà des quatre questions, voici ce que nous avons ajouté. Pour l'aléa, nous avons codé les cinq
-façons du cours de fabriquer une loi normale : dans le pricer, elles donnent le même prix, à moins de
-1,07 écart-type. Pour la réduction de variance, nous avons comparé trois façons de
-choisir β et cherché le biais de son estimation, sans le détecter sur 2 000 répétitions.
-Nous avons refait les exercices du cours : la valeur de référence est dans notre intervalle à 99 %
-dans 56 cas sur 56. Nous avons calculé les sensibilités du prix, et vérifié
-la convention de chaque taux de marché à sa source. Enfin, tout est reproductible : même graine,
-même prix au bit près, et plusieurs centaines de tests automatiques.
-
-En codant les formules, nous avons aussi relevé six coquilles dans les slides. Nous les tenons à
-votre disposition. »
+- « Au-delà des quatre questions, voici ce que nous avons ajouté. Pour **l'aléa**, nous avons codé
+  les **cinq façons du cours** de fabriquer une loi normale : dans le pricer, elles donnent le même
+  prix, à moins de 1,07 écart-type. »
+- « Pour la réduction de variance, nous avons comparé **trois façons de choisir β** et cherché le
+  **biais** de son estimation, sans le détecter sur 2 000 répétitions. Nous avons refait les
+  **exercices du cours** : la valeur de référence est dans notre intervalle à 99 % dans
+  **56 cas sur 56**. »
+- « Nous avons calculé les **sensibilités** du prix, et vérifié la **convention de chaque taux** de
+  marché à sa source. Enfin, tout est **reproductible** : même graine, même prix au bit près, et
+  plusieurs centaines de tests automatiques. »
+- « En codant les formules, nous avons aussi relevé **six coquilles** dans les slides. Nous les tenons
+  à votre disposition. »
 
 **Le chiffre à retenir.** 56 sur 56 : nos intervalles de confiance contiennent
 la valeur de référence dans tous les cas des exercices du cours.
+
+**Si on vous demande…** questions 18 et 19, plus bas.
 
 ---
 
 ## Conclusion (20 secondes)
 
+**Qui parle.** [à attribuer]
+
 **Ce qu'on dit.**
 
-« Pour résumer : l'option asiatique vaut environ 0,60 fois l'européenne à la monnaie.
-La variable de contrôle géométrique divise la variance par plus de mille. Et il faut environ
-1 400 fois moins de trajectoires pour la même précision. Nous vous remercions et
-nous sommes prêts pour vos questions. »
+- « Pour résumer : l'option asiatique vaut environ **0,60 fois l'européenne** à la
+  monnaie. »
+- « La variable de contrôle géométrique **divise la variance par plus de mille**. Et il faut environ
+  **1 400 fois moins de trajectoires** pour la même précision. »
+- « Nous vous remercions et nous sommes prêts pour vos questions. »
 
 ---
 
@@ -425,3 +444,21 @@ premières normales de notre graine ont une variance de 1,0105 au lieu de 1. L'a
 annule les écarts sur les moments impairs, pas un écart sur la variance, et une variance un peu forte
 pousse le call et le put vers le haut. Nous avons gardé cette graine : en changer pour mieux tomber
 aurait été de l'ajustement.
+
+
+---
+
+## Les 10 chiffres à connaître par cœur
+
+| Chiffre | Ce qu'il veut dire | D'où il vient |
+|---|---|---|
+| 5,3242 ± 0,0009 | prix du call asiatique à la monnaie, 1 an, avec le contrôle (IC à 95 %, N = 200 000, graine 20261117) | Q1 ; rapport, tableau 1 (`p3_vr_atm.csv`) |
+| 40 sur 40 | la formule de Black-Scholes tombe dans l'intervalle de confiance de notre européenne simulée | Q1 ; `p2_grid.csv` |
+| 0,60 | asiatique / européenne, call à la monnaie, 1 an : 40 % de moins | Q2, figure 2 ; `p4_grid_cv.csv` |
+| 0,9996 | corrélation entre le gain arithmétique et le gain géométrique | Q3, figure 5 ; `p3_vr_atm.csv` |
+| 1 384 | la variance divisée par le contrôle géométrique, β optimal (call, 1 an) ; 630 avec β = 1 | Q3, tableau 1 ; `p3_vr_atm.csv` |
+| −0,50 | pente de la marge d'erreur en échelles logarithmiques : l'erreur baisse comme 1/√N | Q4, figure 4 ; `p4_convergence_slopes.csv` |
+| 2 447 439 et 1 748 | trajectoires pour une marge de ±0,01, sans puis avec le contrôle | Q4 ; `p4_n_required.csv` |
+| environ 1 400 | gain d'efficacité (variance × temps) du contrôle, à l'ordre de grandeur : −15 % à +37 % entre deux mesures du temps | Q4, figure 3 ; `p3_vr_atm.csv` |
+| 0,0193 USD par euro | call asiatique EUR/USD à la monnaie, 1 an : 1,76 % du cours, contre 2,98 % pour l'européen | cas réel, tableau 2 ; `p5_eurusd.csv` |
+| 56 sur 56 | exercices des slides 77 et 78 : la référence est dans notre intervalle à 99 % | en plus ; `p4_ex77.csv`, `p4_ex78.csv` |
