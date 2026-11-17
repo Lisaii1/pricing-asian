@@ -47,7 +47,7 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
 - 17/11/2026, Loup : actif réel = **EUR/USD** (q = taux euro, r = taux dollar), « même si possible que ça
   puisse changer » ; utilisé en P5.
 - 17/11/2026, Loup : actif théorique d'abord pour valider, réel ensuite.
-- 17/11/2026, réponses aux questions P1 (tranchées par Cowork, **à valider par Loup**) :
+- 17/11/2026, réponses aux questions P1 (tranchées par Cowork, validées par Loup le 17/11/2026) :
   - Q1 Hastings : t = √(−2 ln p) est la forme d'Abramowitz-Stegun 26.2.23 ; on la garde. Si le slide dit
     autre chose, c'est une coquille listée avec les autres (slide 9 « c = 0 », slide 23 Marsaglia,
     dénominateur de Hastings).
@@ -58,7 +58,16 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
     normale, monotone en U : l'antithétique U ↔ 1 − U du cours est exact). Les autres méthodes restent un
     paramètre ; leur coût sur le prix est mesuré en P4.
   - Q6 seed de référence du projet : **20261117**.
+- 17/11/2026, réponses aux questions P2 (tranchées par Cowork) :
+  - Q2 nombre d'observations n_obs = f·T : arrondi classique (demi vers le haut), minimum 1, erreur
+    seulement si T ≤ 0.
+  - Q3 en P4, le temps de l'européen est mesuré en un seul pas ; les prix sont comparés sur les mêmes
+    trajectoires.
+  - Q4 `reports/` reste ignoré par git (notes de travail) ; tout chiffre du rendu vient de `results/`
+    (versionné).
+- 17/11/2026, Cowork (P2) : actif théorique = S0 = 100, σ = 0,20, r = 0,03, q = 0,01, observations
+  mensuelles (paramètres de `scripts/p2_grid.py`, repris en P3).
 
 ## État court
-- P1 fait (4 commits). P2 : prompt `prompts/2026-11-17-p2-pricer.md`.
-- Prochain : P3.
+- P1 fait (4 commits). P2 fait (4 commits). P3 : prompt `prompts/2026-11-17-p3-reduction-variance.md`.
+- Prochain : P4.

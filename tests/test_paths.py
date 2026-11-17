@@ -63,10 +63,26 @@ def test_n_obs_invalid_values_raise(bad):
         n_obs_from(bad, 1.0)
 
 
-def test_n_obs_frequency_rounding_to_zero_raises():
-    # quarterly sur T = 0,1 an : round(0,4) = 0 observation → erreur explicite
+@pytest.mark.parametrize("freq,T_,expected", [
+    ("quarterly", 0.125, 1),    # f·T = 0,5 → 1 (l'arrondi au pair de round() donnait 0)
+    ("monthly", 0.125, 2),      # 1,5 → 2
+    ("quarterly", 0.625, 3),    # 2,5 → 3 (l'arrondi au pair donnerait 2)
+    ("monthly", 0.2, 2),        # 2,4 → 2
+    ("monthly", 0.3, 4),        # 3,6 → 4
+    ("quarterly", 0.1, 1),      # 0,4 → 0, ramené au minimum 1
+    ("daily", 0.001, 1),        # 0,252 → 0, ramené au minimum 1
+])
+def test_n_obs_frequency_rounds_half_up_with_minimum_one(freq, T_, expected):
+    """Décision P2-Q2 (17/11/2026) : n_obs = arrondi classique de f·T (demi vers le haut),
+    minimum 1."""
+    assert n_obs_from(freq, T_) == expected
+    assert len(obs_dates(T_, freq)) == expected
+
+
+@pytest.mark.parametrize("bad_T", [0.0, -0.5])
+def test_n_obs_frequency_raises_only_for_non_positive_maturity(bad_T):
     with pytest.raises(ValueError):
-        n_obs_from("quarterly", 0.1)
+        n_obs_from("quarterly", bad_T)
 
 
 @pytest.mark.parametrize("bad_T", [0.0, -1.0, float("nan"), float("inf")])

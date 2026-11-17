@@ -49,14 +49,16 @@ def _check_posint(value, name: str) -> int:
 
 
 def n_obs_from(obs, T) -> int:
-    """Nombre d'observations : entier n ≥ 1, ou fréquence annuelle → round(f·T) (≥ 1)."""
+    """Nombre d'observations : entier n ≥ 1, ou fréquence annuelle f → arrondi de f·T.
+
+    Arrondi classique, demi vers le haut : ⌊f·T + 1/2⌋ (pas le round() de Python, qui arrondit
+    au pair : 0,5 → 0 et 2,5 → 2), avec un minimum de 1 observation. Seul T ≤ 0 est une erreur
+    (décision du 17/11/2026, CLAUDE.md).
+    """
     if isinstance(obs, str):
         if obs not in FREQUENCIES:
             raise ValueError(f"fréquence inconnue {obs!r} ; choix : {sorted(FREQUENCIES)}")
-        n = round(FREQUENCIES[obs] * _check_maturity(T))
-        if n < 1:
-            raise ValueError(f"fréquence {obs!r} sur T = {T} donne {n} observation : il en faut ≥ 1")
-        return int(n)
+        return max(1, math.floor(FREQUENCIES[obs] * _check_maturity(T) + 0.5))
     return _check_posint(obs, "n_obs")
 
 
