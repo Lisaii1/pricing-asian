@@ -80,8 +80,8 @@ def test_optimal_beta_matches_direct_computation(case, option):
     # variance résiduelle = différence de sommes ≈ 10³ fois plus grandes : 1e−7 relatif suffit
     assert res.std_error == pytest.approx(resid.std(ddof=1) / math.sqrt(n), rel=1e-7)
     assert res.std_error_no_control == pytest.approx(Y.std(ddof=1) / math.sqrt(n), rel=1e-10)
-    assert res.ci_low == res.price - 1.96 * res.std_error
-    assert res.ci_high == res.price + 1.96 * res.std_error
+    assert res.ci_low == res.price - res.z * res.std_error
+    assert res.ci_high == res.price + res.z * res.std_error
     assert res.n_uniforms == n * res.n_obs                     # pas de pilote
 
 

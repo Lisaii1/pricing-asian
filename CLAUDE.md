@@ -66,8 +66,32 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
   - Q4 `reports/` reste ignoré par git (notes de travail) ; tout chiffre du rendu vient de `results/`
     (versionné).
 - 17/11/2026, Cowork (P2) : actif théorique = S0 = 100, σ = 0,20, r = 0,03, q = 0,01, observations
-  mensuelles (paramètres de `scripts/p2_grid.py`, repris en P3).
+  mensuelles (paramètres de `scripts/p2_grid.py`, repris en P3). Sa dérive logarithmique
+  r − q − σ²/2 = 0,03 − 0,01 − 0,02 est **nulle** (relevé de P3) : les tests de signe de dérive
+  utilisent un autre jeu (r = 0,05).
+- 17/11/2026, réponses aux questions P3 (tranchées par Cowork, validées par Loup) :
+  - Q1 slide 76 : voir coquilles 5 et 6 ci-dessous ; notre formule σ_G² est équivalente.
+  - Q2 la combinaison antithétique + contrôle se présente telle qu'elle est mesurée : gain d'efficacité
+    (moitié moins de normales), pas de gain de variance garanti sur le contrôle seul ; P4 compare à N égal
+    ET à temps égal.
+  - Q3 β « optimal » (slide 50) reste le défaut et sert aux chiffres du rapport ; son biais est mesuré en P4.
+  - Q4 n_paths hors pilote, n_pilot = 10 000 : validé.
+  - Q5 tableaux des slides 77 et 78 reproduits, avec IC à 99 % là où le slide le demande.
+  - Q6 corrélation h(Z)/h(−Z) dans MCResult (`antithetic_corr`).
+  - Q7 ligne « actif théorique » gardée (dérive nulle notée ci-dessus).
+- 17/11/2026, P4 : IC au niveau `confidence` (défaut 0,95), z = Φ^{-1}((1 + c)/2) calculé par l'inverse
+  AS241 du projet (z(0,95) = 1,959964 au lieu du 1,96 arrondi du cours).
+
+## Coquilles du cours relevées (citées au rapport final)
+1. Slide 9 : « c = 0 ».
+2. Slide 23 (Marsaglia polaire) : « V = −2U − 1 », lire V = 2U − 1.
+3. Slide 24 (Hastings) : dénominateur imprimé « d1 + d2 t² + d3 t³ », lire 1 + d1 t + d2 t² + d3 t³.
+4. Slide 24 (Hastings) : t lu « −log(min(U, 1 − U)) », lire t = √(−2 ln p) (Abramowitz-Stegun 26.2.23).
+5. Slide 76 : « T = (1/n) Σ S(t_j) », lire T̄ = (1/n) Σ t_j.
+6. Slide 76 : σ̄² = σ²/(n²T̄)·Σ(2i − 1)t_{n+1−j} mélange i et j (lire i partout) ; équivalente à la nôtre
+   (Σ_iΣ_j min(t_i, t_j) = Σ_j (2j − 1)t_{n+1−j}), δ = σ²/2 − σ̄²/2 ; le slide est écrit sans q.
 
 ## État court
-- P1 fait (4 commits). P2 fait (4 commits). P3 : prompt `prompts/2026-11-17-p3-reduction-variance.md`.
-- Prochain : P4.
+- P1 fait (4 commits). P2 fait (4 commits). P3 fait (4 commits). P4 : prompt
+  `prompts/2026-11-17-p4-analyse.md`.
+- Prochain : P5.

@@ -42,7 +42,7 @@ def test_result_fields_and_ci():
     assert res.std_error > 0.0
     assert res.ci_low == res.price - Z_95 * res.std_error
     assert res.ci_high == res.price + Z_95 * res.std_error
-    assert Z_95 == 1.96
+    assert Z_95 == pytest.approx(1.959964, abs=1e-6)   # z calculé par AS241 (P4)
     assert res.n_uniforms == 10_000 * 12      # inverse : 1 uniforme par normale
 
 

@@ -182,8 +182,8 @@ def test_std_error_is_computed_on_pair_means(case, option):
     pm = 0.5 * (Y[0::2] + Y[1::2])
     assert res.price == pytest.approx(Y.mean(), rel=1e-12)
     assert res.std_error == pytest.approx(pm.std(ddof=1) / math.sqrt(n / 2), rel=1e-10)
-    assert res.ci_low == res.price - 1.96 * res.std_error
-    assert res.ci_high == res.price + 1.96 * res.std_error
+    assert res.ci_low == res.price - res.z * res.std_error
+    assert res.ci_high == res.price + res.z * res.std_error
 
 
 @pytest.mark.parametrize("case", MC_CASES)
