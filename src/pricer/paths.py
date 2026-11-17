@@ -29,6 +29,9 @@ from pricer.normals import METHODS, normals
 from pricer.rng import LCG
 
 FREQUENCIES = {"daily": 252, "weekly": 52, "monthly": 12, "quarterly": 4}
+# Méthodes de normales du flux : celles de pricer.normals, plus la transformée inverse avec
+# Φ^{-1} de Hastings (slide 24 ; normals(..., precision="hastings")), pour comparer en P4.
+RNG_METHODS = METHODS + ("inverse_hastings",)
 DEFAULT_BATCH = 50_000
 _PAIR_METHODS = ("box_muller", "polar")   # produisent les normales deux par deux
 
@@ -78,11 +81,12 @@ class NormalStream:
     polaire) tirent toujours un nombre pair de normales et gardent le reste en réserve :
     aucune normale n'est jetée, donc la concaténation des take(...) est exactement
     normals(total, method, seed).z, quel que soit le découpage (testé).
+    method = "inverse_hastings" : normals(..., "inverse", precision="hastings").
     """
 
     def __init__(self, seed, method: str = "inverse"):
-        if method not in METHODS:
-            raise ValueError(f"rng_method inconnue {method!r} ; choix : {METHODS}")
+        if method not in RNG_METHODS:
+            raise ValueError(f"rng_method inconnue {method!r} ; choix : {RNG_METHODS}")
         if seed is None:
             raise ValueError("seed obligatoire (aucun aléa implicite)")
         self.seed = seed
@@ -103,7 +107,10 @@ class NormalStream:
             need = n - self._buf.size
             if self.method in _PAIR_METHODS and need % 2:
                 need += 1
-            z = normals(need, self.method, lcg=self.lcg).z
+            if self.method == "inverse_hastings":
+                z = normals(need, "inverse", lcg=self.lcg, precision="hastings").z
+            else:
+                z = normals(need, self.method, lcg=self.lcg).z
             full = np.concatenate((self._buf, z))
             out, self._buf = full[:n], full[n:]
         self.n_normals += n

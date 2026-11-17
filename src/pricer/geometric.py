@@ -16,7 +16,9 @@ C'est la formule de Black-Scholes d'un MBG de volatilité σ̄ et de dérive r �
 (lecture du slide 76 : σ̄² = σ_G²/t̄, δ = σ²/2 − σ̄²/2 ; égalité testée).
 
 Dates t_k = kT/n : t̄ = T(n+1)/(2n) et σ_G² = σ²·T(n+1)(2n+1)/(6n²) (testé contre la forme
-générale). Limite n → ∞ : σ_G² → σ²T/3 (Kemna-Vorst continu, hors cours).
+générale). Limite n → ∞ : σ_G² → σ²T/3 et t̄ → T/2 (Kemna-Vorst continu, hors cours) :
+geometric_asian_continuous_price, même formule avec μ_G = ln S0 + (r − q − σ²/2)·T/2 et
+σ_G² = σ²T/3 ; l'écart à la formule discrète décroît en O(1/n) (testé).
 S0 compté dans la moyenne (include_s0) : une date t = 0 de plus, n augmente de 1.
 Cas σ_G = 0 (hors cours) : limite déterministe e^{−rT}·max(±(e^{μ_G} − K), 0).
 """
@@ -81,3 +83,32 @@ def geometric_asian_price(S0, K, sigma, r, T, q=0.0, option: str = "call", obs="
     if option == "call":
         return disc * (fwd * norm_cdf(d1) - K * norm_cdf(d2))
     return disc * (K * norm_cdf(-d2) - fwd * norm_cdf(-d1))
+
+
+def _lognormal_option(mu: float, var: float, K: float, disc: float, option: str) -> float:
+    """e^{−rT}·E[(±(G − K))^+] pour ln G ~ N(mu, var)."""
+    sig_g = math.sqrt(var)
+    if sig_g == 0.0:
+        intrinsic = math.exp(mu) - K
+        return disc * (max(intrinsic, 0.0) if option == "call" else max(-intrinsic, 0.0))
+    fwd = math.exp(mu + 0.5 * var)
+    d2 = (mu - math.log(K)) / sig_g
+    d1 = d2 + sig_g
+    if option == "call":
+        return disc * (fwd * norm_cdf(d1) - K * norm_cdf(d2))
+    return disc * (K * norm_cdf(-d2) - fwd * norm_cdf(-d1))
+
+
+def geometric_asian_continuous_price(S0, K, sigma, r, T, q=0.0, option: str = "call") -> float:
+    """Asiatique géométrique à moyenne continue sur [0, T] (hors cours, Kemna-Vorst 1990) :
+    ln G ~ N(ln S0 + (r − q − σ²/2)·T/2, σ²T/3). Limite n → ∞ de geometric_asian_price."""
+    if option not in OPTIONS:
+        raise ValueError(f"option inconnue {option!r} ; choix : {OPTIONS}")
+    K = float(K)
+    if not (math.isfinite(K) and K > 0.0):
+        raise ValueError(f"K doit être > 0, reçu {K!r}")
+    T = _check_maturity(T)
+    S0, sigma, r, q = _check_model(S0, sigma, r, q)
+    mu = math.log(S0) + (r - q - 0.5 * sigma * sigma) * T / 2.0
+    var = sigma * sigma * T / 3.0
+    return _lognormal_option(mu, var, K, math.exp(-r * T), option)
