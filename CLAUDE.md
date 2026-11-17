@@ -151,6 +151,20 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
   `.venv\Scripts\python.exe -m pytest` : l'interpréteur `python` du système (Anaconda, NumPy 1.26)
   fait échouer deux tests bit à bit.
 
+- 17/11/2026, Loup (20:13) : nom pour la page de garde « Loup FLORENTIN » (8e de `p6_build.GROUP`) ;
+  paquet de rendu option B (code + PDF + annexes : tests, CSV, figures, classeur professeur).
+- 17/11/2026, Loup (questions de P6c, vers 21:15) :
+  - Les mots interdits présents dans du code exécutable (libellés de `p5_fetch.py`, `p5_market.py`
+    et de son CSV, étiquette « P3 » de la figure 5, 4 noms dans les tests) sont reformulés dans le
+    dépôt : 20 changements de libellé ou de nom, valeurs inchangées (AST identique hors ces
+    libellés) ; la ligne `q_eur_ln1py_prompt` de `p5_market.csv` s'appelle `q_eur_ln1py_variante`.
+  - `code/` du paquet est autonome : il contient aussi `data/raw/` et `results/` aux chemins lus
+    par le code (copies de `donnees/` et `resultats/`).
+- 17/11/2026, P6c : figures du mode rendu `results/figures/rendu/` (`p5_figures.py --rendu`) pour
+  le rapport, l'oral, le classeur professeur et le paquet ; `results/figures/` reste pour le dossier.
+  Tests : lancer avec `.venv\Scripts\python.exe -m pytest` ; un autre interpréteur est arrêté par le
+  garde-fou de version (`tests/conftest.py`).
+
 ## Coquilles du cours relevées (citées au rapport final)
 1. Slide 9 : « c = 0 ».
 2. Slide 23 (Marsaglia polaire) : « V = −2U − 1 », lire V = 2U − 1.
@@ -169,4 +183,8 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
   P6b fait (2 commits) : prompt `prompts/2026-11-17-p6b-conformite.md` ; grille de conformité au sujet
   `docs/CONFORMITE.md` (15 exigences : 11 faites, 4 partielles ; 19 ajouts ; 7 points restants),
   liée en tête du dossier et de l'oral ; section d'oral « Ce qu'on a fait en plus, en 1 minute ».
-- Prochain : relecture de Loup et du groupe, soutenance.
+  P6c fait (4 commits) : prompt `prompts/2026-11-17-p6c-rendu-v2.md` ; rapport final (nom complet,
+  titre en SVG, justification de l'actif théorique, figures du mode rendu), classeur professeur
+  `results/Resultats_Pricing_Asiatique.xlsx`, paquet `rendu/Projet_Pricing_Asiatique.zip` par
+  `scripts/p6_package.py`, garde-fou de version `tests/conftest.py` ; grille : 12 faites, 3 partielles.
+- Prochain : relecture humaine du paquet, soutenance.
