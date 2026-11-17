@@ -9,6 +9,7 @@ maquette retenue (« nuit profonde »).
 
     docs/ORAL.md            →  docs/pdf/Oral_Pricing_Asiatique.pdf
     docs/CONFORMITE.md      →  docs/pdf/Conformite_Pricing_Asiatique.pdf
+    docs/DOSSIER_GROUPE.md  →  docs/pdf/Dossier_Groupe_Pricing_Asiatique.pdf
 
 Les PDF sont des documents de travail du groupe : ils ne vont pas dans le paquet de rendu.
 Usage : python scripts/p6_build.py --pdf-groupe   (régénère d'abord les .md, puis les PDF)
@@ -32,6 +33,8 @@ ORAL_MD = ROOT / "docs" / "ORAL.md"
 ORAL_PDF = PDF_DIR / "Oral_Pricing_Asiatique.pdf"
 CONF_MD = ROOT / "docs" / "CONFORMITE.md"
 CONF_PDF = PDF_DIR / "Conformite_Pricing_Asiatique.pdf"
+DOSSIER_MD = ROOT / "docs" / "DOSSIER_GROUPE.md"
+DOSSIER_PDF = PDF_DIR / "Dossier_Groupe_Pricing_Asiatique.pdf"
 
 
 # --- Markdown → blocs ----------------------------------------------------------------------------
@@ -664,9 +667,113 @@ def conformite_html(md: str, base: Path = CONF_MD.parent) -> str:
     return page(title, "Grille de conformité au sujet", CONF_CSS, "\n".join(out))
 
 
+# --- le dossier du groupe : sommaire cliquable, une étape par page, figures, glossaire --------------
+
+DOSSIER_CSS = """
+.cover .in{padding-top:22mm}
+.cover p{font-size:12px;max-width:176mm}
+.toc{columns:2;column-gap:10mm;margin-top:6mm}
+.toc a{display:block;color:var(--txt);font-size:12px;padding:2px 0;break-inside:avoid}
+.toc a.l2{color:var(--ink);font-weight:650;font-size:13px;margin-top:6px}
+.toc a.l3{padding-left:12px;color:var(--sub)}
+.toc a.l2 span{font-family:var(--mono);color:var(--a1);margin-right:6px}
+.sec{break-before:page;padding:0 13mm}
+.sec h2{font:750 25px var(--sans);margin:4px 0 8px}
+.sec h3{font:700 17px var(--sans);margin:6mm 0 3mm;color:#fff}
+.sec h3.step{break-before:page;margin-top:0;font-size:21px;border-left:3px solid var(--a1);
+  padding-left:10px}
+.sec p,.sec li{font-size:11px;line-height:1.52}
+.sec ul,.sec ol{padding-left:20px}
+.sec li{margin:0 0 3px}
+.sec table{margin:2mm 0 4mm;break-inside:auto}
+.sec td,.sec th{font-size:10px;padding:4px 7px}
+.sec pre code{font-size:10px;line-height:1.4}
+.sec td:first-child{color:var(--ink)}
+.fig{break-inside:avoid;margin:0 0 7mm;border:1px solid var(--hair);border-radius:10px;
+  background:var(--card);padding:9px 13px 4px}
+.fig h3{margin:0 0 3mm;font-size:15px}
+.fig img{max-height:98mm;width:auto;margin:0 auto 3mm}
+.fig li{font-size:11.5px}
+.gloss{display:grid;grid-template-columns:1fr 1fr;gap:3mm 6mm}
+.gloss p{break-inside:avoid;margin:0;border-left:2px solid var(--a2);padding:2px 0 2px 9px}
+.gloss p strong{color:var(--a1)}
+"""
+
+
+def dossier_html(md: str, base: Path = DOSSIER_MD.parent) -> str:
+    ctx = Ctx(base)
+    head, secs = sections(parse(md))
+    title = next(b for b in head if b.kind == "h" and b.level == 1).text
+    paras = [b for b in head if b.kind == "p" and not b.text.startswith("Sommaire")
+             and "](pdf/" not in b.text]
+    ids: dict = {}
+
+    def anchor(text: str) -> str:
+        a = slug(text)
+        n = ids.get(a, 0)
+        ids[a] = n + 1
+        return a if n == 0 else f"{a}-{n}"
+
+    toc, body = [], []
+    for h, blocks in secs:
+        h_id = anchor(h.text)
+        num = re.match(r"(\d+)\.\s+(.*)$", h.text)
+        label = (f"<span>{num.group(1)}</span>{inline(num.group(2), ctx)}" if num
+                 else inline(h.text, ctx))
+        toc.append(f'<a class="l2" href="#{h_id}">{label}</a>')
+        is_steps = h.text.startswith("2.")
+        is_figs = h.text.startswith("4.")
+        is_gloss = "Glossaire" in h.text
+        out = [f'<section class="sec" id="{h_id}"><div class="eyebrow"><span><b>●</b>&nbsp; '
+               f"Dossier du groupe</span><span>{inline(h.text, ctx)}</span></div>"
+               f"<h2>{inline(h.text, ctx)}</h2>"]
+        i = 0
+        while i < len(blocks):
+            b = blocks[i]
+            if b.kind == "h" and b.level == 3:
+                sub_id = anchor(b.text)
+                toc.append(f'<a class="l3" href="#{sub_id}">{inline(b.text, ctx)}</a>')
+                if is_figs:                     # figure ou tableau : titre, image, explications
+                    j = i + 1
+                    group = []
+                    while j < len(blocks) and not (blocks[j].kind == "h" or blocks[j].kind == "hr"):
+                        group.append(blocks[j])
+                        j += 1
+                    out.append(f'<div class="fig" id="{sub_id}"><h3>{inline(b.text, ctx)}</h3>'
+                               + render(group, ctx) + "</div>")
+                    i = j
+                    continue
+                cls = ' class="step"' if is_steps else ""
+                out.append(f'<h3{cls} id="{sub_id}">{inline(b.text, ctx)}</h3>')
+            elif b.kind == "hr":
+                pass
+            else:
+                out.append(render([b], ctx))
+            i += 1
+        html = "\n".join(out) + "</section>"
+        if is_gloss:
+            start = html.index("<p>")
+            end = html.rindex("</p>") + 4
+            html = html[:start] + '<div class="gloss">' + html[start:end] + "</div>" + html[end:]
+        body.append(html)
+
+    cover = (f'<section class="cover">{GLOWS}<div class="in">'
+             '<div class="eyebrow"><span><b>●</b>&nbsp; Dossier du groupe · document interne</span>'
+             "<span>ECE Paris · ING4 Finance</span></div>"
+             f"<h1>{inline(title, ctx)}</h1>"
+             + "".join(f'<p{" class=lead" if k == 0 else ""}>{inline(b.text, ctx)}</p>'
+                       for k, b in enumerate(paras))
+             + '<div class="beam"></div><h3 class="eyebrow" style="margin:4px 0 0">Sommaire '
+             "(cliquable)</h3>"
+             + f'<nav class="toc">{"".join(toc)}</nav></div></section>')
+    return page(title, "Dossier du groupe · document interne", DOSSIER_CSS,
+                cover + "\n" + "\n".join(body))
+
+
 # --- production ------------------------------------------------------------------------------------
 
-DOCS = [(ORAL_MD, ORAL_PDF, oral_html), (CONF_MD, CONF_PDF, conformite_html)]
+DOCS = [(ORAL_MD, ORAL_PDF, oral_html), (CONF_MD, CONF_PDF, conformite_html),
+        (DOSSIER_MD, DOSSIER_PDF, dossier_html)]
 
 
 def build_html(md_path: Path, maker) -> str:

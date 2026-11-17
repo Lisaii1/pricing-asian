@@ -215,3 +215,49 @@ def test_conformite_pdf_landscape_part_a_and_text():
         assert start in flat, r[0]
     assert "Ce qui reste à faire" in flat and "Bilan" in flat
     assert pb.pdf_page_count(pdf) >= 5
+
+
+# --- le dossier du groupe ---------------------------------------------------------------------------
+
+DOSSIER = ROOT / "docs" / "DOSSIER_GROUPE.md"
+
+
+@pytest.fixture(scope="module")
+def dossier_html():
+    return pg.build_html(DOSSIER, pg.dossier_html)
+
+
+def test_dossier_toc_links_every_section_step_and_figure(dossier_html):
+    toc = re.search(r'<nav class="toc">(.*?)</nav>', dossier_html, re.S).group(1)
+    targets = re.findall(r'href="#([^"]+)"', toc)
+    ids = set(re.findall(r'\bid="([^"]+)"', dossier_html))
+    assert targets and set(targets) <= ids
+    md = DOSSIER.read_text(encoding="utf-8")
+    assert len(targets) == len(re.findall(r"^#{2,3} ", md, re.M))       # chaque ## et ###
+    steps = re.findall(r'<h3 class="step" id="[^"]+">(P\d[ab]?)\b', dossier_html)
+    assert steps == ["P1", "P2", "P3", "P4", "P5a", "P5b", "P6"]          # une page chacune
+
+
+def test_dossier_figures_with_their_explanations_and_glossary(dossier_html):
+    figs = re.findall(r'<div class="fig" id="[^"]+">(.*?)</div>', dossier_html, re.S)
+    assert len(figs) == 8                                    # 6 figures et 2 tableaux
+    for f in figs:
+        assert f.count("<img ") == 1 and f.count("<li>") == 2      # « on voit », « ça veut dire »
+        assert "/results/figures/" in f
+    gloss = re.search(r'<div class="gloss">(.*?)</div>', dossier_html, re.S).group(1)
+    assert gloss.count("<p>") == len(re.findall(r"^\*\*", DOSSIER.read_text(encoding="utf-8")
+                                                .split("## 8. Glossaire")[1], re.M)) == 17
+
+
+def test_dossier_pdf_has_clickable_summary_and_its_text():
+    pdf = pg.DOSSIER_PDF
+    raw = pdf.read_bytes()
+    md = DOSSIER.read_text(encoding="utf-8")
+    assert len(re.findall(rb"/Subtype\s*/Link", raw)) >= len(re.findall(r"^#{2,3} ", md, re.M))
+    assert len(re.findall(rb"/Subtype\s*/Image", raw)) >= 8
+    flat = _flat(_pdf_text(pdf))
+    for title in ("En une page", "Les 6 coquilles du cours", "Glossaire", "Carte du dépôt"):
+        assert title in flat, title
+    f = pb.fields()
+    assert _flat(f["vr_call_T1_ctrl_ratio"].text) in flat
+    assert pb.pdf_page_count(pdf) >= 15
