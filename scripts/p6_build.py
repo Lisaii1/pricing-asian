@@ -52,6 +52,7 @@ PDF = ROOT / "rapport" / "Rapport_Pricing_Asiatique.pdf"
 
 DOCUMENTS = {                                   # fichier produit → gabarit
     "docs/DOSSIER_GROUPE.md": "docs/templates/DOSSIER_GROUPE.md",
+    "docs/ORAL.md": "docs/templates/ORAL.md",
 }
 INTERNAL = ("docs/DOSSIER_GROUPE.md",)          # document interne au groupe
 RENDUS = tuple(out for out in DOCUMENTS if out not in INTERNAL)   # rendus au professeur
