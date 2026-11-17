@@ -94,6 +94,17 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
     vérifié par `scan_stream` (P5a, étape 0).
 - 17/11/2026, Loup (15:21) : maquette retenue `docs/maquettes/2026-11-17-maquette-F-nuit-profonde.html`,
   palette Plasma (« Plasma validé pour moi »).
+- 17/11/2026, Loup (questionnaire de Cowork, vers 15:22), actif réel EUR/USD (P5a) :
+  - Série de cours : fixing de référence BCE EUR/USD (`EXR/D.USD.EUR.SP00.A`) en série principale,
+    clôtures Alpha Vantage en contrôle croisé.
+  - Volatilité : historique 1 an (252 derniers fixings BCE, √252) pour le prix central, puis prix pour
+    σ de 4 % à 8 %.
+  - Cas : exportateur français qui encaisse des USD chaque mois pendant 1 an et couvre son taux moyen :
+    call asiatique sur EUR/USD, à la monnaie, 12 observations mensuelles, T = 1.
+  - Taux (Garman-Kohlhagen, q joue le dividende) : r = Trésor américain 1 an, r = ln(1 + y) ;
+    q = BCE courbe AAA spot 1 an, publiée en composition continue (« continuous compounding »,
+    réponse BCE) donc q = y (écart avec le ln(1 + y) du prompt P5a, à confirmer par Loup).
+  - Relevés bruts dans `data/raw/` (octets conservés, `-text`), décrits par `data/raw/MANIFEST.md`.
 
 ## Coquilles du cours relevées (citées au rapport final)
 1. Slide 9 : « c = 0 ».
@@ -105,6 +116,6 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
    (Σ_iΣ_j min(t_i, t_j) = Σ_j (2j − 1)t_{n+1−j}), δ = σ²/2 − σ̄²/2 ; le slide est écrit sans q.
 
 ## État court
-- P1 fait (4 commits). P2 fait (4 commits). P3 fait (4 commits). P4 : prompt
-  `prompts/2026-11-17-p4-analyse.md`.
-- Prochain : P5.
+- P1 fait (4 commits). P2 fait (4 commits). P3 fait (4 commits). P4 fait (6 commits).
+  P5a fait (5 commits) : prompt `prompts/2026-11-17-p5a-eurusd.md`.
+- Prochain : P5b figures et Excel.
