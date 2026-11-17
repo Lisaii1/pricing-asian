@@ -210,6 +210,7 @@ def test_no_result_is_typed_in_the_build_script():
 def test_documents_are_declared_with_their_templates():
     expected = {"docs/DOSSIER_GROUPE.md": "docs/templates/DOSSIER_GROUPE.md",
                 "docs/ORAL.md": "docs/templates/ORAL.md",
+                "docs/CONFORMITE.md": "docs/templates/CONFORMITE.md",
                 "rapport/rapport.html": "rapport/rapport_template.html"}
     assert pb.DOCUMENTS and set(pb.DOCUMENTS.items()) <= set(expected.items())
     assert set(pb.RENDUS) == set(pb.DOCUMENTS) - {"docs/DOSSIER_GROUPE.md"}
@@ -270,6 +271,157 @@ def test_dossier_has_the_sections_asked_for():
                  "Estimateur Monte-Carlo", "IC", "Variable de contrôle", "β", "Antithétique",
                  "Efficacité", "Garman-Kohlhagen", "Forward", "Greeks"):
         assert re.search(rf"^\*\*{re.escape(term)}", text, re.M), term
+
+
+# --- grille de conformité au sujet ---------------------------------------------------------------
+
+CONFORMITE = ROOT / "docs" / "CONFORMITE.md"
+SUBJECT = ROOT / "docs" / "2026-S1_ProjetPricing.pdf"
+STATUSES = ("✅", "⚠️", "❌")
+PARTS = ("A. Ce que le sujet demande", "B. Ce qu'on a fait en plus", "C. Ce qui reste à faire")
+needs_conformite = pytest.mark.skipif("docs/CONFORMITE.md" not in pb.DOCUMENTS, reason="étape 1")
+
+
+def _part(text: str, i: int) -> str:
+    start = re.search(rf"^## {re.escape(PARTS[i])}.*$", text, re.M)
+    assert start, PARTS[i]
+    end = (re.search(rf"^## {re.escape(PARTS[i + 1])}", text[start.end():], re.M)
+           if i + 1 < len(PARTS) else re.search(r"^## ", text[start.end():], re.M))
+    return text[start.end():start.end() + end.start()] if end else text[start.end():]
+
+
+def _table(section: str) -> list[list[str]]:
+    """Lignes des tableaux Markdown d'une section (en-têtes et séparateurs ôtés), cellules
+    nettoyées. Une section peut contenir plusieurs tableaux : chaque ligne suivie d'un séparateur
+    est un en-tête."""
+    rows: list[list[str]] = []
+    for line in section.splitlines():
+        if not line.startswith("|"):
+            continue
+        if re.match(r"\|\s*:?-", line):
+            rows.pop()                          # la ligne précédente était l'en-tête
+            continue
+        rows.append([c.strip() for c in line.strip().strip("|").split("|")])
+    return rows
+
+
+def _quotes(cell: str) -> list[str]:
+    return re.findall(r"«\s*(.+?)\s*»", cell)
+
+
+def _squash(text: str) -> str:
+    """Pour comparer une citation au texte extrait du PDF : sans blancs ni traits d'union (le PDF
+    coupe « Acceptation-Rejet » en fin de ligne)."""
+    return re.sub(r"[\s\-‐]", "", text)
+
+
+@pytest.fixture(scope="module")
+def conformite():
+    return CONFORMITE.read_text(encoding="utf-8")
+
+
+@needs_conformite
+def test_conformite_has_the_three_parts(conformite):
+    for i, title in enumerate(PARTS):
+        assert re.search(rf"^## {re.escape(title)}", conformite, re.M), title
+        assert _part(conformite, i).strip(), title
+
+
+@needs_conformite
+def test_conformite_part_a_one_row_per_requirement_with_one_status(conformite):
+    rows = _table(_part(conformite, 0))
+    assert len(rows) >= 14
+    counts = dict.fromkeys(STATUSES, 0)
+    for row in rows:
+        assert len(row) == 5 and all(row), row[0][:60]
+        assert _quotes(row[0]), row[0][:60]
+        found = [s for s in STATUSES if s in row[1]]
+        assert len(found) == 1, row[1]
+        counts[found[0]] += 1
+    quoted = " ".join(q for row in rows for q in _quotes(row[0]))
+    for must in ("groupes de 7 à 10", "Date limite", "Choix entre", "VBA Excel ou python",
+                 "L’interface du code", "fréquence de constatation", "Générateur congruentiel",
+                 "actifs réels et théoriques", "2 pages maximum", "dynamique Black-Scholes",
+                 "(call et put) asiatique", "mêmes caractéristiques", "variable de contrôle",
+                 "gain de temps/précision"):
+        assert must in quoted, must
+    bilan = re.search(r"Bilan : (\d+) exigences ; (\d+) ✅ faites?, (\d+) ⚠️ partielles?, "
+                      r"(\d+) ❌ non faites?\.", conformite)
+    assert bilan, "ligne « Bilan » absente"
+    assert [int(g) for g in bilan.groups()] == [len(rows), *counts.values()]
+
+
+@needs_conformite
+def test_conformite_quotes_are_word_for_word_in_the_subject(conformite):
+    try:
+        subject = _squash(pb.pdf_text(SUBJECT))
+    except FileNotFoundError:
+        pytest.skip("pdftotext introuvable : texte du sujet non extrait")
+    for row in _table(_part(conformite, 0)):
+        for quote in _quotes(row[0]):
+            for piece in quote.split("[…]"):
+                assert _squash(piece) in subject, piece
+
+
+def test_quote_check_catches_a_paraphrase():
+    try:
+        subject = _squash(pb.pdf_text(SUBJECT))
+    except FileNotFoundError:
+        pytest.skip("pdftotext introuvable")
+    assert _squash("Analyser le gain de temps/précision que vous observez.") in subject
+    assert _squash("Analyser le gain de temps et de précision") not in subject
+
+
+@needs_conformite
+def test_conformite_part_b_rows_are_complete(conformite):
+    rows = _table(_part(conformite, 1))
+    assert len(rows) >= 15
+    for row in rows:
+        assert len(row) == 5 and all(row), row[0][:60]
+        oral = re.sub(r"`[^`]*`", "", row[4])
+        assert len(re.findall(r"[.?!](?=\s|$)", oral)) == 2, row[0]   # deux phrases
+
+
+@needs_conformite
+def test_conformite_part_c_is_a_short_list(conformite):
+    items = re.findall(r"^- ", _part(conformite, 2), re.M)
+    assert 3 <= len(items) <= 10
+
+
+@needs_conformite
+def test_conformite_cites_tests_that_exist(conformite):
+    cited = re.findall(r"(test_\w+\.py)::(test_\w+)", conformite)
+    assert len(cited) >= 25
+    for file, name in cited:
+        source = (ROOT / "tests" / file).read_text(encoding="utf-8")
+        assert re.search(rf"^def {name}\(", source, re.M), f"{file}::{name}"
+
+
+@needs_conformite
+def test_conformite_cites_code_and_files_that_exist(conformite):
+    import importlib
+    names = re.findall(r"`(pricer\.\w+)\.(\w+)`", conformite)
+    assert len(names) >= 10
+    for module, name in names:
+        assert hasattr(importlib.import_module(module), name), f"{module}.{name}"
+    for csv_name in set(re.findall(r"\b(\w+\.csv)\b", conformite)):
+        assert any((d / csv_name).is_file() for d in (RESULTS, RESULTS / "historique",
+                                                     ROOT / "data" / "raw")), csv_name
+
+
+def test_conformite_fields_read_independently(fields):
+    rows = _rows("p4_grid_cv.csv")
+    strikes = sorted({float(r["K"]) for r in rows})
+    maturities = sorted({float(r["T"]) for r in rows})
+    assert fields["grid_strikes"].text == ", ".join(fmt_int(k) for k in strikes)
+    assert fields["grid_maturites"].text == " ; ".join(pb.plain(t) for t in maturities)
+    assert fields["grid_n_strikes"].text == str(len(strikes))
+    assert fields["grid_n_maturites"].text == str(len(maturities))
+    assert fields["n_membres"].text == str(len(NAMES) + 1)          # les 7 noms et Loup
+    crn = _one("p4_greeks.csv", kind="asian", option="call", K=100, crn="True", control="geometric")
+    sans = _one("p4_greeks.csv", kind="asian", option="call", K=100, crn="False",
+                control="geometric")
+    assert fields["gk_delta_crn_div"].text == pb.og(float(sans["delta_se"]) / float(crn["delta_se"]))
 
 
 # --- documents rendus au professeur --------------------------------------------------------------

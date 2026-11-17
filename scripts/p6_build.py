@@ -6,6 +6,7 @@ et les versions, depuis CLAUDE.md et requirements.txt), puis écrit les fichiers
 
     docs/templates/DOSSIER_GROUPE.md  →  docs/DOSSIER_GROUPE.md
     docs/templates/ORAL.md            →  docs/ORAL.md
+    docs/templates/CONFORMITE.md      →  docs/CONFORMITE.md   (grille de conformité au sujet)
     rapport/rapport_template.html     →  rapport/rapport.html  →  rapport/Rapport_Pricing_Asiatique.pdf
 
 Arrondis : prix à 10^-4 ; écarts-types et demi-largeurs d'IC sous 10^-4 en notation scientifique à
@@ -53,6 +54,7 @@ PDF = ROOT / "rapport" / "Rapport_Pricing_Asiatique.pdf"
 DOCUMENTS = {                                   # fichier produit → gabarit
     "docs/DOSSIER_GROUPE.md": "docs/templates/DOSSIER_GROUPE.md",
     "docs/ORAL.md": "docs/templates/ORAL.md",
+    "docs/CONFORMITE.md": "docs/templates/CONFORMITE.md",
     "rapport/rapport.html": "rapport/rapport_template.html",
 }
 INTERNAL = ("docs/DOSSIER_GROUPE.md",)          # document interne au groupe
@@ -667,6 +669,27 @@ def _p5(f: _Fields) -> None:
     f.put("sens_sigma_max", fmt_pct(max(sigmas), 0), f"{file} · max de sigma (grille)")
 
 
+def _conformite(f: _Fields) -> None:
+    """Champs propres à la grille de conformité : la grille K × T telle qu'elle est dans le CSV,
+    la taille du groupe, le gain des nombres aléatoires communs sur l'écart-type du delta."""
+    file = "p4_grid_cv.csv"
+    rows = table(file)
+    strikes = sorted({float(r["K"]) for r in rows})
+    maturities = sorted({float(r["T"]) for r in rows})
+    f.put("grid_strikes", ", ".join(fmt_int(k) for k in strikes), f"{file} · valeurs de K")
+    f.put("grid_n_strikes", fmt_int(len(strikes)), f"{file} · nombre de valeurs de K")
+    f.put("grid_maturites", " ; ".join(plain(t) for t in maturities), f"{file} · valeurs de T")
+    f.put("grid_n_maturites", fmt_int(len(maturities)), f"{file} · nombre de valeurs de T")
+    f.put("n_membres", fmt_int(len(GROUP) + 1), "p6_build.GROUP (noms donnés par Loup) et Loup")
+    file = "p4_greeks.csv"
+    at = {"kind": "asian", "option": "call", "K": 100, "control": "geometric"}
+    crn = float(one(table(file), crn="True", **at)["delta_se"])
+    sans = float(one(table(file), crn="False", **at)["delta_se"])
+    f.put("gk_delta_crn_div", og(sans / crn),
+          f"{file} · delta_se sans / avec nombres aléatoires communs, ordre de grandeur · "
+          f"{_where(at)}")
+
+
 def _decisions(f: _Fields) -> None:
     req = (ROOT / "requirements.txt").read_text(encoding="utf-8")
     for package in PACKAGES:
@@ -694,7 +717,7 @@ def _decisions(f: _Fields) -> None:
 def fields() -> dict[str, Field]:
     f = _Fields()
     for part in (_theoretical, _p1, _p2, _p3, _p4_convergence, _p4_beta, _p4_sensitivities,
-                 _p4_course, _p4_greeks, _p5, _decisions):
+                 _p4_course, _p4_greeks, _p5, _conformite, _decisions):
         part(f)
     return f
 
@@ -830,7 +853,7 @@ def pdf_text(pdf: Path) -> str:
         raise FileNotFoundError("pdftotext introuvable")
     done = subprocess.run([str(tool), "-enc", "UTF-8", "-layout", str(pdf), "-"], check=True,
                           capture_output=True, timeout=60)
-    return done.stdout.decode("utf-8")
+    return done.stdout.decode("utf-8", errors="replace")   # le sujet a des glyphes mathématiques
 
 
 # --- ligne de commande -----------------------------------------------------------------------
