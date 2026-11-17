@@ -5,20 +5,21 @@ Actif théorique (CLAUDE.md) : S0 = 100, σ = 0,20, r = 0,03, q = 0,01, contrôl
 b optimal (slide 50) sauf mention contraire. IC à 95 % (z = Φ^{-1}(0,975) par AS241).
 
 1. Biais de β (results/p4_beta_bias.csv, détail par seed dans p4_beta_bias_runs.csv) : call
-   K = 100, T = 1, mensuel ; N = 1 000 trajectoires, 500 seeds 20261117 + i (i = 0..499), contrôle
+   K = 100, T = 1, mensuel ; N = 1 000 trajectoires, 2 000 runs (500 en P4/P5a ; 2 000 depuis P5b,
+   étape 1, pour trancher le biais du mode pilot), contrôle
    « optimal » (b estimé sur l'échantillon, biais d'ordre 1/N) et « pilot » (b estimé sur 10 000
-   trajectoires préalables, sans biais). Biais = moyenne des 500 prix − référence (contrôle à
+   trajectoires préalables, sans biais). Biais = moyenne des 2 000 prix − référence (contrôle à
    N = 4 000 000 sur un flux disjoint, voir ci-dessous), exprimé en écarts-types de la moyenne
-   (sd_of_mean = s_prix/√500) et en écart-type combiné √(sd_of_mean² + se_ref²).
+   (sd_of_mean = s_prix/√2 000) et en écart-type combiné √(sd_of_mean² + se_ref²).
    Flux disjoints (P5a, étape 0 ; avant : seeds 20261117 + i, dont 1 à 15 paires de fenêtres se
    recouvraient) : un seul flux LCG parti de x0 = 20261117, découpé bout à bout par le saut exact de
    pricer.rng (state_after) : le run i démarre à l'état a^(i·M)·x0 mod m, M = uniformes consommées
    par run (12 × 1 000 en optimal, 12 × 11 000 en pilot, vérifié run par run), et utilise les
    positions i·M + 1, …, (i + 1)·M du flux. La référence de ce biais (contrôle, N = 4 000 000,
-   48 000 000 uniformes) démarre après les runs des deux modes, à la position R = 500·max(M)
-   = 66 000 000. Borne : R + 48 000 000 = 114 000 000 < m − 1 = 2 147 483 646 (période de
+   48 000 000 uniformes) démarre après les runs des deux modes, à la position R = 2 000·max(M)
+   = 264 000 000. Borne : R + 48 000 000 = 312 000 000 < m − 1 = 2 147 483 646 (période de
    Park-Miller) ; on vérifie en plus, par paquets de 1 000 000 d'états, que x0 ne revient pas parmi
-   x_1, …, x_{114 000 000} (scan_stream) et que les états aux positions i·M et R sont bien les seeds
+   x_1, …, x_{312 000 000} (scan_stream) et que les états aux positions i·M et R sont bien les seeds
    utilisées. Cette référence n'est donc plus celle de p4_convergence.py (dont le flux est recouvert
    par les runs du mode pilot).
 2. Méthode d'aléa (results/p4_rng_methods.csv) : les 4 méthodes de pricer.normals et la
@@ -64,7 +65,7 @@ SEED = 20261117
 RNG = "inverse"
 K0, T0 = 100.0, 1.0
 
-N_BIAS, N_SEEDS = 1_000, 500
+N_BIAS, N_SEEDS = 1_000, 2_000      # 500 en P4/P5a
 N_PILOT = 10_000            # défaut de price_asian
 N_BIAS_REF = 4_000_000
 SCAN_CHUNK = 1_000_000
@@ -127,8 +128,8 @@ def _write(path: Path, fields, rows) -> None:
 
 N_OBS_BIAS = 12          # mensuel sur T = 1
 M_RUN = {"optimal": N_OBS_BIAS * N_BIAS, "pilot": N_OBS_BIAS * (N_BIAS + N_PILOT)}
-REF_OFFSET = N_SEEDS * max(M_RUN.values())                 # 66 000 000
-SCAN_LIMIT = REF_OFFSET + N_OBS_BIAS * N_BIAS_REF           # 114 000 000
+REF_OFFSET = N_SEEDS * max(M_RUN.values())                 # 264 000 000
+SCAN_LIMIT = REF_OFFSET + N_OBS_BIAS * N_BIAS_REF           # 312 000 000
 
 
 def bias_layout():

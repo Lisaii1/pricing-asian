@@ -24,6 +24,7 @@ from pricer.normals import normals
 from pricer.paths import RNG_METHODS, NormalStream
 
 SEED = 20261117
+N_RUNS_BIAS = 2_000          # P5b, étape 1 (500 en P4/P5a)
 BASE = dict(S0=100.0, K=100.0, sigma=0.20, r=0.03, T=1.0, q=0.01)
 MODEL = dict(S0=100.0, sigma=0.25, r=0.05, T=1.5, q=0.02)
 RESULTS = Path(__file__).resolve().parents[1] / "results"
@@ -110,11 +111,11 @@ def test_beta_bias_csv():
     assert {r["beta_mode"] for r in rows} == {"optimal", "pilot"}
     runs = _rows("p4_beta_bias_runs.csv")
     for r in rows:
-        assert int(r["n_seeds"]) == 500 and int(r["n_paths"]) == 1_000
+        assert int(r["n_seeds"]) == N_RUNS_BIAS and int(r["n_paths"]) == 1_000
         prices = np.array([float(x["price"]) for x in runs if x["beta_mode"] == r["beta_mode"]])
-        assert prices.size == 500
+        assert prices.size == N_RUNS_BIAS
         assert float(r["mean_price"]) == pytest.approx(prices.mean(), rel=1e-12)
-        sd_mean = prices.std(ddof=1) / math.sqrt(500)
+        sd_mean = prices.std(ddof=1) / math.sqrt(N_RUNS_BIAS)
         assert float(r["sd_of_mean"]) == pytest.approx(sd_mean, rel=1e-10)
         assert float(r["bias"]) == pytest.approx(prices.mean() - float(r["ref_price"]), abs=1e-14)
     # seeds : saut exact sur un flux unique (P5a, étape 0), voir
@@ -171,7 +172,7 @@ def test_grid_cv_csv():
         assert float(r["ratio_ci_high"]) == pytest.approx(float(r["ci_high"]) / bs, rel=1e-12)
 
 
-# --- P5a étape 0 : 500 runs sur flux LCG disjoints (saut exact) -----------------------------------
+# --- P5a étape 0, P5b étape 1 : 2 000 runs sur flux LCG disjoints (saut exact) --------------------------------
 
 def test_beta_bias_runs_use_disjoint_jumped_streams():
     """Run i démarre à l'état a^(i·M)·x0 mod m, M = uniformes consommées par run ; la référence
@@ -184,12 +185,12 @@ def test_beta_bias_runs_use_disjoint_jumped_streams():
         M = int(r["n_uniforms_per_run"])
         assert M == 12 * (1_000 + int(r["n_pilot"]))          # 1 uniforme par normale (AS241)
         seeds = [int(x["seed"]) for x in runs if x["beta_mode"] == mode]
-        assert seeds == [state_after(SEED, i * M) for i in range(500)]
+        assert seeds == [state_after(SEED, i * M) for i in range(N_RUNS_BIAS)]
         assert int(r["stream_x0"]) == SEED
         assert int(r["n_seed_pairs_overlapping"]) == 0
         assert int(r["n_seeds_overlapping_ref"]) == 0
-        assert int(r["ref_offset_uniforms"]) == 500 * m_max
-        assert int(r["ref_seed"]) == state_after(SEED, 500 * m_max)
-        total = 500 * m_max + int(r["ref_n_paths"]) * 12
+        assert int(r["ref_offset_uniforms"]) == N_RUNS_BIAS * m_max
+        assert int(r["ref_seed"]) == state_after(SEED, N_RUNS_BIAS * m_max)
+        total = N_RUNS_BIAS * m_max + int(r["ref_n_paths"]) * 12
         assert int(r["stream_states_scanned"]) == total
         assert r["first_return_of_x0"] == ""                   # x0 ne revient pas : pas de cycle
