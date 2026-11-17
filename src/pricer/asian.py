@@ -24,6 +24,14 @@ Trois modes pour b (paramètre beta) :
                suivantes du même LCG, sans réutiliser le pilote : sans biais (hors cours).
 Écart-type de l'estimateur contrôlé : celui des résidus Y − b(X − E[X]), dont la variance
 empirique s'écrit avec les sommes accumulées : [syy − 2b·sxy + b²·sxx]/(N − 1).
+
+Variables antithétiques (slide 52 ; polycopié Haqueberge p. 13-14) : chaque trajectoire Z est
+jumelée avec −Z (pricer.paths). n_paths est le nombre total de trajectoires, soit M = n_paths/2
+paires. Le prix est la moyenne des n_paths payoffs, c'est-à-dire la moyenne des M moyennes de
+paires (h(Z) + h(−Z))/2. Les deux trajectoires d'une paire n'étant pas indépendantes,
+l'écart-type est celui des moyennes de paires : s_paires/√M.
+Combinaison : le contrôle s'applique aux moyennes de paires de Y et de X ; « sans contrôle »
+désigne alors l'estimateur antithétique seul, sur le même échantillon.
 """
 from __future__ import annotations
 
@@ -72,6 +80,7 @@ class MCResult:
     std_error_no_control: float | None = None  # écart-type sans contrôle, même échantillon
     variance_ratio: float | None = None        # variance sans contrôle / variance avec contrôle
     n_pilot: int = 0                           # trajectoires du pilote (en plus de n_paths)
+    antithetic: bool = False                   # trajectoires jumelées (Z, −Z)
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -123,11 +132,14 @@ class _Moments:
         return max(self.syy - 2.0 * b * self.sxy + b * b * self.sxx, 0.0) / (self.n - 1)
 
 
-def _check_count(value, name: str) -> int:
+def _check_count(value, name: str, antithetic: bool = False) -> int:
+    """Entier ≥ 2 trajectoires, ou ≥ 2 paires si antithétique (la parité et le type de
+    antithetic sont vérifiés par gbm_paths)."""
     if isinstance(value, bool) or not isinstance(value, numbers.Integral):
         raise TypeError(f"{name} doit être un entier, reçu {value!r}")
-    if value < 2:
-        raise ValueError(f"{name} doit être ≥ 2 (variance empirique en 1/(N − 1))")
+    minimum = 4 if antithetic else 2      # il faut au moins 2 termes (paires ou trajectoires)
+    if value < minimum:
+        raise ValueError(f"{name} doit être ≥ {minimum} (variance empirique en 1/(N − 1))")
     return int(value)
 
 
@@ -149,7 +161,8 @@ def _check_beta(beta, control):
 
 
 def _price(kind, S0, K, sigma, r, T, q, option, obs, n_paths, seed, rng_method, batch_size,
-           include_s0, control, average=None, beta="optimal", n_pilot=DEFAULT_PILOT) -> MCResult:
+           include_s0, control, average=None, beta="optimal", n_pilot=DEFAULT_PILOT,
+           antithetic=False) -> MCResult:
     if option not in OPTIONS:
         raise ValueError(f"option inconnue {option!r} ; choix : {OPTIONS}")
     if kind == "asian" and average not in AVERAGES:
@@ -163,8 +176,8 @@ def _price(kind, S0, K, sigma, r, T, q, option, obs, n_paths, seed, rng_method, 
     K = float(K)
     if not (math.isfinite(K) and K > 0.0):
         raise ValueError(f"K doit être > 0, reçu {K!r}")
-    n_paths = _check_count(n_paths, "n_paths")
-    n_pilot = _check_count(n_pilot, "n_pilot") if beta_mode == "pilot" else 0
+    n_paths = _check_count(n_paths, "n_paths", antithetic)
+    n_pilot = _check_count(n_pilot, "n_pilot", antithetic) if beta_mode == "pilot" else 0
 
     start = time.perf_counter()
     stream = NormalStream(seed, rng_method)
@@ -177,18 +190,23 @@ def _price(kind, S0, K, sigma, r, T, q, option, obs, n_paths, seed, rng_method, 
         return disc * (np.maximum(level - K, 0.0) if option == "call"
                        else np.maximum(K - level, 0.0))
 
+    def sample(level: np.ndarray) -> np.ndarray:
+        """Payoffs par trajectoire, ou moyennes de paires (h(Z) + h(−Z))/2 si antithétique."""
+        h = payoff(level)
+        return 0.5 * (h[0::2] + h[1::2]) if antithetic else h
+
     def accumulate(n: int) -> _Moments:
         """Simule les n trajectoires suivantes du flux et accumule Y (et X si contrôle)."""
         acc = _Moments()
         for S in gbm_paths(S0, sigma, r, T, q, obs=obs, n_paths=n, batch_size=batch_size,
-                           include_s0=include_s0, stream=stream):
+                           include_s0=include_s0, stream=stream, antithetic=antithetic):
             x = None
             if kind == "european":
-                y = payoff(S[:, -1])
+                y = sample(S[:, -1])
             else:
                 if control or average == "geometric":
-                    x = payoff(np.exp(np.log(S).mean(axis=1)))        # G = (Π S(t_k))^{1/n}
-                y = x if average == "geometric" else payoff(S.mean(axis=1))   # A = (1/n)Σ S(t_k)
+                    x = sample(np.exp(np.log(S).mean(axis=1)))        # G = (Π S(t_k))^{1/n}
+                y = x if average == "geometric" else sample(S.mean(axis=1))   # A = (1/n)Σ S(t_k)
             acc.add(y, x if control else None)
         return acc
 
@@ -217,13 +235,13 @@ def _price(kind, S0, K, sigma, r, T, q, option, obs, n_paths, seed, rng_method, 
                     ci_high=price + Z_95 * se, n_paths=n_paths, seed=seed,
                     rng_method=rng_method, n_obs=n_obs, elapsed=elapsed, option=option,
                     kind=kind, include_s0=bool(include_s0), n_uniforms=stream.n_uniforms,
-                    average=average, **extra)
+                    average=average, antithetic=antithetic, **extra)
 
 
 def price_asian(S0, K, sigma, r, T, q=0.0, option="call", obs="monthly", n_paths=100_000,
                 seed=REFERENCE_SEED, rng_method="inverse", batch_size=DEFAULT_BATCH,
                 include_s0=False, control=None, average="arithmetic", beta="optimal",
-                n_pilot=DEFAULT_PILOT) -> MCResult:
+                n_pilot=DEFAULT_PILOT, antithetic=False) -> MCResult:
     """Call ou put asiatique à moyenne arithmétique par Monte-Carlo.
 
     Paramètres généraux : S0, K, sigma, r, T, q (dividende continu), option.
@@ -234,21 +252,25 @@ def price_asian(S0, K, sigma, r, T, q=0.0, option="call", obs="monthly", n_paths
     Simulation : n_paths, seed, rng_method (méthode de pricer.normals), batch_size.
     Réduction de variance : control = None ou "geometric" (option sur moyenne géométrique
     comme variable de contrôle) ; beta = "optimal" (défaut, slide 50), un réel, ou "pilot"
-    (b estimé sur n_pilot trajectoires tirées avant les n_paths de l'estimation).
+    (b estimé sur n_pilot trajectoires tirées avant les n_paths de l'estimation) ;
+    antithetic = True : trajectoires jumelées (Z, −Z), n_paths = nombre total (pair),
+    écart-type sur les moyennes de paires ; avec control, le contrôle porte sur ces moyennes.
     """
     return _price("asian", S0, K, sigma, r, T, q, option, obs, n_paths, seed, rng_method,
-                  batch_size, include_s0, control, average, beta, n_pilot)
+                  batch_size, include_s0, control, average, beta, n_pilot, antithetic)
 
 
 def price_european_mc(S0, K, sigma, r, T, q=0.0, option="call", obs="monthly",
                       n_paths=100_000, seed=REFERENCE_SEED, rng_method="inverse",
-                      batch_size=DEFAULT_BATCH, include_s0=False, control=None) -> MCResult:
+                      batch_size=DEFAULT_BATCH, include_s0=False, control=None,
+                      antithetic=False) -> MCResult:
     """Call ou put européen par Monte-Carlo, mêmes paramètres que price_asian.
 
     Payoff sur S_T = dernière date d'observation (t_n = T). Avec les mêmes obs et seed que
     price_asian, les deux prix sont calculés sur les mêmes trajectoires ; avec obs=1, S_T est
     simulé en un pas, exactement comme au slide 43. Le schéma étant exact, la loi de S_T ne
     dépend pas de obs. control : le contrôle géométrique n'est défini que pour l'asiatique.
+    antithetic = True : trajectoires jumelées (Z, −Z), comme pour price_asian.
     """
     return _price("european", S0, K, sigma, r, T, q, option, obs, n_paths, seed, rng_method,
-                  batch_size, include_s0, control)
+                  batch_size, include_s0, control, antithetic=antithetic)

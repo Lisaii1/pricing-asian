@@ -123,18 +123,29 @@ def _check_model(S0, sigma, r, q) -> tuple[float, float, float, float]:
 
 def gbm_paths(S0, sigma, r, T, q=0.0, obs="monthly", n_paths: int = 100_000,
               seed=20261117, rng_method: str = "inverse", batch_size: int = DEFAULT_BATCH,
-              include_s0: bool = False, stream: NormalStream | None = None
-              ) -> Iterator[np.ndarray]:
+              include_s0: bool = False, stream: NormalStream | None = None,
+              antithetic: bool = False) -> Iterator[np.ndarray]:
     """Blocs de trajectoires (tableaux (b, n_obs), ou (b, n_obs + 1) avec S0), b ≤ batch_size.
 
     Les paramètres sont validés à l'appel ; le générateur renvoyé simule bloc par bloc.
     ``stream`` permet de fournir un flux existant (le pricer s'en sert pour compter les
     normales et uniformes consommées) ; sinon un flux neuf est créé à partir de seed.
+
+    ``antithetic`` (cours, slide 52 ; polycopié Haqueberge p. 13-14) : n_paths est le nombre
+    total de trajectoires, il doit être pair. Chaque tirage Z donne deux trajectoires
+    consécutives, ligne 2i avec Z et ligne 2i + 1 avec −Z ; seules n_paths/2 trajectoires de
+    normales sont tirées. Pour la loi N(0, 1), −Z est la forme Φ^{-1}(1 − U) du slide 52
+    (égalité testée pour la méthode inverse) et vaut pour toutes les méthodes de normales.
+    Un bloc contient alors des paires entières : 2·max(1, batch_size // 2) trajectoires au plus.
     """
     S0, sigma, r, q = _check_model(S0, sigma, r, q)
     T = _check_maturity(T)
     n_paths = _check_posint(n_paths, "n_paths")
     batch_size = _check_posint(batch_size, "batch_size")
+    if not isinstance(antithetic, bool):
+        raise TypeError(f"antithetic doit être un booléen, reçu {antithetic!r}")
+    if antithetic and n_paths % 2:
+        raise ValueError(f"antithetic : n_paths doit être pair (paires Z, −Z), reçu {n_paths}")
     t = obs_dates(T, obs)
     if stream is None:
         stream = NormalStream(seed, rng_method)
@@ -155,4 +166,18 @@ def gbm_paths(S0, sigma, r, T, q=0.0, obs="monthly", n_paths: int = 100_000,
             done += b
             yield S
 
-    return _blocks()
+    def _antithetic_blocks() -> Iterator[np.ndarray]:
+        pairs_per_block = max(1, batch_size // 2)
+        done = 0
+        while done < n_paths:
+            b = min(pairs_per_block, (n_paths - done) // 2)        # paires de ce bloc
+            x = vol * stream.take(b * n).reshape(b, n)
+            S = np.empty((2 * b, n))
+            S[0::2] = S0 * np.exp(np.cumsum(drift + x, axis=1))    # trajectoire de Z
+            S[1::2] = S0 * np.exp(np.cumsum(drift - x, axis=1))    # trajectoire de −Z
+            if include_s0:
+                S = np.concatenate((np.full((2 * b, 1), S0), S), axis=1)
+            done += 2 * b
+            yield S
+
+    return _antithetic_blocks() if antithetic else _blocks()
