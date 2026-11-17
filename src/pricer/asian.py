@@ -25,6 +25,7 @@ from pricer.paths import DEFAULT_BATCH, NormalStream, gbm_paths, n_obs_from
 
 Z_95 = 1.96
 REFERENCE_SEED = 20261117
+AVERAGES = ("arithmetic", "geometric")
 
 
 @dataclass(frozen=True)
@@ -43,6 +44,7 @@ class MCResult:
     include_s0: bool
     n_uniforms: int         # uniformes consommées dans le LCG
     z: float = Z_95
+    average: str | None = None   # asiatique : "arithmetic" / "geometric" ; européen : None
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -72,12 +74,14 @@ class _Moments:
 
 
 def _price(kind, S0, K, sigma, r, T, q, option, obs, n_paths, seed, rng_method, batch_size,
-           include_s0, control) -> MCResult:
+           include_s0, control, average=None) -> MCResult:
     if control is not None:
         raise NotImplementedError("control (variable de contrôle) est réservé à P3 : seul None "
                                   "est accepté pour l'instant")
     if option not in OPTIONS:
         raise ValueError(f"option inconnue {option!r} ; choix : {OPTIONS}")
+    if kind == "asian" and average not in AVERAGES:
+        raise ValueError(f"average inconnue {average!r} ; choix : {AVERAGES}")
     K = float(K)
     if not (math.isfinite(K) and K > 0.0):
         raise ValueError(f"K doit être > 0, reçu {K!r}")
@@ -93,7 +97,12 @@ def _price(kind, S0, K, sigma, r, T, q, option, obs, n_paths, seed, rng_method, 
     acc = _Moments()
     for S in gbm_paths(S0, sigma, r, T, q, obs=obs, n_paths=n_paths, batch_size=batch_size,
                        include_s0=include_s0, stream=stream):
-        x = S.mean(axis=1) if kind == "asian" else S[:, -1]
+        if kind == "european":
+            x = S[:, -1]
+        elif average == "arithmetic":
+            x = S.mean(axis=1)                       # A = (1/n) Σ S(t_k)
+        else:
+            x = np.exp(np.log(S).mean(axis=1))       # G = (Π S(t_k))^{1/n}
         payoff = np.maximum(x - K, 0.0) if option == "call" else np.maximum(K - x, 0.0)
         acc.add(disc * payoff)
     se = math.sqrt(acc.variance / acc.n)
@@ -101,22 +110,25 @@ def _price(kind, S0, K, sigma, r, T, q, option, obs, n_paths, seed, rng_method, 
     return MCResult(price=acc.mean, std_error=se, ci_low=acc.mean - Z_95 * se,
                     ci_high=acc.mean + Z_95 * se, n_paths=int(n_paths), seed=seed,
                     rng_method=rng_method, n_obs=n_obs, elapsed=elapsed, option=option,
-                    kind=kind, include_s0=bool(include_s0), n_uniforms=stream.n_uniforms)
+                    kind=kind, include_s0=bool(include_s0), n_uniforms=stream.n_uniforms,
+                    average=average)
 
 
 def price_asian(S0, K, sigma, r, T, q=0.0, option="call", obs="monthly", n_paths=100_000,
                 seed=REFERENCE_SEED, rng_method="inverse", batch_size=DEFAULT_BATCH,
-                include_s0=False, control=None) -> MCResult:
+                include_s0=False, control=None, average="arithmetic") -> MCResult:
     """Call ou put asiatique à moyenne arithmétique par Monte-Carlo.
 
     Paramètres généraux : S0, K, sigma, r, T, q (dividende continu), option.
     Spécifiques asiatiques : obs = nombre de dates d'observation (entier) ou fréquence
-    "daily" / "weekly" / "monthly" / "quarterly" ; include_s0 = S0 compté dans la moyenne.
+    "daily" / "weekly" / "monthly" / "quarterly" ; include_s0 = S0 compté dans la moyenne ;
+    average = "arithmetic" (énoncé) ou "geometric" (payoff sur G simulé, pour valider la
+    formule fermée de pricer.geometric).
     Simulation : n_paths, seed, rng_method (méthode de pricer.normals), batch_size.
     control : réservé à P3 (variable de contrôle géométrique), seul None accepté.
     """
     return _price("asian", S0, K, sigma, r, T, q, option, obs, n_paths, seed, rng_method,
-                  batch_size, include_s0, control)
+                  batch_size, include_s0, control, average)
 
 
 def price_european_mc(S0, K, sigma, r, T, q=0.0, option="call", obs="monthly",
