@@ -164,6 +164,14 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
   le rapport, l'oral, le classeur professeur et le paquet ; `results/figures/` reste pour le dossier.
   Tests : lancer avec `.venv\Scripts\python.exe -m pytest` ; un autre interpréteur est arrêté par le
   garde-fou de version (`tests/conftest.py`).
+- 17/11/2026, P6d (demande de Loup, 20:49 et 21:03) : l'oral, la grille et le dossier existent aussi
+  en PDF pour apprendre (`docs/pdf/`), produits depuis les .md (source unique, règle des chiffres
+  inchangée) par `scripts/p6_pdf_groupe.py` : convertisseur Markdown maison, donc aucune dépendance
+  nouvelle ni `requirements-dev.txt` ; même chaîne que le rapport (Chrome headless). Le gabarit de
+  l'oral est découpé en points avec mots-clés en gras, sans changer un mot prononcé ; « Qui parle »
+  = champs `orateur_*` (`p6_build.ORATEURS`, « [à attribuer] » d'ici la répartition). Ces PDF et
+  le paquet équipe (`p6_package.py --equipe`) sont internes au groupe : jamais dans le paquet de
+  rendu ; l'oral, la grille et le LISEZ-MOI équipe restent sans mot de l'outillage (testé).
 
 ## Coquilles du cours relevées (citées au rapport final)
 1. Slide 9 : « c = 0 ».
@@ -187,4 +195,8 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
   titre en SVG, justification de l'actif théorique, figures du mode rendu), classeur professeur
   `results/Resultats_Pricing_Asiatique.xlsx`, paquet `rendu/Projet_Pricing_Asiatique.zip` par
   `scripts/p6_package.py`, garde-fou de version `tests/conftest.py` ; grille : 12 faites, 3 partielles.
-- Prochain : relecture humaine du paquet, soutenance.
+  P6d fait (5 commits) : prompt `prompts/2026-11-17-p6d-pdf-groupe-v2.md` ; PDF de travail du groupe
+  `docs/pdf/` (oral en fiches, grille, dossier) par `scripts/p6_build.py --pdf-groupe` ; paquet
+  équipe `rendu/Dossier_Equipe_Pricing_Asiatique.zip` par `scripts/p6_package.py --equipe` ;
+  `README.md` « Par où commencer ».
+- Prochain : relecture humaine, répartition de l'oral, envoi.

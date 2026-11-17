@@ -353,7 +353,7 @@ def lisez_moi_equipe_html(n_tests: int) -> str:
         ("cd pricing-asian", ""),
         ("python -m venv .venv", f"Python {py.group(1) if py else '3'}, une seule fois"),
         (r".venv\Scripts\pip install -r requirements.txt", "versions exactes, une seule fois"),
-        (r".venv\Scripts\python -m pytest -q", "lance tous les tests, environ une minute"),
+        (r".venv\Scripts\python -m pytest -q", "lance tous les tests, quelques minutes"),
     ]
     css = """
 .one{padding:0 14mm}

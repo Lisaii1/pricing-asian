@@ -2,6 +2,8 @@
 
 Projet Pricing Monte-Carlo, ING4 Finance, ECE Paris (A. W. Sanoussi Mani). Énoncé 2. Rendu le {{date_rendu}}.
 
+**En PDF : [Dossier_Groupe_Pricing_Asiatique.pdf](pdf/Dossier_Groupe_Pricing_Asiatique.pdf)** (sommaire cliquable, une étape par page, figures intégrées, glossaire).
+
 **Grille de conformité au sujet : [CONFORMITE.md](CONFORMITE.md).** Exigence par exigence : ce que le
 sujet demande (cité mot pour mot), ce qui est fait et sa preuve, ce qu'on a fait en plus, ce qui reste
 à faire. Comme l'oral, elle ne cite pas nos étapes de travail : on peut la montrer au professeur.
@@ -726,6 +728,7 @@ Durées relevées sur la machine de Loup pendant le projet (parfois chargée, do
 | `docs/DOSSIER_GROUPE.md` | ce dossier |
 | `docs/ORAL.md` | le texte de la soutenance et les questions probables |
 | `docs/CONFORMITE.md` | la grille de conformité au sujet : exigences, statuts, preuves, ajouts, reste à faire |
+| `docs/pdf/` | les mêmes documents en PDF pour le groupe : ce dossier, les fiches de l'oral, la grille (`p6_build.py --pdf-groupe`) |
 | `docs/templates/` | les gabarits du dossier, de l'oral et de la grille (c'est eux qu'on modifie) |
 | `docs/maquettes/` | les maquettes graphiques, dont celle retenue par Loup |
 | `rapport/` | le gabarit du rapport, le rapport en HTML et le PDF rendu |

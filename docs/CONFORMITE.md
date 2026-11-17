@@ -2,6 +2,8 @@
 
 Projet Pricing Monte-Carlo, énoncé 2. ECE Paris, ING4 Finance (A. W. Sanoussi Mani). Rendu le 22 novembre 2026.
 
+**En PDF : [Conformite_Pricing_Asiatique.pdf](pdf/Conformite_Pricing_Asiatique.pdf)** (exigences en paysage avec pastilles de statut, ajouts en cartes, reste à faire à cocher).
+
 Cette grille reprend le sujet ([2026-S1_ProjetPricing.pdf](../docs/2026-S1_ProjetPricing.pdf)) exigence
 par exigence. Pour chacune : la phrase du sujet citée mot pour mot, notre statut, où le trouver, la
 preuve, et une phrase simple pour l'expliquer. Ensuite : ce que nous avons fait en plus, et ce qui

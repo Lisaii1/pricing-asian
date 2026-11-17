@@ -2,6 +2,8 @@
 
 Projet Pricing Monte-Carlo, énoncé 2. ECE Paris, ING4 Finance. Rendu le {{date_rendu}}.
 
+**En PDF, pour apprendre : [Oral_Pricing_Asiatique.pdf](pdf/Oral_Pricing_Asiatique.pdf)** (une fiche par partie, les questions en fiches, les 10 chiffres à connaître).
+
 Grille de conformité au sujet, exigence par exigence, avec ce que nous avons fait en plus :
 [CONFORMITE.md](CONFORMITE.md).
 

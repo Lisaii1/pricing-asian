@@ -129,7 +129,8 @@ def test_oral_ten_numbers_table(oral):
 def test_questions_two_or_three_per_page(oral):
     pages = pg.qr_pages(oral[2])
     assert sum(len(p) for p in pages) == len(oral[2]) == 20
-    assert all(2 <= len(p) <= 3 for p in pages[:-1]) and 1 <= len(pages[-1]) <= 3
+    assert all(2 <= len(p) <= 3 for p in pages)
+    assert all(pg._words([b for q in p for b in q[2]]) <= 330 for p in pages)
 
 
 @pytest.fixture(scope="module")
@@ -261,3 +262,30 @@ def test_dossier_pdf_has_clickable_summary_and_its_text():
     f = pb.fields()
     assert _flat(f["vr_call_T1_ctrl_ratio"].text) in flat
     assert pb.pdf_page_count(pdf) >= 15
+
+
+# --- liens vers les PDF et README ----------------------------------------------------------------
+
+@pytest.mark.parametrize("md, pdf", [(ORAL, pg.ORAL_PDF), (CONF, pg.CONF_PDF),
+                                     (DOSSIER, pg.DOSSIER_PDF)])
+def test_each_markdown_links_its_pdf_at_the_top(md, pdf):
+    head = "\n".join(md.read_text(encoding="utf-8").splitlines()[:6])
+    assert f"](pdf/{pdf.name})" in head
+    assert pdf.is_file()
+    html = pg.build_html(md, {ORAL: pg.oral_html, CONF: pg.conformite_html,
+                              DOSSIER: pg.dossier_html}[md])
+    assert pdf.name not in html                     # le PDF ne renvoie pas vers lui-même
+
+
+def test_readme_says_where_to_start_in_the_asked_order():
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    section = re.search(r"^## Par où commencer\n(.*?)^## ", text, re.M | re.S).group(1)
+    items = re.findall(r"^\d+\. \*\*(.+?)\*\* : `([^`]+)`", section, re.M)
+    assert [label for label, _p in items] == ["Dossier du groupe (PDF)", "Oral (PDF)",
+                                              "Conformité (PDF)", "Rapport (PDF)", "Figures", "Excel"]
+    for _label, path in items:
+        assert (ROOT / path).exists(), path
+    assert [p for _l, p in items][:4] == [
+        "docs/pdf/Dossier_Groupe_Pricing_Asiatique.pdf", "docs/pdf/Oral_Pricing_Asiatique.pdf",
+        "docs/pdf/Conformite_Pricing_Asiatique.pdf", "rapport/Rapport_Pricing_Asiatique.pdf"]
+    assert pb.forbidden_hits(text) == []

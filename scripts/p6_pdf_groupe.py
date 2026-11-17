@@ -436,6 +436,10 @@ def qr_pages(questions: list) -> list[list]:
             words = 0
         pages[-1].append(q)
         words += w
+    if len(pages) > 1 and len(pages[-1]) == 1:          # pas de question seule en dernière page :
+        j = max(k for k, pg_ in enumerate(pages[:-1]) if len(pg_) == QR_PER_PAGE)
+        for k in range(j, len(pages) - 1):              # on décale d'une question vers la fin
+            pages[k + 1].insert(0, pages[k].pop())
     return pages
 
 
