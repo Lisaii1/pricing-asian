@@ -86,6 +86,24 @@ def test_readme_documents_the_function_and_every_parameter(built):
     assert "-> " not in re.search(r"```\n(price_asian\(.*?)\n```", text, re.S).group(1)
 
 
+def test_readme_lists_the_six_course_typos_one_line_each(built):
+    """Le rapport renvoie au LISEZMOI pour les coquilles du cours : la section doit y être."""
+    text = (built[0] / "LISEZMOI.md").read_text(encoding="utf-8")
+    section = text.split("## Coquilles relevées dans le support de cours", 1)[1]
+    rows = [line for line in section.splitlines() if line.startswith("| ")][1:]
+    assert [r.split(" | ")[0].lstrip("| ").split(",")[0] for r in rows] ==         ["9", "23", "24", "24", "76", "76"]
+    assert all(r.count(" | ") == 2 for r in rows)          # slide, ce qui est écrit, forme correcte
+    assert "V = 2U − 1" in section and "1 + d1 t + d2 t² + d3 t³" in section
+
+
+def test_report_points_to_the_readme_not_to_an_oral_defence():
+    """Pas de soutenance prévue : le rapport renvoie à un document qui est dans le rendu."""
+    for name in ("rapport_template.html", "rapport.html"):
+        html = (ROOT / "rapport" / name).read_text(encoding="utf-8")
+        assert "soutenance" not in html.lower(), name
+        assert "sont détaillées dans le LISEZMOI du code." in html, name
+
+
 def test_every_results_csv_is_produced_by_a_listed_script():
     produced = {o for _s, _a, outs, _n in pk.RERUN for o in outs}
     assert {p.name for p in (ROOT / "results").glob("*.csv")} <= produced

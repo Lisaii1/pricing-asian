@@ -120,6 +120,20 @@ METHOD_NAMES = {"inverse": "générateur congruentiel linéaire + transformée i
                 "acceptance_rejection": "générateur congruentiel linéaire + acceptation-rejet"}
 
 
+# Coquilles du support de cours (mêmes sources que la grille : question 18 de l'oral, commentaires
+# du code de pricer.rng, pricer.normals et pricer.geometric) : (slide, ce qui est écrit, forme correcte).
+COQUILLES = [
+    ("9, générateur mixte", "condition de période complète « c = 0 »", "c ≠ 0"),
+    ("23, méthode polaire", "« V = −2U − 1 »", "V = 2U − 1"),
+    ("24, Hastings", "dénominateur « d1 + d2 t² + d3 t³ »", "1 + d1 t + d2 t² + d3 t³"),
+    ("24, Hastings", "« t = −log(min(U, 1 − U)) »",
+     "t = √(−2 ln p), p = min(U, 1 − U) (Abramowitz et Stegun)"),
+    ("76, moyenne géométrique", "« T = (1/n) Σ S(t_j) »", "T̄ = (1/n) Σ t_j, moyenne des dates"),
+    ("76, moyenne géométrique", "σ̄² = σ²/(n²T̄)·Σ(2i − 1)·t_{n+1−j}, indices i et j mélangés",
+     "un seul indice : σ̄² = σ²/(n²T̄)·Σ_i (2i − 1)·t_{n+1−i}"),
+]
+
+
 # --- l'exemple de la fonction ---------------------------------------------------------------------
 
 def reference_row() -> dict:
@@ -166,6 +180,7 @@ def readme(example_out: str) -> str:
     rerun = "\n".join(
         f"| `scripts/{s}{(' ' + a) if a else ''}` | {', '.join(f'`{o}`' for o in outs)} | {note} |"
         for s, a, outs, note in RERUN)
+    coquilles = "\n".join(f"| {s} | {w} | {c} |" for s, w, c in COQUILLES)
     py = re.search(r"\(Python (\d+\.\d+)", (ROOT / "requirements.txt").read_text(encoding="utf-8"))
     return f"""# Option asiatique et réduction de variance — projet Pricing Monte-Carlo
 
@@ -258,6 +273,15 @@ Depuis `code/` :
 
 Les quelques tests qui comparent le code à des fichiers de travail non livrés (figures de travail,
 maquette graphique) sont sautés ; tous les autres doivent passer.
+
+## Coquilles relevées dans le support de cours
+
+Six, trouvées en codant les formules telles qu'elles sont imprimées (slides du cours « Pricing
+Monte-Carlo » 2026). Le code suit la forme correcte.
+
+| Slide | Ce qui est écrit | Forme correcte |
+|---|---|---|
+{coquilles}
 """
 
 
