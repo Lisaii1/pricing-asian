@@ -4,9 +4,10 @@ Entrées : relevés bruts de data/raw/ (voir data/raw/MANIFEST.md), aucun appel 
   S0     dernier fixing de référence BCE EUR/USD (USD pour 1 EUR, 14 h 15 CET), date écrite.
   σ      historique : écart-type (1/(n − 1)) des log-rendements des 252 derniers fixings BCE
          (251 rendements), × √252 ; même calcul sur les 252 dernières clôtures Alpha Vantage.
-  r      USD (domestique) : Trésor américain 1 an (« 1 Yr ») au plus tard à la date de S0,
-         converti r = ln(1 + y) (convention du prompt P5a : composition annuelle).
-         Variante 2·ln(1 + y/2) (composition semestrielle) écrite pour comparaison.
+  r      USD (domestique) : Trésor américain 1 an (« 1 Yr ») au plus tard à la date de S0. Rendement
+         de la courbe par, « bond-equivalent », intérêts semestriels (FAQ du Trésor ; Fed FEDS
+         2006-28 éq. (4)) : r = 2·ln(1 + y/2) (P5b, réponse Q2 ; sources dans pricer.market).
+         Variante ln(1 + y) (convention de P5a) écrite pour comparaison.
   q      EUR (étranger, joue le dividende, Garman-Kohlhagen) : BCE, courbe AAA zone euro, taux spot
          1 an au plus tard à la date de S0. La réponse BCE le dit « continuous compounding »
          (colonne TITLE_COMPL) : q = y, sans conversion. La variante ln(1 + y) du prompt est écrite
@@ -28,8 +29,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from pricer.market import (cross_check, historical_vol, last_on_or_before,  # noqa: E402
-                           read_series, to_continuous)
+from pricer.market import (TREASURY_SOURCES, cross_check, historical_vol,  # noqa: E402
+                           last_on_or_before, read_series, to_continuous,
+                           treasury_par_to_continuous)
 
 RAW = ROOT / "data" / "raw"
 OUT = ROOT / "results" / "p5_market.csv"
@@ -68,10 +70,11 @@ def calibrate() -> dict:
             "BCE : prix central" if name == "sigma_ecb" else "contrôle", first=win[0][0])
 
     d_r, y_r = last_on_or_before(read_series(UST, "Date", "1 Yr"), d0)
-    put("r_usd", to_continuous(y_r / 100, "annual"), "continu, par an", d_r, UST.name,
-        "ln(1 + y), y = 1 Yr / 100", f"y = {y_r} %")
-    put("r_usd_semiannual_alt", to_continuous(y_r / 100, "semiannual"), "continu, par an", d_r,
-        UST.name, "2·ln(1 + y/2)", "comparaison : si le 1 Yr est en base semestrielle")
+    put("r_usd", treasury_par_to_continuous(y_r / 100), "continu, par an", d_r, UST.name,
+        "2·ln(1 + y/2), y = 1 Yr / 100 (bond-equivalent, semestriel)",
+        f"y = {y_r} % ; sources (lues le 17/11/2026) : " + " ; ".join(TREASURY_SOURCES))
+    put("r_usd_annual_alt", to_continuous(y_r / 100, "annual"), "continu, par an", d_r,
+        UST.name, "ln(1 + y)", "comparaison : convention de P5a, non retenue")
     put("y_usd_1y_pct", y_r, "% publié", d_r, UST.name, "tel que publié", "")
 
     compl = _ecb_title_compl(YC)

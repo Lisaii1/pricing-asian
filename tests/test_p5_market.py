@@ -1,7 +1,7 @@
 """Calibration EUR/USD (P5a, étape 2) : results/p5_market.csv recalculé depuis les relevés bruts.
 
 S0 = dernier fixing BCE ; σ = historique 252 fixings (BCE et Alpha Vantage) ; r = Trésor 1 an,
-ln(1 + y) ; q = BCE AAA spot 1 an, déjà en composition continue (métadonnée TITLE_COMPL de la
+base semestrielle « bond-equivalent » : r = 2·ln(1 + y/2) (P5b, Q2 ; ln(1 + y) en comparaison) ; q = BCE AAA spot 1 an, déjà en composition continue (métadonnée TITLE_COMPL de la
 réponse BCE : « continuous compounding »), donc q = y ; contrôle croisé BCE / Alpha Vantage.
 """
 from __future__ import annotations
@@ -45,13 +45,19 @@ def test_sigma_ecb_and_av_recomputed_from_raw():
     assert float(rows["sigma_av"]["value"]) == pytest.approx(historical_vol(av, 252), rel=1e-14)
 
 
-def test_r_is_treasury_1y_log_one_plus_y_on_or_before_s0_date():
+def test_r_is_treasury_1y_semiannual_on_or_before_s0_date():
     rows = _csv()
     d0 = date.fromisoformat(rows["S0"]["date"])
     d, y = last_on_or_before(read_series(UST, "Date", "1 Yr"), d0)
     assert rows["r_usd"]["date"] == d.isoformat()
-    assert float(rows["r_usd"]["value"]) == pytest.approx(math.log1p(y / 100), rel=1e-15)
-    assert float(rows["r_usd"]["value"]) == pytest.approx(to_continuous(y / 100, "annual"))
+    assert float(rows["r_usd"]["value"]) == pytest.approx(2 * math.log1p(y / 200), rel=1e-15)
+    assert float(rows["r_usd"]["value"]) == pytest.approx(to_continuous(y / 100, "semiannual"))
+    # sources de la convention écrites dans le CSV
+    assert "home.treasury.gov" in rows["r_usd"]["note"]
+    assert "federalreserve.gov/pubs/feds/2006/200628" in rows["r_usd"]["note"]
+    # variante ln(1 + y) (P5a) gardée en ligne de comparaison
+    assert float(rows["r_usd_annual_alt"]["value"]) == pytest.approx(math.log1p(y / 100), rel=1e-15)
+    assert "r_usd_semiannual_alt" not in rows
 
 
 def test_q_is_ecb_aaa_1y_spot_already_continuous():

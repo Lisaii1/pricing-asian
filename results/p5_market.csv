@@ -2,15 +2,15 @@ name,value,unit,date,date_first,source,convention,note
 S0,1.0989,USD pour 1 EUR,2026-11-17,,2026-11-17_ecb_EXR_D.USD.EUR.SP00.A.csv,fixing de référence BCE,dernier fixing disponible
 sigma_ecb,0.055566611208102926,par an,2026-11-17,2025-11-21,2026-11-17_ecb_EXR_D.USD.EUR.SP00.A.csv,"std(ln S_k/S_{k-1}, ddof=1)·√252 sur 252 points (251 rendements)",BCE : prix central
 sigma_av,0.055623257435652065,par an,2026-11-16,2025-11-28,2026-11-17_alphavantage_FX_DAILY_EURUSD_full.csv,"std(ln S_k/S_{k-1}, ddof=1)·√252 sur 252 points (251 rendements)",contrôle
-r_usd,0.04516455195437364,"continu, par an",2026-11-16,,2026-11-17_treasury_daily_yield_curve_2026.csv,"ln(1 + y), y = 1 Yr / 100",y = 4.62 %
-r_usd_semiannual_alt,0.04567446780551445,"continu, par an",2026-11-16,,2026-11-17_treasury_daily_yield_curve_2026.csv,2·ln(1 + y/2),comparaison : si le 1 Yr est en base semestrielle
+r_usd,0.04567446780551445,"continu, par an",2026-11-16,,2026-11-17_treasury_daily_yield_curve_2026.csv,"2·ln(1 + y/2), y = 1 Yr / 100 (bond-equivalent, semestriel)",y = 4.62 % ; sources (lues le 17/11/2026) : https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics/interest-rates-frequently-asked-questions ; https://www.federalreserve.gov/pubs/feds/2006/200628
+r_usd_annual_alt,0.04516455195437364,"continu, par an",2026-11-16,,2026-11-17_treasury_daily_yield_curve_2026.csv,ln(1 + y),"comparaison : convention de P5a, non retenue"
 y_usd_1y_pct,4.62,% publié,2026-11-16,,2026-11-17_treasury_daily_yield_curve_2026.csv,tel que publié,
 q_eur,0.029866567622,"continu, par an",2026-11-16,,2026-11-17_ecb_YC_B.U2.EUR.4F.G_N_A.SV_C_YM.SR_1Y.csv,y / 100 (déjà continu),TITLE_COMPL BCE : « continuous compounding »
 q_eur_ln1py_prompt,0.029429247851678587,"continu, par an",2026-11-16,,2026-11-17_ecb_YC_B.U2.EUR.4F.G_N_A.SV_C_YM.SR_1Y.csv,ln(1 + y),"comparaison : convention du prompt, non retenue"
 y_eur_1y_pct,2.9866567622,% publié,2026-11-16,,2026-11-17_ecb_YC_B.U2.EUR.4F.G_N_A.SV_C_YM.SR_1Y.csv,tel que publié,
 estr_pct,2.44,% publié,2026-11-16,,2026-11-17_ecb_EST_B.EU000A2X2A25.WT.csv,tel que publié,comparaison seulement (taux au jour le jour)
 ust_3m_pct,4.32,% publié,2026-11-13,,2026-11-17_alphavantage_TREASURY_YIELD_3month_daily_sample.csv,tel que publié,"comparaison seulement (Alpha Vantage, Cowork)"
-forward_1y,1.11584020006786,USD pour 1 EUR,2026-11-17,,calcul,S0·e^{(r − q)·1},strike « forward 1 an »
+forward_1y,1.11640932976501,USD pour 1 EUR,2026-11-17,,calcul,S0·e^{(r − q)·1},strike « forward 1 an »
 xcheck_n_common,252,jours,2026-11-16,2025-11-20,2026-11-17_ecb_EXR_D.USD.EUR.SP00.A.csv − 2026-11-17_alphavantage_FX_DAILY_EURUSD_full.csv,"fixing BCE − clôture AV, même date",252 derniers jours communs
 xcheck_mean_diff,0.00017341269841269604,USD pour 1 EUR,2026-11-16,2025-11-20,2026-11-17_ecb_EXR_D.USD.EUR.SP00.A.csv − 2026-11-17_alphavantage_FX_DAILY_EURUSD_full.csv,"fixing BCE − clôture AV, même date",252 derniers jours communs
 xcheck_mean_abs_diff,0.002178174603174595,USD pour 1 EUR,2026-11-16,2025-11-20,2026-11-17_ecb_EXR_D.USD.EUR.SP00.A.csv − 2026-11-17_alphavantage_FX_DAILY_EURUSD_full.csv,"fixing BCE − clôture AV, même date",252 derniers jours communs

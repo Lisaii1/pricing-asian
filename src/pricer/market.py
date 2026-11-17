@@ -28,6 +28,18 @@ from pathlib import Path
 
 import numpy as np
 
+# Convention des rendements de la courbe par du Trésor américain (P5b, Q2) : « bond-equivalent »,
+# intérêts semestriels, APY = (1 + i/2)² − 1, donc r = 2·ln(1 + y/2) en continu. Sources (lues le
+# 17/11/2026) :
+#   FAQ du Trésor : https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics/interest-rates-frequently-asked-questions
+#   Fed, FEDS 2006-28, éq. (4) y = 2·ln(1 + y_ce/2) : https://www.federalreserve.gov/pubs/feds/2006/200628
+TREASURY_CONVENTION = "semiannual"
+TREASURY_SOURCES = (
+    "https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics/"
+    "interest-rates-frequently-asked-questions",
+    "https://www.federalreserve.gov/pubs/feds/2006/200628",
+)
+
 MISSING = frozenset({"", ".", "N/A", "NA", "NaN", "nan"})
 CONVENTIONS = ("annual", "semiannual", "continuous")
 TRADING_DAYS = 252
@@ -79,6 +91,11 @@ def to_continuous(y: float, convention: str) -> float:
     if convention == "semiannual":
         return 2.0 * math.log1p(y / 2.0)
     return y
+
+
+def treasury_par_to_continuous(y: float) -> float:
+    """Taux continu d'un rendement de la courbe par du Trésor (décimal) : r = 2·ln(1 + y/2)."""
+    return to_continuous(y, TREASURY_CONVENTION)
 
 
 def log_returns(prices) -> np.ndarray:

@@ -12,7 +12,7 @@ import numpy as np
 import pytest
 
 from pricer.market import (cross_check, historical_vol, last_on_or_before, log_returns,
-                           read_series, to_continuous)
+                           read_series, to_continuous, treasury_par_to_continuous)
 from pricer.normals import normals
 
 
@@ -72,6 +72,15 @@ def test_to_continuous_annual_is_log_one_plus_y():
 def test_to_continuous_continuous_is_identity_and_semiannual():
     assert to_continuous(0.0298, "continuous") == 0.0298
     assert to_continuous(0.04, "semiannual") == pytest.approx(2 * math.log(1.02), rel=1e-15)
+
+
+def test_treasury_par_yield_is_semiannual_bond_equivalent():
+    # Trésor américain (FAQ « interest rate statistics ») : rendements « bond-equivalent »,
+    # intérêts semestriels ; Fed FEDS 2006-28 éq. (4) : y = 2·ln(1 + y_ce/2).
+    assert treasury_par_to_continuous(0.0462) == pytest.approx(2 * math.log(1.0231), rel=1e-15)
+    assert treasury_par_to_continuous(0.0462) == to_continuous(0.0462, "semiannual")
+    # aller-retour : e^{r} = (1 + y/2)²
+    assert math.exp(treasury_par_to_continuous(0.05)) == pytest.approx(1.025 ** 2, rel=1e-15)
 
 
 def test_to_continuous_orders_conventions_for_positive_rate():
