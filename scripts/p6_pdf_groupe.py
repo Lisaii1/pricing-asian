@@ -8,6 +8,7 @@ Markdown de nos documents, aucune dépendance nouvelle) → PDF par Chrome ou Ed
 maquette retenue (« nuit profonde »).
 
     docs/ORAL.md            →  docs/pdf/Oral_Pricing_Asiatique.pdf
+    docs/CONFORMITE.md      →  docs/pdf/Conformite_Pricing_Asiatique.pdf
 
 Les PDF sont des documents de travail du groupe : ils ne vont pas dans le paquet de rendu.
 Usage : python scripts/p6_build.py --pdf-groupe   (régénère d'abord les .md, puis les PDF)
@@ -29,6 +30,8 @@ import p6_build as pb  # noqa: E402
 PDF_DIR = ROOT / "docs" / "pdf"
 ORAL_MD = ROOT / "docs" / "ORAL.md"
 ORAL_PDF = PDF_DIR / "Oral_Pricing_Asiatique.pdf"
+CONF_MD = ROOT / "docs" / "CONFORMITE.md"
+CONF_PDF = PDF_DIR / "Conformite_Pricing_Asiatique.pdf"
 
 
 # --- Markdown → blocs ----------------------------------------------------------------------------
@@ -538,9 +541,132 @@ def oral_html(md: str, base: Path = ORAL_MD.parent) -> str:
     return page(title, "Soutenance · fiches de l'oral", ORAL_CSS, "\n".join(out))
 
 
+# --- la grille de conformité : partie A en paysage, B en cartes, C à cocher ------------------------
+
+CONF_CSS = """
+@page land{size:A4 landscape;margin:10mm 0 12mm}
+.land{page:land}
+.part{break-before:page;padding:0 12mm}
+.part h2{font:750 24px var(--sans);margin:6px 0 6px}
+.part h3{font:600 10px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--a1);
+  margin:5mm 0 2mm}
+.cover p{font-size:12.5px;max-width:172mm}
+.tiles{display:flex;gap:5mm;margin:8mm 0 4mm}
+.tile{flex:1;border:1px solid var(--hair);border-radius:10px;background:var(--card);padding:10px 14px}
+.tile b{display:block;font:300 34px/1.1 var(--mono);color:var(--ink)}
+.tile span{font:600 9.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--sub)}
+.tile.ok b{color:var(--a1)} .tile.part b{color:var(--a3)} .tile.no b{color:var(--neg)}
+.grid-a{table-layout:fixed}
+.grid-a th{font-size:8.5px}
+.grid-a td{font-size:11px;line-height:1.4;padding:6px 7px}
+.grid-a td:first-child{color:var(--ink)}
+.grid-a td:nth-child(4){font-size:9.5px;color:var(--sub)}
+.grid-a td:last-child{color:#e6e7f0}
+.pill{display:inline-block;white-space:nowrap;font:600 10px var(--sans);border-radius:20px;
+  padding:3px 9px}
+.pill.ok{background:rgba(0,255,163,.14);color:var(--a1);border:1px solid rgba(0,255,163,.5)}
+.pill.part{background:rgba(255,214,10,.13);color:var(--a3);border:1px solid rgba(255,214,10,.5)}
+.pill.no{background:rgba(255,77,109,.14);color:var(--neg);border:1px solid rgba(255,77,109,.55)}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:4mm}
+.card{break-inside:avoid;border:1px solid var(--hair);border-top:3px solid var(--a2);
+  border-radius:9px;background:var(--card);padding:10px 13px}
+.card h4{font:700 13.5px/1.3 var(--sans);margin:0 0 5px;color:#fff}
+.card h4 span{font-family:var(--mono);color:var(--a3);margin-right:7px}
+.card .use{font-size:11px;color:var(--sub);margin:0 0 6px}
+.card .say{font-size:12.5px;line-height:1.48;color:#e6e7f0;border-left:2px solid var(--a1);
+  padding-left:9px;margin:0 0 6px}
+.card .say b{font:600 8.5px var(--mono);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--a1);display:block;margin-bottom:2px}
+.card .where{font-size:9.5px;color:var(--mut);margin:0}
+.todo{list-style:none;padding:0;margin:4mm 0}
+.todo li{font-size:14px;line-height:1.5;margin:0 0 5mm;padding-left:11mm;position:relative}
+.todo li::before{content:"";position:absolute;left:0;top:2px;width:17px;height:17px;
+  border:2px solid var(--a1);border-radius:4px}
+"""
+
+STATUS = {"✅": "ok", "⚠️": "part", "❌": "no"}
+BILAN = re.compile(r"Bilan : (\d+) exigences ; (\d+) ✅ [^,]+, (\d+) ⚠️ [^,]+, (\d+) ❌")
+
+
+def _pill(cell: str, ctx: Ctx) -> str:
+    kind = next(v for k, v in STATUS.items() if k in cell)
+    return f'<span class="pill {kind}">{inline(cell, ctx)}</span>'
+
+
+def grid_a_html(table: Block, ctx: Ctx) -> str:
+    """Tableau de la partie A : largeurs de colonnes fixes, statut en pastille de couleur."""
+    head, *rows = table.rows
+    cols = "".join(f'<col style="width:{w}%">' for w in (23, 9, 21, 22, 25))
+    th = "".join(f"<th>{inline(c, ctx)}</th>" for c in head)
+    trs = "".join("<tr>" + "".join(
+        f"<td>{_pill(c, ctx) if j == 1 else inline(c, ctx)}</td>" for j, c in enumerate(r))
+        + "</tr>" for r in rows)
+    return (f'<table class="grid-a"><colgroup>{cols}</colgroup><thead><tr>{th}</tr></thead>'
+            f"<tbody>{trs}</tbody></table>")
+
+
+def conformite_html(md: str, base: Path = CONF_MD.parent) -> str:
+    ctx = Ctx(base)
+    head, secs = sections(parse(md))
+    title = next(b for b in head if b.kind == "h" and b.level == 1).text
+    paras = [b for b in head if b.kind == "p" and "](pdf/" not in b.text]
+    a, b_part, c = (next((h, body) for h, body in secs if h.text.startswith(k))
+                    for k in ("A. ", "B. ", "C. "))
+    bilan = next(x.text for x in a[1] if x.kind == "p" and x.text.startswith("Bilan :"))
+    total, ok, part, no = BILAN.search(bilan).groups()
+    tiles = "".join(f'<div class="tile {k}"><b>{v}</b><span>{lab}</span></div>' for k, v, lab in (
+        ("", total, "exigences du sujet"), ("ok", ok, "✅ faites"), ("part", part, "⚠️ partielles"),
+        ("no", no, "❌ non faites")))
+
+    out = [f'<section class="cover">{GLOWS}<div class="in">'
+           '<div class="eyebrow"><span><b>●</b>&nbsp; Grille de conformité au sujet</span>'
+           "<span>ECE Paris · ING4 Finance</span></div>"
+           f"<h1>{inline(title, ctx)}</h1>"
+           + "".join(f'<p{" class=lead" if i == 0 else ""}>{inline(p.text, ctx)}</p>'
+                     for i, p in enumerate(paras))
+           + f'<div class="tiles">{tiles}</div></div></section>']
+
+    ids: dict = {}
+    body = []
+    for blk in a[1]:
+        if blk.kind == "table":
+            body.append(grid_a_html(blk, ctx))
+        elif blk.kind == "h" and body and any("<table" in x for x in body):
+            body.append('<div style="break-before:page"></div>' + render([blk], ctx, ids))
+        elif blk.kind != "hr":
+            body.append(render([blk], ctx, ids))
+    out.append(f'<section class="part land" id="{slug(a[0].text)}"><div class="eyebrow"><span>'
+               "<b>●</b>&nbsp; Partie A · exigence par exigence</span><span>statut, où, preuve"
+               f"</span></div><h2>{inline(a[0].text, ctx)}</h2>" + "\n".join(body) + "</section>")
+
+    intro = [blk for blk in b_part[1] if blk.kind == "p"]
+    table = next(blk for blk in b_part[1] if blk.kind == "table")
+    cards = "".join(
+        f'<div class="card"><h4><span>{i}</span>{inline(r[0], ctx)}</h4>'
+        f'<p class="use">{inline(r[1], ctx)}</p>'
+        f'<p class="say"><b>À l\'oral</b>{inline(r[4], ctx)}</p>'
+        f'<p class="where">Où : {inline(r[2], ctx)}</p></div>'
+        for i, r in enumerate(table.rows[1:], start=1))
+    out.append(f'<section class="part" id="{slug(b_part[0].text)}"><div class="eyebrow"><span>'
+               f"<b>●</b>&nbsp; Partie B · {len(table.rows) - 1} ajouts</span><span>à l'oral, en "
+               f"deux phrases</span></div><h2>{inline(b_part[0].text, ctx)}</h2>"
+               + render(intro, ctx)
+               + '<p style="color:var(--mut);font-size:10.5px">La preuve de chaque ajout (tests, '
+               "fichiers de résultats) est dans la grille complète, docs/CONFORMITE.md.</p>"
+               + f'<div class="cards">{cards}</div></section>')
+
+    items = next(blk for blk in c[1] if blk.kind == "ul").items
+    out.append(f'<section class="part" id="{slug(c[0].text)}"><div class="eyebrow"><span>'
+               f"<b>●</b>&nbsp; Partie C · {len(items)} points</span><span>à cocher</span></div>"
+               f"<h2>{inline(c[0].text, ctx)}</h2>"
+               + '<ul class="todo">' + "".join(f"<li>{inline(t, ctx)}</li>" for t in items)
+               + "</ul></section>")
+    return page(title, "Grille de conformité au sujet", CONF_CSS, "\n".join(out))
+
+
 # --- production ------------------------------------------------------------------------------------
 
-DOCS = [(ORAL_MD, ORAL_PDF, oral_html)]
+DOCS = [(ORAL_MD, ORAL_PDF, oral_html), (CONF_MD, CONF_PDF, conformite_html)]
 
 
 def build_html(md_path: Path, maker) -> str:

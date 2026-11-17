@@ -171,3 +171,47 @@ def test_group_pdfs_and_their_code_stay_out_of_the_rendu_package():
     assert not any("p6_pdf_groupe" in rel or rel.startswith("docs/") for rel in shipped)
     assert "p6_pdf_groupe.py" in pk.EXCLUDED_NAMES and "test_p6_pdf_groupe.py" in pk.EXCLUDED_TESTS
     assert "docs" in pk.EXCLUDED_PARTS
+
+
+# --- la grille de conformité -----------------------------------------------------------------------
+
+CONF = ROOT / "docs" / "CONFORMITE.md"
+
+
+@pytest.fixture(scope="module")
+def conf_html():
+    return pg.build_html(CONF, pg.conformite_html)
+
+
+def _conf_rows(part: str) -> list[list[str]]:
+    _head, secs = pg.sections(pg.parse(CONF.read_text(encoding="utf-8")))
+    body = next(b for h, b in secs if h.text.startswith(part))
+    return [r for t in body if t.kind == "table" for r in t.rows[1:]]
+
+
+def test_conformite_html_pills_cards_checklist(conf_html):
+    rows_a, rows_b = _conf_rows("A. "), _conf_rows("B. ")
+    pills = re.findall(r'<span class="pill (ok|part|no)">', conf_html)
+    assert len(pills) == len(rows_a) == 15
+    expected = [next(v for k, v in pg.STATUS.items() if k in r[1]) for r in rows_a]
+    assert pills == expected                                   # couleur = statut de la ligne
+    assert conf_html.count('class="card"') == len(rows_b) == 19
+    assert conf_html.count("À l'oral") == len(rows_b)
+    assert '<ul class="todo">' in conf_html and 'class="part land"' in conf_html
+    assert pb.forbidden_hits(pb.visible_text(conf_html, "x.html")) == []
+
+
+def test_conformite_pdf_landscape_part_a_and_text():
+    pdf = pg.CONF_PDF
+    raw = pdf.read_bytes()
+    boxes = [tuple(round(float(x)) for x in m.groups())
+             for m in re.finditer(rb"/MediaBox\s*\[\s*0 0 ([\d.]+) ([\d.]+)\s*\]", raw)]
+    assert any(w > h for w, h in boxes) and any(w < h for w, h in boxes)   # paysage et portrait
+    text = _pdf_text(pdf)
+    flat = _flat(text)
+    assert pb.forbidden_hits(text) == []
+    for r in _conf_rows("B. "):                     # deux colonnes de cartes : -layout les
+        start = " ".join(re.sub(r"[`*]", "", r[0]).split()[:3])     # entrelace, d'où 3 mots
+        assert start in flat, r[0]
+    assert "Ce qui reste à faire" in flat and "Bilan" in flat
+    assert pb.pdf_page_count(pdf) >= 5
