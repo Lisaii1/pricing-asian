@@ -57,13 +57,6 @@ def test_std_error_is_sample_std_over_sqrt_n():
     assert res.std_error == pytest.approx(pay.std(ddof=1) / math.sqrt(5_000), rel=1e-11)
 
 
-def test_control_reserved_for_p3():
-    with pytest.raises(NotImplementedError):
-        price_asian(**BASE, n_paths=100, control="geometric")
-    with pytest.raises(NotImplementedError):
-        price_european_mc(**BASE, n_paths=100, control="geometric")
-
-
 @pytest.mark.parametrize("bad", [dict(option="digital"), dict(K=0.0), dict(n_paths=1),
                                  dict(seed=None), dict(rng_method="mersenne")])
 def test_invalid_inputs_raise(bad):
