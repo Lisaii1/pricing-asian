@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pricing asiatique — maquettes des figures</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--base:#0e0f12;--card:rgba(21,22,27,.80);--card-in:rgba(255,255,255,.025);--ink:#eef0f4;--muted:#8d93a1;--faint:#5d626e;
+--line:rgba(255,255,255,.07);--line-hi:rgba(255,255,255,.14);--accent:#ff8a3d;--accent-ink:#ff9d5c;--blue:#7aa2ff;--pos:#6ccf8e;--neg:#f08a93;
+--b1:#ff8a3d;--b2:#ff7a1a;--b3:#ff5a1f;--o1:.30;--o2:.15;--o3:.12;--shadow:0 30px 60px -40px rgba(0,0,0,.85)}
+[data-theme=light]{--base:#dde2e9;--card:rgba(255,255,255,.72);--card-in:rgba(240,243,247,.7);--ink:#14171d;--muted:#5f6673;--faint:#8a909b;
+--line:rgba(15,23,42,.08);--line-hi:rgba(15,23,42,.16);--accent:#e8641b;--accent-ink:#b8470b;--blue:#2563eb;--pos:#15803d;--neg:#be123c;
+--b1:#ffffff;--b2:#8e9bb0;--b3:#f8fafc;--o1:1;--o2:.55;--o3:.9;--shadow:0 18px 40px -26px rgba(30,41,59,.35)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--base);color:var(--ink);font:14px/1.5 Inter,system-ui,sans-serif;min-height:100vh;position:relative;overflow-x:hidden}
+.aurora{position:fixed;inset:0;z-index:0;pointer-events:none;filter:blur(90px)}
+.aurora i{position:absolute;border-radius:50%}
+.aurora i:nth-child(1){width:55vw;height:45vw;left:-10vw;top:-15vw;background:var(--b1);opacity:var(--o1)}
+.aurora i:nth-child(2){width:45vw;height:40vw;right:-12vw;top:20vh;background:var(--b2);opacity:var(--o2)}
+.aurora i:nth-child(3){width:50vw;height:35vw;left:25vw;bottom:-20vw;background:var(--b3);opacity:var(--o3)}
+[data-theme=dark] .aurora i{opacity:calc(var(--o1)*.55)}
+main{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:28px 20px 60px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+h1{font-size:22px;margin:0;font-weight:700;letter-spacing:-.01em}
+h1 span{color:var(--accent)}
+.sub{color:var(--muted);font-size:13px;margin-top:4px}
+.tog{display:flex;background:var(--card);border:1px solid var(--line-hi);border-radius:999px;padding:3px;backdrop-filter:blur(14px)}
+.tog button{border:0;background:none;color:var(--muted);font:600 12px Inter;padding:7px 14px;border-radius:999px;cursor:pointer}
+.tog button.on{background:var(--accent);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+.card.wide{grid-column:1/-1}
+.tag{display:inline-block;font:600 10.5px 'JetBrains Mono',monospace;color:var(--accent-ink);border:1px solid var(--line-hi);border-radius:6px;padding:2px 7px;margin-bottom:8px}
+.tag.ill{color:var(--muted)}
+h2{font-size:15px;margin:0 0 2px;font-weight:600}
+.why{color:var(--muted);font-size:12.5px;margin:0 0 12px}
+.fig{width:100%;display:block}
+.src{font:11px 'JetBrains Mono',monospace;color:var(--faint);margin-top:8px}
+.kpis{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 10px}
+.kpi{background:var(--card-in);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.kpi b{display:block;font:600 18px 'JetBrains Mono',monospace;color:var(--accent)}
+.kpi span{font-size:11px;color:var(--muted)}
+svg text{font-family:'JetBrains Mono',monospace;fill:var(--muted);font-size:10px}
+.seg{display:inline-flex;gap:4px;margin-left:8px}
+.seg button{border:1px solid var(--line-hi);background:none;color:var(--muted);font:600 11px Inter;padding:3px 9px;border-radius:7px;cursor:pointer}
+.seg button.on{color:var(--accent-ink);border-color:var(--accent)}
+footer{color:var(--faint);font-size:11.5px;margin-top:24px}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body data-theme="dark">
+<div class="aurora"><i></i><i></i><i></i></div>
+<main>
+<header>
+ <div><h1>Option asiatique · <span>maquettes des figures</span></h1>
+ <div class="sub">Projet Pricing ING4 — énoncé 2. Cinq figures proposées pour le rapport (2 pages) et la soutenance.</div></div>
+ <div class="tog"><button data-t="dark" class="on">Sombre orange</button><button data-t="light">Clair argent</button></div>
+</header>
+
+<div class="grid">
+ <section class="card wide">
+  <span class="tag ill">F1 · ÉVENTAIL · trajectoires illustratives</span>
+  <h2>Pourquoi l'asiatique coûte moins cher : la moyenne disperse moins que le cours final</h2>
+  <p class="why">EUR/USD, 200 trajectoires sur 1 an. À droite : distribution du cours final S<sub>T</sub> (européen) contre la moyenne mensuelle A (asiatique).</p>
+  <canvas id="fan" class="fig" height="330"></canvas>
+  <div class="src">S0 = 1,0996 (Alpha Vantage, 16/11/2026) · σ = 5,55 % (vol. historique 252 j, calculée sur ces données) · dérive mise à 0 pour la maquette (r et q viendront de P5) · tirages faits dans la page pour la maquette ; la figure finale sortira du pricer.</div>
+ </section>
+
+ <section class="card">
+  <span class="tag">F2 · CARTE DE CHALEUR · results/p2_grid.csv</span>
+  <h2>Prix asiatique / prix européen selon K et T</h2>
+  <p class="why">Ratio par case. <span class="seg"><button data-o="call" class="on">Call</button><button data-o="put">Put</button></span></p>
+  <svg id="heat" class="fig" viewBox="0 0 520 300"></svg>
+  <div class="src">Actif théorique S0 = 100, σ = 20 %, r = 3 %, q = 1 %, mensuel, N = 200 000.</div>
+ </section>
+
+ <section class="card">
+  <span class="tag">F3 · GAIN D'EFFICACITÉ · results/p3_vr_atm.csv</span>
+  <h2>Ce que rapporte chaque réduction de variance</h2>
+  <p class="why">Gain = (variance × temps) sans réduction / avec. Échelle log. <span class="seg" id="segT"><button data-T="0.25">T 0,25</button><button data-T="1.0" class="on">T 1</button><button data-T="2.0">T 2</button></span></p>
+  <svg id="bars" class="fig" viewBox="0 0 520 300"></svg>
+  <div class="src">K = 100, N = 200 000, seed 20261117 ; barres pleines = call, contour = put.</div>
+ </section>
+
+ <section class="card">
+  <span class="tag">F4 · CONVERGENCE · projection 1/√N (P4 remplacera)</span>
+  <h2>Marge d'erreur à 95 % selon le nombre de trajectoires</h2>
+  <p class="why">Demi-largeur 1,96·σ̂/√N, σ̂ mesuré à N = 200 000 (call T = 1).</p>
+  <div class="kpis" id="kpis"></div>
+  <svg id="conv" class="fig" viewBox="0 0 520 270"></svg>
+  <div class="src">Ligne pointillée : marge cible 0,01. P4 tracera les points mesurés de 10³ à 10⁶.</div>
+ </section>
+
+ <section class="card">
+  <span class="tag ill">F5 · NUAGE · payoffs illustratifs</span>
+  <h2>Pourquoi le contrôle géométrique marche : A et G presque alignés</h2>
+  <p class="why">Payoff arithmétique contre géométrique, trajectoire par trajectoire.</p>
+  <canvas id="scat" class="fig" height="270"></canvas>
+  <div class="src">Corrélation mesurée par le pricer : 0,9993 à 0,9999 selon T (results/p3_vr_atm.csv).</div>
+ </section>
+</div>
+<footer>Maquette Cowork, 17/11/2026. Les figures F2, F3, F4 utilisent les CSV réels du dépôt ; F1 et F5 sont illustratives. Indicateur pédagogique, pas un conseil d'investissement.</footer>
+</main>
+
+<script>
+const GRID=[{"K": "80.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.9908416667408464"}, {"K": "80.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "0.04644212819668125"}, {"K": "90.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.9449208753535001"}, {"K": "90.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "0.29104998486114103"}, {"K": "100.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.7179810183293966"}, {"K": "100.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "0.7216305403375167"}, {"K": "110.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.34740550474870957"}, {"K": "110.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "0.9497883762280797"}, {"K": "120.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.10288054720939435"}, {"K": "120.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "1.000243577436391"}, {"K": "80.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.968109262555812"}, {"K": "80.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.06008685278491403"}, {"K": "90.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.8776896176782361"}, {"K": "90.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.29654977558793366"}, {"K": "100.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.6408130416315482"}, {"K": "100.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.654389458349957"}, {"K": "110.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.3411317707965435"}, {"K": "110.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.8943299847907755"}, {"K": "120.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.13085066711999552"}, {"K": "120.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.9849591923499553"}, {"K": "80.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.9214187557745849"}, {"K": "80.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.11039503635993961"}, {"K": "90.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.8033194384087553"}, {"K": "90.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.34082100915316016"}, {"K": "100.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.6024182366022997"}, {"K": "100.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.6213450686655612"}, {"K": "110.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.37775412802922925"}, {"K": "110.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.8309722214681972"}, {"K": "120.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.20041546591852263"}, {"K": "120.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.9445760539571696"}, {"K": "80.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.8499424092996566"}, {"K": "80.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.19029857751369086"}, {"K": "90.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.7311207073071566"}, {"K": "90.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.3935328551978879"}, {"K": "100.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.5772089838444838"}, {"K": "100.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.6066680638981087"}, {"K": "110.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.41821831541826865"}, {"K": "110.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.7761906208871509"}, {"K": "120.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.2821969071040642"}, {"K": "120.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.8898076731622163"}], VR=[{"T": "0.25", "option": "call", "estimator": "plain", "std_error": "0.010044461110700025", "efficiency_gain_vs_plain": "1.0"}, {"T": "0.25", "option": "call", "estimator": "antithetic", "std_error": "0.007383119139180117", "efficiency_gain_vs_plain": "3.683893309549271"}, {"T": "0.25", "option": "call", "estimator": "control_beta_optimal", "std_error": "0.0001400683688787422", "efficiency_gain_vs_plain": "5205.147219134835"}, {"T": "0.25", "option": "call", "estimator": "antithetic_control", "std_error": "0.00013712027387551226", "efficiency_gain_vs_plain": "10317.385470604038"}, {"T": "0.25", "option": "call", "estimator": "control_beta_1", "std_error": "0.00016958006132150239", "efficiency_gain_vs_plain": "4549.880036885196"}, {"T": "0.25", "option": "put", "estimator": "plain", "std_error": "0.00865963269595004", "efficiency_gain_vs_plain": "1.0"}, {"T": "0.25", "option": "put", "estimator": "antithetic", "std_error": "0.006233423405247754", "efficiency_gain_vs_plain": "3.6524261582609037"}, {"T": "0.25", "option": "put", "estimator": "control_beta_optimal", "std_error": "0.00011829102965435515", "efficiency_gain_vs_plain": "3917.9062223335604"}, {"T": "0.25", "option": "put", "estimator": "antithetic_control", "std_error": "0.00011431302439244973", "efficiency_gain_vs_plain": "6684.780869090189"}, {"T": "0.25", "option": "put", "estimator": "control_beta_1", "std_error": "0.00013997946587329565", "efficiency_gain_vs_plain": "3103.534300221338"}, {"T": "1.0", "option": "call", "estimator": "plain", "std_error": "0.017849506993033764", "efficiency_gain_vs_plain": "1.0"}, {"T": "1.0", "option": "call", "estimator": "antithetic", "std_error": "0.013382867090815953", "efficiency_gain_vs_plain": "3.4281755363759077"}, {"T": "1.0", "option": "call", "estimator": "control_beta_optimal", "std_error": "0.0004798618921913345", "efficiency_gain_vs_plain": "1454.213190239618"}, {"T": "1.0", "option": "call", "estimator": "antithetic_control", "std_error": "0.00047739383767371924", "efficiency_gain_vs_plain": "2564.7760363347643"}, {"T": "1.0", "option": "call", "estimator": "control_beta_1", "std_error": "0.0007112134333521805", "efficiency_gain_vs_plain": "686.5678337646299"}, {"T": "1.0", "option": "put", "estimator": "plain", "std_error": "0.013668753722692306", "efficiency_gain_vs_plain": "1.0"}, {"T": "1.0", "option": "put", "estimator": "antithetic", "std_error": "0.009789149705785566", "efficiency_gain_vs_plain": "3.507133132658646"}, {"T": "1.0", "option": "put", "estimator": "control_beta_optimal", "std_error": "0.0003513307482438455", "efficiency_gain_vs_plain": "1392.1227068540863"}, {"T": "1.0", "option": "put", "estimator": "antithetic_control", "std_error": "0.0003347203666351614", "efficiency_gain_vs_plain": "2654.434701552462"}, {"T": "1.0", "option": "put", "estimator": "control_beta_1", "std_error": "0.000489244527018958", "efficiency_gain_vs_plain": "739.6184978507215"}, {"T": "2.0", "option": "call", "estimator": "plain", "std_error": "0.025293271141877377", "efficiency_gain_vs_plain": "1.0"}, {"T": "2.0", "option": "call", "estimator": "antithetic", "std_error": "0.019142686313298993", "efficiency_gain_vs_plain": "3.286867653247314"}, {"T": "2.0", "option": "call", "estimator": "control_beta_optimal", "std_error": "0.000979293656560343", "efficiency_gain_vs_plain": "635.525806109335"}, {"T": "2.0", "option": "call", "estimator": "antithetic_control", "std_error": "0.000984408232843794", "efficiency_gain_vs_plain": "1111.5352601321067"}, {"T": "2.0", "option": "call", "estimator": "control_beta_1", "std_error": "0.00151992800039952", "efficiency_gain_vs_plain": "265.9484565202569"}, {"T": "2.0", "option": "put", "estimator": "plain", "std_error": "0.01736443245611399", "efficiency_gain_vs_plain": "1.0"}, {"T": "2.0", "option": "put", "estimator": "antithetic", "std_error": "0.012352287208218937", "efficiency_gain_vs_plain": "3.741664153699452"}, {"T": "2.0", "option": "put", "estimator": "control_beta_optimal", "std_error": "0.0006245754135949136", "efficiency_gain_vs_plain": "769.6045446049039"}, {"T": "2.0", "option": "put", "estimator": "antithetic_control", "std_error": "0.0005928228192406562", "efficiency_gain_vs_plain": "1464.8246912818329"}, {"T": "2.0", "option": "put", "estimator": "control_beta_1", "std_error": "0.0008885862620650262", "efficiency_gain_vs_plain": "369.4613694909983"}];
+const css=v=>getComputedStyle(document.body).getPropertyValue(v).trim();
+// LCG Park-Miller + Box-Muller, juste pour la maquette
+let seed=20261117;const U=()=>(seed=(seed*16807)%2147483647)/2147483647;
+let spare=null;const Z=()=>{if(spare!==null){const s=spare;spare=null;return s}const r=Math.sqrt(-2*Math.log(U())),v=2*Math.PI*U();spare=r*Math.sin(v);return r*Math.cos(v)};
+function sim(n,steps,S0,s,mu,T){seed=20261117;spare=null;const dt=T/steps,P=[];for(let i=0;i<n;i++){const p=[S0];let x=S0;for(let k=0;k<steps;k++){x*=Math.exp((mu-s*s/2)*dt+s*Math.sqrt(dt)*Z());p.push(x)}P.push(p)}return P}
+function sizeCanvas(c){const r=window.devicePixelRatio||1,w=c.clientWidth,h=+c.getAttribute('height');c.width=w*r;c.height=h*r;c.style.height=h+'px';const x=c.getContext('2d');x.setTransform(r,0,0,r,0,0);return[x,w,h]}
+const fmt=(v,d=4)=>v.toFixed(d).replace('.',',');
+
+function drawFan(){const c=document.getElementById('fan');const[x,w,h]=sizeCanvas(c);x.clearRect(0,0,w,h);
+ const S0=1.0996,s=.0555,mu=0,T=1,steps=252,P=sim(200,steps,S0,s,mu,T);
+ const L=48,R=w-210,top=10,bot=h-26;const all=P.flat();const lo=Math.min(...all),hi=Math.max(...all);
+ const X=k=>L+(R-L)*k/steps,Y=v=>bot-(bot-top)*(v-lo)/(hi-lo);
+ x.strokeStyle=css('--line');x.lineWidth=1;x.fillStyle=css('--muted');x.font='10px JetBrains Mono';
+ for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4;x.beginPath();x.moveTo(L,Y(v));x.lineTo(R,Y(v));x.stroke();x.fillText(v.toFixed(3),4,Y(v)+3)}
+ ['0','3 m','6 m','9 m','1 an'].forEach((t,i)=>x.fillText(t,X(steps*i/4)-8,h-8));
+ const fin=P.map(p=>p[steps]),f0=Math.min(...fin),f1=Math.max(...fin);
+ const acc=css('--accent'),blue=css('--blue');
+ P.forEach(p=>{const t=(p[steps]-f0)/(f1-f0);x.strokeStyle=t>.5?acc:blue;x.globalAlpha=.10+.25*Math.abs(t-.5);x.beginPath();p.forEach((v,k)=>k?x.lineTo(X(k),Y(v)):x.moveTo(X(k),Y(v)));x.stroke()});
+ x.globalAlpha=1;
+ // trajectoire moyenne et moyenne mensuelle d'une trajectoire
+ const mean=P[0].map((_,k)=>P.reduce((a,p)=>a+p[k],0)/P.length);x.strokeStyle=css('--ink');x.lineWidth=2.2;x.beginPath();mean.forEach((v,k)=>k?x.lineTo(X(k),Y(v)):x.moveTo(X(k),Y(v)));x.stroke();
+ const ex=P[17];x.fillStyle=acc;for(let m=1;m<=12;m++){const k=Math.round(steps*m/12);x.beginPath();x.arc(X(k),Y(ex[k]),3,0,7);x.fill()}
+ x.strokeStyle=acc;x.lineWidth=1.6;x.beginPath();ex.forEach((v,k)=>k?x.lineTo(X(k),Y(v)):x.moveTo(X(k),Y(v)));x.stroke();
+ // histogrammes
+ const A=P.map(p=>{let s=0;for(let m=1;m<=12;m++)s+=p[Math.round(steps*m/12)];return s/12});
+ const bins=24,bw=(hi-lo)/bins,hS=Array(bins).fill(0),hA=Array(bins).fill(0);
+ fin.forEach(v=>hS[Math.min(bins-1,((v-lo)/bw)|0)]++);A.forEach(v=>hA[Math.min(bins-1,((v-lo)/bw)|0)]++);
+ const mx=Math.max(...hS,...hA),H0=R+18,HW=170;
+ for(let i=0;i<bins;i++){const y0=Y(lo+bw*(i+1)),bh=Y(lo+bw*i)-y0-1;x.fillStyle=blue;x.globalAlpha=.45;x.fillRect(H0,y0,HW*hS[i]/mx,bh);x.globalAlpha=.85;x.fillStyle=acc;x.fillRect(H0,y0+bh*.25,HW*hA[i]/mx,bh*.5)}
+ x.globalAlpha=1;x.fillStyle=css('--muted');x.fillText('S_T (européen)',H0,top+10);x.fillStyle=acc;x.fillText('moyenne A (asiatique)',H0,top+24);
+}
+function heat(opt){const g=GRID.filter(r=>r.option===opt),Ks=[80,90,100,110,120],Ts=['0.25','0.5','1.0','2.0'];
+ const el=document.getElementById('heat'),L=70,T0=24,cw=88,ch=60;let s='';const acc=css('--accent');
+ Ks.forEach((k,i)=>s+=`<text x="${L+i*cw+cw/2}" y="16" text-anchor="middle">K ${k}</text>`);
+ Ts.forEach((t,j)=>{s+=`<text x="${L-8}" y="${T0+j*ch+ch/2+4}" text-anchor="end">T ${t.replace('.',',')}</text>`;
+  Ks.forEach((k,i)=>{const r=g.find(z=>+z.K===k&&z.T===t);const v=+r.ratio_asian_over_euro_bs;
+   s+=`<rect x="${L+i*cw+2}" y="${T0+j*ch+2}" width="${cw-4}" height="${ch-4}" rx="7" fill="${acc}" fill-opacity="${(.08+.85*(1-Math.min(v,1))).toFixed(2)}" stroke="var(--line)"/>`;
+   s+=`<text x="${L+i*cw+cw/2}" y="${T0+j*ch+ch/2+4}" text-anchor="middle" style="fill:var(--ink);font-size:12px;font-weight:600">${fmt(v,2)}</text>`})});
+ s+=`<text x="${L}" y="${T0+4*ch+18}">plus orange = asiatique beaucoup moins cher que l'européen</text>`;el.innerHTML=s}
+function bars(T){const names={plain:'Sans réduction',antithetic:'Antithétique',control_beta_1:'Contrôle β = 1',control_beta_optimal:'Contrôle β optimal',antithetic_control:'Antithétique + contrôle'};
+ const order=Object.keys(names),el=document.getElementById("bars"),L=172,W=300,rh=52;let s='';const acc=css('--accent');
+ const lg=v=>Math.log10(v)/4;[1,10,100,1000,10000].forEach(t=>{const xx=L+W*lg(t);s+=`<line x1="${xx}" x2="${xx}" y1="10" y2="${10+rh*5}" stroke="var(--line)"/><text x="${xx}" y="${rh*5+26}" text-anchor="middle">×${t.toLocaleString('fr-FR')}</text>`});
+ order.forEach((e,i)=>{const c=VR.find(r=>r.T===T&&r.option==='call'&&r.estimator===e),p=VR.find(r=>r.T===T&&r.option==='put'&&r.estimator===e);const y=14+i*rh;
+  s+=`<text x="${L-10}" y="${y+20}" text-anchor="end" style="fill:var(--ink);font-size:11px">${names[e]}</text>`;
+  const gc=+c.efficiency_gain_vs_plain,gp=+p.efficiency_gain_vs_plain;
+  s+=`<rect x="${L}" y="${y+6}" width="${Math.max(2,W*lg(gc))}" height="14" rx="4" fill="${acc}"/>`;
+  s+=`<rect x="${L}" y="${y+24}" width="${Math.max(2,W*lg(gp))}" height="10" rx="3" fill="none" stroke="${acc}"/>`;
+  s+=`<text x="${L+Math.max(2,W*lg(gc))+6}" y="${y+18}" style="fill:var(--ink)">×${Math.round(gc).toLocaleString('fr-FR')}</text>`});
+ el.innerHTML=s}
+function conv(){const el=document.getElementById('conv'),L=56,R=500,T0=10,B=230;const pick=e=>VR.find(r=>r.T==='1.0'&&r.option==='call'&&r.estimator===e);
+ const ests=[['plain','Sans réduction','--blue'],['antithetic_control','Antithétique + contrôle','--accent']];
+ const X=n=>L+(R-L)*(Math.log10(n)-3)/3,Y=v=>T0+(B-T0)*(Math.log10(0.5)-Math.log10(v))/(Math.log10(0.5)-Math.log10(1e-4));let s='';
+ [1e3,1e4,1e5,1e6].forEach(n=>s+=`<line x1="${X(n)}" x2="${X(n)}" y1="${T0}" y2="${B}" stroke="var(--line)"/><text x="${X(n)}" y="${B+16}" text-anchor="middle">N 10^${Math.log10(n)}</text>`);
+ [1e-1,1e-2,1e-3,1e-4].forEach(v=>s+=`<line x1="${L}" x2="${R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${Y(v)+3}" text-anchor="end">${v}</text>`);
+ s+=`<line x1="${L}" x2="${R}" y1="${Y(.01)}" y2="${Y(.01)}" stroke="var(--ink)" stroke-dasharray="4 4" opacity=".6"/>`;
+ let k='';ests.forEach(([e,n,c])=>{const r=pick(e),sig=+r.std_error*Math.sqrt(200000),col=css(c);let d='';for(let i=0;i<=60;i++){const N=10**(3+3*i/60);const hw=1.96*sig/Math.sqrt(N);d+=(i?'L':'M')+X(N)+','+Y(hw)}
+  s+=`<path d="${d}" fill="none" stroke="${col}" stroke-width="2.4"/>`;const need=Math.ceil((1.96*sig/.01)**2);
+  k+=`<div class="kpi"><b style="color:${col}">${need.toLocaleString('fr-FR')}</b><span>${n} : N pour ±0,01</span></div>`});
+ el.innerHTML=s;document.getElementById('kpis').innerHTML=k}
+function scat(){const c=document.getElementById('scat');const[x,w,h]=sizeCanvas(c);x.clearRect(0,0,w,h);
+ const P=sim(1500,12,100,.2,.02,1),K=100,pts=P.map(p=>{const o=p.slice(1);const A=o.reduce((a,b)=>a+b)/12,G=Math.exp(o.reduce((a,b)=>a+Math.log(b),0)/12);return[Math.max(G-K,0),Math.max(A-K,0)]});
+ const m=Math.max(...pts.flat()),L=40,B=h-24,X=v=>L+(w-L-14)*v/m,Y=v=>B-(B-10)*v/m;
+ x.strokeStyle=css('--line');x.fillStyle=css('--muted');x.font='10px JetBrains Mono';
+ for(let i=0;i<=4;i++){const v=m*i/4;x.beginPath();x.moveTo(L,Y(v));x.lineTo(w-14,Y(v));x.stroke();x.fillText(v.toFixed(0),8,Y(v)+3);x.fillText(v.toFixed(0),X(v)-4,h-8)}
+ x.strokeStyle=css('--ink');x.globalAlpha=.35;x.setLineDash([4,4]);x.beginPath();x.moveTo(X(0),Y(0));x.lineTo(X(m),Y(m));x.stroke();x.setLineDash([]);x.globalAlpha=.55;
+ x.fillStyle=css('--accent');pts.forEach(([g,a])=>{x.beginPath();x.arc(X(g),Y(a),2,0,7);x.fill()});x.globalAlpha=1;
+ x.fillStyle=css('--muted');x.fillText('payoff géométrique →',w-150,B-6);x.fillText('↑ payoff arithmétique',L+6,20)}
+
+let opt='call',TT='1.0';
+function all(){drawFan();heat(opt);bars(TT);conv();scat()}
+document.querySelectorAll('.tog button').forEach(b=>b.onclick=()=>{document.body.dataset.theme=b.dataset.t;document.querySelectorAll('.tog button').forEach(z=>z.classList.toggle('on',z===b));all()});
+document.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{opt=b.dataset.o;document.querySelectorAll('[data-o]').forEach(z=>z.classList.toggle('on',z===b));heat(opt)});
+document.querySelectorAll('[data-T]').forEach(b=>b.onclick=()=>{TT=b.dataset.T;document.querySelectorAll('[data-T]').forEach(z=>z.classList.toggle('on',z===b));bars(TT)});
+addEventListener('resize',()=>{drawFan();scat()});
+document.fonts?document.fonts.ready.then(all):all();
+</script>
+</body>
+</html>

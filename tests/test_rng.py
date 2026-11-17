@@ -191,3 +191,47 @@ def test_uniform_moments_and_ks():
     assert ks.pvalue > 1e-3
     ac1 = np.corrcoef(u[:-1], u[1:])[0, 1]
     assert abs(ac1) < 5 / np.sqrt(n)
+
+
+# --- saut exact public et balayage par paquets (P5a, étape 0 : flux disjoints) -----------------
+
+def test_state_after_equals_sequential_generation():
+    from pricer.rng import state_after
+    seed = 20261117
+    seq = LCG(seed).integers(50_000)
+    assert state_after(seed, 0) == seed
+    for n in (1, 7, 4_096, 4_097, 49_999, 50_000):
+        assert state_after(seed, n) == int(seq[n - 1])
+
+
+def test_state_after_mixed_lcg():
+    from pricer.rng import state_after
+    seq = LCG(3, a=5, m=16, c=3).integers(40)
+    for n in (1, 5, 17, 40):
+        assert state_after(3, n, a=5, m=16, c=3) == int(seq[n - 1])
+
+
+def test_scan_stream_finds_return_of_seed_on_small_lcg():
+    from pricer.rng import scan_stream
+    # a = 3, m = 7 : 3 est racine primitive mod 7, période 6
+    first, states = scan_stream(1, positions=[0, 2, 6], limit=20, chunk=4, a=3, m=7)
+    assert first == 6
+    assert states == {0: 1, 2: 2, 6: 1}          # x_2 = 9 mod 7 = 2, x_6 = 1
+
+
+def test_scan_stream_no_return_within_limit_and_chunking_invariant():
+    from pricer.rng import scan_stream
+    seed = 20261117
+    pos = [0, 1, 999, 1_000, 123_456, 300_000]
+    ref = LCG(seed).integers(300_000)
+    for chunk in (1_000, 77_777, 1_000_000):
+        first, states = scan_stream(seed, positions=pos, limit=300_000, chunk=chunk)
+        assert first is None
+        assert states[0] == seed
+        assert all(states[p] == int(ref[p - 1]) for p in pos[1:])
+
+
+def test_scan_stream_rejects_positions_beyond_limit():
+    from pricer.rng import scan_stream
+    with pytest.raises(ValueError):
+        scan_stream(1, positions=[11], limit=10)

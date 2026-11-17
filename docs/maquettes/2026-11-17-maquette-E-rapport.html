@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pricing asiatique — maquette E · sombre TradingView × Apple (rapport PDF)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0e14;--page:#131722;--panel:#1a1e29;--grid:#2a2e39;--ink:#e6e8ee;--sub:#b2b5be;--muted:#787b86;
+--blue:#2962ff;--teal:#26a69a;--red:#ef5350;--amber:#f5a623;--line:rgba(255,255,255,.06)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:12px/1.5 Inter,-apple-system,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.hint{max-width:860px;margin:22px auto 0;color:var(--muted);font-size:12.5px;padding:0 12px}
+.hint b{color:var(--ink)}
+.page{width:794px;min-height:1123px;margin:22px auto;background:var(--page);border-radius:6px;box-shadow:0 30px 80px -30px rgba(0,0,0,.8);padding:40px 44px;position:relative}
+.top{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--grid);padding-bottom:12px;margin-bottom:16px}
+.brand{font-weight:600;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.brand i{display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--blue);margin-right:8px;vertical-align:1px}
+.pg{font:500 11px 'JetBrains Mono';color:var(--muted)}
+h1{font-size:26px;line-height:1.15;font-weight:700;letter-spacing:-.02em;margin:0 0 4px}
+.lead{color:var(--sub);font-size:12.5px;margin:0 0 16px;max-width:620px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.kpi span{display:block;color:var(--muted);font-size:10.5px}
+.kpi b{display:block;font:600 19px 'JetBrains Mono';margin-top:2px}
+.kpi small{font:500 10.5px 'JetBrains Mono'}
+.up{color:var(--teal)}.dn{color:var(--red)}.bl{color:#5b8cff}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.ch h2{font-size:12.5px;font-weight:600;margin:0}
+.ch .leg{display:flex;gap:12px;color:var(--muted);font-size:10.5px}
+.ch .leg i{display:inline-block;width:10px;height:3px;border-radius:2px;margin-right:5px;vertical-align:2px}
+.cap{color:var(--muted);font-size:10.5px;margin-top:6px;line-height:1.45}
+.cap b{color:var(--sub);font-weight:500}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+h3{font-size:13px;font-weight:600;margin:14px 0 4px}
+p.t{color:var(--sub);margin:0 0 8px;text-align:justify}
+.ph{border:1px dashed var(--grid);border-radius:8px;color:var(--muted);padding:10px 12px;font-size:11px;margin-bottom:10px}
+table{width:100%;border-collapse:collapse;font:500 11px 'JetBrains Mono'}
+th{color:var(--muted);font:500 10.5px Inter;text-align:right;padding:5px 6px;border-bottom:1px solid var(--grid)}
+th:first-child,td:first-child{text-align:left}
+td{text-align:right;padding:5px 6px;border-bottom:1px solid var(--line)}
+.foot{position:absolute;left:44px;right:44px;bottom:22px;display:flex;justify-content:space-between;color:var(--muted);font-size:10px;border-top:1px solid var(--grid);padding-top:8px}
+canvas,svg{width:100%;display:block}
+svg text{font-family:'JetBrains Mono',monospace;font-size:10px;fill:var(--muted)}
+</style>
+</head>
+<body>
+<div class="hint"><b>Maquette E · sombre TradingView × Apple</b> — les deux pages du rapport PDF à leur taille réelle (A4). Les graphiques reprennent ceux de la première maquette. F2 et F3 et les chiffres-clés viennent des CSV du dépôt (P2, P3) ; l'éventail et le nuage sont illustratifs ; les blocs en pointillé sont la place du texte, à écrire en P6.</div>
+
+<section class="page">
+ <div class="top"><div class="brand"><i></i>Projet Pricing ING4 · Énoncé 2</div><div class="pg">ECE Paris · 2026 · 1/2</div></div>
+ <h1>Option asiatique par Monte-Carlo : prix, comparaison européenne et réduction de variance</h1>
+ <p class="lead">Moyenne arithmétique, dynamique de Black-Scholes avec dividende continu. Aléa généré par un générateur congruentiel (Park-Miller) et la transformée inverse, sans générateur de bibliothèque.</p>
+ <div class="kpis" id="kpis"></div>
+
+ <div class="card">
+  <div class="ch"><h2>Fig. 1 — La moyenne disperse moins que le cours final</h2><div class="leg"><span><i style="background:var(--teal)"></i>finit haut</span><span><i style="background:var(--red)"></i>finit bas</span><span><i style="background:var(--amber)"></i>moyenne A</span><span><i style="background:#5b8cff"></i>S<sub>T</sub></span></div></div>
+  <canvas id="fan" height="250"></canvas>
+  <div class="cap"><b>EUR/USD, 1 an, observations mensuelles.</b> S0 = 1,0996 (16/11/2026), σ = 5,55 % (historique 252 j). Trajectoires illustratives pour la maquette.</div>
+ </div>
+
+ <div class="two">
+  <div class="card">
+   <div class="ch"><h2>Fig. 2 — Asiatique / européen (call)</h2></div>
+   <svg id="heat" viewBox="0 0 330 230"></svg>
+   <div class="cap"><b>S0 = 100, σ = 20 %, r = 3 %, q = 1 %</b>, N = 200 000. Plus la case est foncée, plus l'asiatique est bon marché.</div>
+  </div>
+  <div class="card">
+   <div class="ch"><h2>Fig. 3 — Gain d'efficacité, K = 100, T = 1</h2></div>
+   <svg id="bars" viewBox="0 0 330 230"></svg>
+   <div class="cap"><b>Gain = (variance × temps) de référence / méthode.</b> Barre pleine : call ; trait : put.</div>
+  </div>
+ </div>
+ <div class="ph">Texte 1 · Méthode : générateur, schéma exact, estimateur et IC à 95 % (≈ 8 lignes, P6)</div>
+ <div class="foot"><span>Indicateur pédagogique, pas un conseil d'investissement.</span><span>Code : github.com/Lisaii1/pricing-asian (privé)</span></div>
+</section>
+
+<section class="page">
+ <div class="top"><div class="brand"><i></i>Résultats et réduction de variance</div><div class="pg">2/2</div></div>
+ <div class="two">
+  <div class="card">
+   <div class="ch"><h2>Fig. 4 — Marge d'erreur (IC 95 %)</h2><div class="leg"><span><i style="background:#5b8cff"></i>sans</span><span><i style="background:var(--teal)"></i>anti + contrôle</span></div></div>
+   <svg id="conv" viewBox="0 0 330 220"></svg>
+   <div class="cap"><b>Projection 1,96·σ̂/√N</b> depuis N = 200 000 ; P4 remplacera par les points mesurés. Pointillé : marge 0,01.</div>
+  </div>
+  <div class="card">
+   <div class="ch"><h2>Fig. 5 — Payoffs arithmétique / géométrique</h2></div>
+   <canvas id="scat" height="220"></canvas>
+   <div class="cap"><b>Corrélation mesurée 0,9987 à 0,9999</b> selon T (results/p3_vr_atm.csv). Nuage illustratif.</div>
+  </div>
+ </div>
+ <div class="card">
+  <div class="ch"><h2>Tableau 1 — Estimateurs à la monnaie, call T = 1, N = 200 000</h2></div>
+  <table id="tab"></table>
+  <div class="cap">Seed 20261117, transformée inverse AS241. Écart-type de l'estimateur et IC à 95 %.</div>
+ </div>
+ <div class="ph">Texte 2 · Comparaison asiatique / européen (question 2) · Texte 3 · Contrôle géométrique, β, antithétiques (question 3) · Texte 4 · Gain de temps / précision (question 4) · Application EUR/USD et limites (≈ 25 lignes, P6)</div>
+ <div class="foot"><span>Sources : Alpha Vantage (EUR/USD, 16/11/2026) ; cours Pricing Monte-Carlo 2026 (A. W. Sanoussi Mani).</span><span>ECE Paris · ING4</span></div>
+</section>
+
+<script>
+const GRID=[{"K": "80.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.9908416667408464"}, {"K": "80.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "0.04644212819668125"}, {"K": "90.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.9449208753535001"}, {"K": "90.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "0.29104998486114103"}, {"K": "100.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.7179810183293966"}, {"K": "100.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "0.7216305403375167"}, {"K": "110.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.34740550474870957"}, {"K": "110.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "0.9497883762280797"}, {"K": "120.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.10288054720939435"}, {"K": "120.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "1.000243577436391"}, {"K": "80.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.968109262555812"}, {"K": "80.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.06008685278491403"}, {"K": "90.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.8776896176782361"}, {"K": "90.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.29654977558793366"}, {"K": "100.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.6408130416315482"}, {"K": "100.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.654389458349957"}, {"K": "110.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.3411317707965435"}, {"K": "110.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.8943299847907755"}, {"K": "120.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.13085066711999552"}, {"K": "120.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.9849591923499553"}, {"K": "80.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.9214187557745849"}, {"K": "80.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.11039503635993961"}, {"K": "90.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.8033194384087553"}, {"K": "90.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.34082100915316016"}, {"K": "100.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.6024182366022997"}, {"K": "100.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.6213450686655612"}, {"K": "110.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.37775412802922925"}, {"K": "110.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.8309722214681972"}, {"K": "120.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.20041546591852263"}, {"K": "120.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.9445760539571696"}, {"K": "80.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.8499424092996566"}, {"K": "80.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.19029857751369086"}, {"K": "90.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.7311207073071566"}, {"K": "90.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.3935328551978879"}, {"K": "100.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.5772089838444838"}, {"K": "100.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.6066680638981087"}, {"K": "110.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.41821831541826865"}, {"K": "110.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.7761906208871509"}, {"K": "120.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.2821969071040642"}, {"K": "120.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.8898076731622163"}],VR=[{"T": "0.25", "option": "call", "estimator": "plain", "price": "3.031023341810034", "std_error": "0.010044461110700025", "corr": "", "efficiency_gain_vs_plain": "1.0"}, {"T": "0.25", "option": "call", "estimator": "antithetic", "price": "3.0207678373974183", "std_error": "0.007383119139180117", "corr": "", "efficiency_gain_vs_plain": "3.683893309549271"}, {"T": "0.25", "option": "call", "estimator": "control_beta_optimal", "price": "3.0249316969948095", "std_error": "0.0001400683688787422", "corr": "0.9999027660389407", "efficiency_gain_vs_plain": "5205.147219134835"}, {"T": "0.25", "option": "call", "estimator": "antithetic_control", "price": "3.0248655993362585", "std_error": "0.00013712027387551226", "corr": "0.9998275230555471", "efficiency_gain_vs_plain": "10317.385470604038"}, {"T": "0.25", "option": "call", "estimator": "control_beta_1", "price": "3.0249896774554066", "std_error": "0.00016958006132150239", "corr": "0.9999027660389407", "efficiency_gain_vs_plain": "4549.880036885196"}, {"T": "0.25", "option": "put", "estimator": "plain", "price": "2.687414066375501", "std_error": "0.00865963269595004", "corr": "", "efficiency_gain_vs_plain": "1.0"}, {"T": "0.25", "option": "put", "estimator": "antithetic", "price": "2.6906711327258908", "std_error": "0.006233423405247754", "corr": "", "efficiency_gain_vs_plain": "3.6524261582609037"}, {"T": "0.25", "option": "put", "estimator": "control_beta_optimal", "price": "2.693201271489114", "std_error": "0.00011829102965435515", "corr": "0.9999066971421303", "efficiency_gain_vs_plain": "3917.9062223335604"}, {"T": "0.25", "option": "put", "estimator": "antithetic_control", "price": "2.6931250259730537", "std_error": "0.00011431302439244973", "corr": "0.9998318314813285", "efficiency_gain_vs_plain": "6684.780869090189"}, {"T": "0.25", "option": "put", "estimator": "control_beta_1", "price": "2.693251293534296", "std_error": "0.00013997946587329565", "corr": "0.9999066971421303", "efficiency_gain_vs_plain": "3103.534300221338"}, {"T": "1.0", "option": "call", "estimator": "plain", "price": "5.317739286498677", "std_error": "0.017849506993033764", "corr": "", "efficiency_gain_vs_plain": "1.0"}, {"T": "1.0", "option": "call", "estimator": "antithetic", "price": "5.327482779850004", "std_error": "0.013382867090815953", "corr": "", "efficiency_gain_vs_plain": "3.4281755363759077"}, {"T": "1.0", "option": "call", "estimator": "control_beta_optimal", "price": "5.324176267146406", "std_error": "0.0004798618921913345", "corr": "0.9996385663617008", "efficiency_gain_vs_plain": "1454.213190239618"}, {"T": "1.0", "option": "call", "estimator": "antithetic_control", "price": "5.324493475701731", "std_error": "0.00047739383767371924", "corr": "0.9993635511338304", "efficiency_gain_vs_plain": "2564.7760363347643"}, {"T": "1.0", "option": "call", "estimator": "control_beta_1", "price": "5.323986893828822", "std_error": "0.0007112134333521805", "corr": "0.9996385663617008", "efficiency_gain_vs_plain": "686.5678337646299"}, {"T": "1.0", "option": "put", "estimator": "plain", "price": "4.266708987467453", "std_error": "0.013668753722692306", "corr": "", "efficiency_gain_vs_plain": "1.0"}, {"T": "1.0", "option": "put", "estimator": "antithetic", "price": "4.268367037886536", "std_error": "0.009789149705785566", "corr": "", "efficiency_gain_vs_plain": "3.507133132658646"}, {"T": "1.0", "option": "put", "estimator": "control_beta_optimal", "price": "4.265860875564554", "std_error": "0.0003513307482438455", "corr": "0.999669618108156", "efficiency_gain_vs_plain": "1392.1227068540863"}, {"T": "1.0", "option": "put", "estimator": "antithetic_control", "price": "4.265868691935509", "std_error": "0.0003347203666351614", "corr": "0.9994152485105332", "efficiency_gain_vs_plain": "2654.434701552462"}, {"T": "1.0", "option": "put", "estimator": "control_beta_1", "price": "4.265839742626439", "std_error": "0.000489244527018958", "corr": "0.999669618108156", "efficiency_gain_vs_plain": "739.6184978507215"}, {"T": "2.0", "option": "call", "estimator": "plain", "price": "7.409254294677302", "std_error": "0.025293271141877377", "corr": "", "efficiency_gain_vs_plain": "1.0"}, {"T": "2.0", "option": "call", "estimator": "antithetic", "price": "7.432407700806825", "std_error": "0.019142686313298993", "corr": "", "efficiency_gain_vs_plain": "3.286867653247314"}, {"T": "2.0", "option": "call", "estimator": "control_beta_optimal", "price": "7.4442575416905035", "std_error": "0.000979293656560343", "corr": "0.9992501943018967", "efficiency_gain_vs_plain": "635.525806109335"}, {"T": "2.0", "option": "call", "estimator": "antithetic_control", "price": "7.444009775370302", "std_error": "0.000984408232843794", "corr": "0.9986768712018056", "efficiency_gain_vs_plain": "1111.5352601321067"}, {"T": "2.0", "option": "call", "estimator": "control_beta_1", "price": "7.4426476995377575", "std_error": "0.00151992800039952", "corr": "0.9992501943018967", "efficiency_gain_vs_plain": "265.9484565202569"}, {"T": "2.0", "option": "put", "estimator": "plain", "price": "5.455724729036241", "std_error": "0.01736443245611399", "corr": "", "efficiency_gain_vs_plain": "1.0"}, {"T": "2.0", "option": "put", "estimator": "antithetic", "price": "5.445523373803734", "std_error": "0.012352287208218937", "corr": "", "efficiency_gain_vs_plain": "3.741664153699452"}, {"T": "2.0", "option": "put", "estimator": "control_beta_optimal", "price": "5.4525831969793614", "std_error": "0.0006245754135949136", "corr": "0.9993529182952406", "efficiency_gain_vs_plain": "769.6045446049039"}, {"T": "2.0", "option": "put", "estimator": "antithetic_control", "price": "5.453216915958412", "std_error": "0.0005928228192406562", "corr": "0.9988476739934514", "efficiency_gain_vs_plain": "1464.8246912818329"}, {"T": "2.0", "option": "put", "estimator": "control_beta_1", "price": "5.452468773389107", "std_error": "0.0008885862620650262", "corr": "0.9993529182952406", "efficiency_gain_vs_plain": "369.4613694909983"}];
+const C={teal:'#26a69a',red:'#ef5350',blue:'#5b8cff',amber:'#f5a623',grid:'#2a2e39',muted:'#787b86',ink:'#e6e8ee'};
+const fr=(v,d)=>v.toFixed(d).replace('.',',');
+let seed;const U=()=>(seed=(seed*16807)%2147483647)/2147483647;let sp=null;
+const Z=()=>{if(sp!==null){const s=sp;sp=null;return s}const r=Math.sqrt(-2*Math.log(U())),v=2*Math.PI*U();sp=r*Math.sin(v);return r*Math.cos(v)};
+function sim(n,st,S0,s,mu,T){seed=20261117;sp=null;const dt=T/st,P=[];for(let i=0;i<n;i++){let x=S0;const p=[x];for(let k=0;k<st;k++){x*=Math.exp((mu-s*s/2)*dt+s*Math.sqrt(dt)*Z());p.push(x)}P.push(p)}return P}
+function cv(c){const r=devicePixelRatio||1,w=c.clientWidth,h=+c.getAttribute('height');c.width=w*r;c.height=h*r;c.style.height=h+'px';const x=c.getContext('2d');x.setTransform(r,0,0,r,0,0);x.font='10px JetBrains Mono';return[x,w,h]}
+function fan(){const c=document.getElementById('fan'),[x,w,h]=cv(c),P=sim(180,252,1.0996,.0555,0,1),st=252,L=42,R=w-150,T=6,B=h-18;
+ const all=P.flat(),lo=Math.min(...all),hi=Math.max(...all),X=k=>L+(R-L)*k/st,Y=v=>B-(B-T)*(v-lo)/(hi-lo);
+ x.strokeStyle=C.grid;x.fillStyle=C.muted;for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4;x.beginPath();x.moveTo(L,Y(v));x.lineTo(R,Y(v));x.stroke();x.fillText(v.toFixed(3),0,Y(v)+3)}
+ ['0','3 m','6 m','9 m','12 m'].forEach((s,i)=>x.fillText(s,X(st*i/4)-8,h-4));
+ const S0=1.0996;P.forEach(p=>{x.strokeStyle=p[st]>=S0?C.teal:C.red;x.globalAlpha=.16;x.lineWidth=1;x.beginPath();p.forEach((v,k)=>k?x.lineTo(X(k),Y(v)):x.moveTo(X(k),Y(v)));x.stroke()});
+ x.globalAlpha=1;const ex=P[17];x.strokeStyle=C.ink;x.lineWidth=1.4;x.beginPath();ex.forEach((v,k)=>k?x.lineTo(X(k),Y(v)):x.moveTo(X(k),Y(v)));x.stroke();
+ x.fillStyle=C.amber;for(let m=1;m<=12;m++){const k=Math.round(st*m/12);x.beginPath();x.arc(X(k),Y(ex[k]),2.6,0,7);x.fill()}
+ x.setLineDash([3,3]);x.strokeStyle=C.muted;x.beginPath();x.moveTo(L,Y(S0));x.lineTo(R,Y(S0));x.stroke();x.setLineDash([]);
+ x.fillStyle=C.ink;x.fillRect(R-56,Y(S0)-8,56,16);x.fillStyle='#131722';x.fillText('1,0996',R-50,Y(S0)+4);
+ const fin=P.map(p=>p[st]),A=P.map(p=>{let s=0;for(let m=1;m<=12;m++)s+=p[Math.round(st*m/12)];return s/12}),nb=24,bw=(hi-lo)/nb,hS=Array(nb).fill(0),hA=Array(nb).fill(0);
+ fin.forEach(v=>hS[Math.min(nb-1,((v-lo)/bw)|0)]++);A.forEach(v=>hA[Math.min(nb-1,((v-lo)/bw)|0)]++);const mx=Math.max(...hS,...hA),H0=R+12,HW=130;
+ for(let i=0;i<nb;i++){const y0=Y(lo+bw*(i+1)),bh=Math.max(1,Y(lo+bw*i)-y0-1);x.fillStyle=C.blue;x.globalAlpha=.35;x.fillRect(H0,y0,HW*hS[i]/mx,bh);x.globalAlpha=.9;x.fillStyle=C.amber;x.fillRect(H0,y0+bh*.3,HW*hA[i]/mx,bh*.4)}x.globalAlpha=1}
+function heat(){const g=GRID.filter(r=>r.option==='call'),Ks=[80,90,100,110,120],Ts=['0.25','0.5','1.0','2.0'],L=46,T0=18,cw=55,ch=48;let s='';
+ Ks.forEach((k,i)=>s+=`<text x="${L+i*cw+cw/2}" y="11" text-anchor="middle">K ${k}</text>`);
+ Ts.forEach((t,j)=>{s+=`<text x="${L-6}" y="${T0+j*ch+ch/2+4}" text-anchor="end">T ${t.replace('.',',')}</text>`;Ks.forEach((k,i)=>{const v=+g.find(z=>+z.K===k&&z.T===t).ratio_asian_over_euro_bs;
+  s+=`<rect x="${L+i*cw+2}" y="${T0+j*ch+2}" width="${cw-4}" height="${ch-4}" rx="6" fill="#2962ff" fill-opacity="${(.06+.75*(1-Math.min(v,1))).toFixed(2)}"/><text x="${L+i*cw+cw/2}" y="${T0+j*ch+ch/2+4}" text-anchor="middle" style="fill:#e6e8ee;font-size:11px;font-weight:600">${fr(v,2)}</text>`})});
+ document.getElementById('heat').innerHTML=s}
+function bars(){const nm={plain:'Sans réduction',antithetic:'Antithétique',control_beta_1:'Contrôle β = 1',control_beta_optimal:'Contrôle β opt.',antithetic_control:'Anti + contrôle'},L=98,W=180,rh=40;let s='';const lg=v=>Math.log10(v)/4;
+ [1,10,100,1000,10000].forEach(v=>{const xx=L+W*lg(v);s+=`<line x1="${xx}" x2="${xx}" y1="4" y2="${4+rh*5}" stroke="#2a2e39"/><text x="${xx}" y="${rh*5+18}" text-anchor="middle">×${v>=1000?v/1000+'k':v}</text>`});
+ Object.keys(nm).forEach((e,i)=>{const c=VR.find(z=>z.T==='1.0'&&z.option==='call'&&z.estimator===e),p=VR.find(z=>z.T==='1.0'&&z.option==='put'&&z.estimator===e),gc=+c.efficiency_gain_vs_plain,gp=+p.efficiency_gain_vs_plain,y=6+i*rh;
+  s+=`<text x="${L-8}" y="${y+16}" text-anchor="end" style="fill:#b2b5be">${nm[e]}</text><rect x="${L}" y="${y+6}" width="${Math.max(2,W*lg(gc))}" height="12" rx="3" fill="#26a69a"/><rect x="${L}" y="${y+21}" width="${Math.max(2,W*lg(gp))}" height="5" rx="2" fill="none" stroke="#26a69a"/><text x="${L+Math.max(2,W*lg(gc))+5}" y="${y+16}" style="fill:#e6e8ee">×${Math.round(gc).toLocaleString('fr-FR')}</text>`});
+ document.getElementById('bars').innerHTML=s}
+function conv(){const L=46,R=320,T0=8,B=190,pick=e=>VR.find(r=>r.T==='1.0'&&r.option==='call'&&r.estimator===e),X=n=>L+(R-L)*(Math.log10(n)-3)/3,Y=v=>T0+(B-T0)*(Math.log10(.5)-Math.log10(v))/(Math.log10(.5)+4);let s='';
+ [1e3,1e4,1e5,1e6].forEach(n=>s+=`<line x1="${X(n)}" x2="${X(n)}" y1="${T0}" y2="${B}" stroke="#2a2e39"/><text x="${X(n)}" y="${B+14}" text-anchor="middle">10^${Math.log10(n)}</text>`);
+ [.1,.01,.001,.0001].forEach(v=>s+=`<line x1="${L}" x2="${R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#2a2e39"/><text x="${L-5}" y="${Y(v)+3}" text-anchor="end">${String(v).replace('.',',')}</text>`);
+ s+=`<line x1="${L}" x2="${R}" y1="${Y(.01)}" y2="${Y(.01)}" stroke="#787b86" stroke-dasharray="3 3"/>`;
+ [['plain',C.blue],['antithetic_control',C.teal]].forEach(([e,col])=>{const sig=+pick(e).std_error*Math.sqrt(200000);let d='';for(let i=0;i<=40;i++){const N=10**(3+3*i/40);d+=(i?'L':'M')+X(N)+','+Y(1.96*sig/Math.sqrt(N))}s+=`<path d="${d}" fill="none" stroke="${col}" stroke-width="2"/>`});
+ document.getElementById('conv').innerHTML=s}
+function scat(){const c=document.getElementById('scat'),[x,w,h]=cv(c),P=sim(1200,12,100,.2,.02,1),pts=P.map(p=>{const o=p.slice(1),A=o.reduce((a,b)=>a+b)/12,G=Math.exp(o.reduce((a,b)=>a+Math.log(b),0)/12);return[Math.max(G-100,0),Math.max(A-100,0)]});
+ const m=Math.max(...pts.flat()),L=28,B=h-16,X=v=>L+(w-L-6)*v/m,Y=v=>B-(B-6)*v/m;x.strokeStyle=C.grid;x.fillStyle=C.muted;
+ for(let i=0;i<=4;i++){const v=m*i/4;x.beginPath();x.moveTo(L,Y(v));x.lineTo(w-6,Y(v));x.stroke();x.fillText(v.toFixed(0),2,Y(v)+3)}
+ x.setLineDash([3,3]);x.strokeStyle=C.muted;x.beginPath();x.moveTo(X(0),Y(0));x.lineTo(X(m),Y(m));x.stroke();x.setLineDash([]);
+ x.fillStyle=C.teal;x.globalAlpha=.6;pts.forEach(([g,a])=>{x.beginPath();x.arc(X(g),Y(a),1.6,0,7);x.fill()});x.globalAlpha=1;x.fillStyle=C.muted;x.fillText('géométrique →',w-90,B-4);x.fillText('↑ arithmétique',L+4,14)}
+function kpis(){const g=r=>VR.find(z=>z.T==='1.0'&&z.option==='call'&&z.estimator===r),pl=g('plain'),cv=g('control_beta_optimal'),atm=+GRID.find(r=>+r.K===100&&r.T==='1.0'&&r.option==='call').ratio_asian_over_euro_bs,gmax=Math.max(...VR.map(r=>+r.efficiency_gain_vs_plain));
+ document.getElementById('kpis').innerHTML=
+ `<div class="kpi"><span>Call asiatique ATM, T = 1</span><b>${fr(+cv.price,4)}</b><small class="bl">± ${fr(1.96*+cv.std_error,4)}</small></div>`+
+ `<div class="kpi"><span>Asiatique / européen</span><b>${fr(atm,4)}</b><small class="dn">▼ ${fr((1-atm)*100,1)} %</small></div>`+
+ `<div class="kpi"><span>Écart-type, sans → contrôle</span><b>${fr(+pl.std_error,4)}</b><small class="up">→ ${fr(+cv.std_error,4)}</small></div>`+
+ `<div class="kpi"><span>Gain d'efficacité max</span><b>×${Math.round(gmax).toLocaleString('fr-FR')}</b><small class="up">▲ anti + contrôle</small></div>`}
+function tab(){const nm={plain:'Sans réduction',antithetic:'Antithétique',control_beta_1:'Contrôle β = 1',control_beta_optimal:'Contrôle β optimal',antithetic_control:'Antithétique + contrôle'};
+ let s='<tr><th>Estimateur</th><th>Prix</th><th>Écart-type</th><th>IC 95 %</th><th>Gain d\'efficacité</th></tr>';
+ Object.keys(nm).forEach(e=>{const r=VR.find(z=>z.T==='1.0'&&z.option==='call'&&z.estimator===e),p=+r.price,se=+r.std_error;
+  s+=`<tr><td style="font-family:Inter;color:#b2b5be">${nm[e]}</td><td>${fr(p,4)}</td><td>${fr(se,4)}</td><td>[${fr(p-1.96*se,4)} ; ${fr(p+1.96*se,4)}]</td><td class="up">×${Math.round(+r.efficiency_gain_vs_plain).toLocaleString('fr-FR')}</td></tr>`});
+ document.getElementById('tab').innerHTML=s}
+function all(){fan();heat();bars();conv();scat();kpis();tab()}
+(document.fonts?document.fonts.ready:Promise.resolve()).then(all);addEventListener('resize',()=>{fan();scat()});
+</script>
+</body></html>

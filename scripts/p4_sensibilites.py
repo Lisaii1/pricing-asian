@@ -8,11 +8,19 @@ b optimal (slide 50) sauf mention contraire. IC à 95 % (z = Φ^{-1}(0,975) par 
    K = 100, T = 1, mensuel ; N = 1 000 trajectoires, 500 seeds 20261117 + i (i = 0..499), contrôle
    « optimal » (b estimé sur l'échantillon, biais d'ordre 1/N) et « pilot » (b estimé sur 10 000
    trajectoires préalables, sans biais). Biais = moyenne des 500 prix − référence (contrôle à
-   N = 4 000 000, même référence que p4_convergence.py), exprimé en écarts-types de la moyenne
+   N = 4 000 000 sur un flux disjoint, voir ci-dessous), exprimé en écarts-types de la moyenne
    (sd_of_mean = s_prix/√500) et en écart-type combiné √(sd_of_mean² + se_ref²).
-   Diagnostic d'indépendance : les flux de seeds voisines du LCG Park-Miller occupent des positions
-   pseudo-aléatoires du même cycle ; on compte exactement les paires de seeds dont les fenêtres
-   d'uniformes se recouvrent, et les seeds dont la fenêtre recouvre celle de la référence.
+   Flux disjoints (P5a, étape 0 ; avant : seeds 20261117 + i, dont 1 à 15 paires de fenêtres se
+   recouvraient) : un seul flux LCG parti de x0 = 20261117, découpé bout à bout par le saut exact de
+   pricer.rng (state_after) : le run i démarre à l'état a^(i·M)·x0 mod m, M = uniformes consommées
+   par run (12 × 1 000 en optimal, 12 × 11 000 en pilot, vérifié run par run), et utilise les
+   positions i·M + 1, …, (i + 1)·M du flux. La référence de ce biais (contrôle, N = 4 000 000,
+   48 000 000 uniformes) démarre après les runs des deux modes, à la position R = 500·max(M)
+   = 66 000 000. Borne : R + 48 000 000 = 114 000 000 < m − 1 = 2 147 483 646 (période de
+   Park-Miller) ; on vérifie en plus, par paquets de 1 000 000 d'états, que x0 ne revient pas parmi
+   x_1, …, x_{114 000 000} (scan_stream) et que les états aux positions i·M et R sont bien les seeds
+   utilisées. Cette référence n'est donc plus celle de p4_convergence.py (dont le flux est recouvert
+   par les runs du mode pilot).
 2. Méthode d'aléa (results/p4_rng_methods.csv) : les 4 méthodes de pricer.normals et la
    transformée inverse avec Hastings, N = 200 000, sans et avec contrôle, même seed : prix, IC,
    temps (médiane de 3 runs), uniformes consommées, écart à la référence en écarts-types.
@@ -25,7 +33,8 @@ b optimal (slide 50) sauf mention contraire. IC à 95 % (z = Φ^{-1}(0,975) par 
    repris pour comparaison.
 
 Valeurs écrites en pleine précision (arrondi à 10^-4 dans le rapport).
-Usage : .venv/Scripts/python.exe scripts/p4_sensibilites.py
+Usage : .venv/Scripts/python.exe scripts/p4_sensibilites.py [--only beta]
+        (--only beta : régénère seulement p4_beta_bias.csv et p4_beta_bias_runs.csv)
 """
 from __future__ import annotations
 
@@ -48,7 +57,7 @@ from pricer.black_scholes import bs_price  # noqa: E402
 from pricer.geometric import (geometric_asian_continuous_price,  # noqa: E402
                               geometric_asian_price)
 from pricer.paths import RNG_METHODS  # noqa: E402
-from pricer.rng import LCG  # noqa: E402
+from pricer.rng import scan_stream, state_after  # noqa: E402
 
 PARAMS = dict(S0=100.0, sigma=0.20, r=0.03, q=0.01)
 SEED = 20261117
@@ -56,6 +65,9 @@ RNG = "inverse"
 K0, T0 = 100.0, 1.0
 
 N_BIAS, N_SEEDS = 1_000, 500
+N_PILOT = 10_000            # défaut de price_asian
+N_BIAS_REF = 4_000_000
+SCAN_CHUNK = 1_000_000
 N_RNG, N_RNG_RUNS = 200_000, 3
 FREQ_N_OBS = (1, 4, 12, 52, 252)
 N_FREQ = 200_000
@@ -77,7 +89,9 @@ FIELDS_BIAS = ["beta_mode", "n_seeds", "seed_first", "seed_last", "n_paths", "n_
                "sd_of_mean", "mean_std_error", "ref_price", "ref_std_error", "ref_n_paths",
                "ref_seed", "bias", "bias_in_sd_of_mean", "bias_in_combined_se",
                "ci95_coverage", "mean_beta", "sd_beta", "n_uniforms_per_run",
-               "n_seed_pairs_overlapping", "n_seeds_overlapping_ref", "time_total_s"]
+               "n_seed_pairs_overlapping", "n_seeds_overlapping_ref", "stream_x0",
+               "ref_offset_uniforms", "stream_states_scanned", "first_return_of_x0",
+               "scan_chunk", "time_total_s"]
 FIELDS_RUNS = ["beta_mode", "seed", "price", "std_error", "ci_low", "ci_high", "beta",
                "ref_in_ci"]
 FIELDS_RNG = ["rng_method", "control", "n_paths", *MODEL, "K", "T", "option", "obs", "n_obs",
@@ -111,42 +125,57 @@ def _write(path: Path, fields, rows) -> None:
 
 # --- 1. biais de β --------------------------------------------------------------------------------
 
-def _overlaps(seeds: list[int], window: int, ref_seed: int, ref_window: int) -> tuple[int, int]:
-    """(paires de seeds dont les fenêtres se recouvrent, seeds dont la fenêtre recouvre celle de
-    la référence). Le flux de la seed x utilise les états x_1..x_W ; ceux de x et y se recouvrent
-    si y ∈ {x_1, …, x_{W−1}} ou x ∈ {y_1, …, y_{W−1}}."""
-    targets = np.array(seeds, dtype=np.uint64)
-    pairs, near_ref = set(), set()
-    for i, s in enumerate(seeds):
-        states = LCG(s).integers(window - 1)
-        pairs.update(frozenset((i, int(j))) for j in np.flatnonzero(np.isin(targets, states))
-                     if j != i)
-        if np.isin(np.uint64(ref_seed), states):
-            near_ref.add(i)
-    g, done = LCG(ref_seed), 0
-    while done < ref_window - 1:
-        chunk = min(1_000_000, ref_window - 1 - done)
-        near_ref.update(int(j) for j in np.flatnonzero(np.isin(targets, g.integers(chunk))))
-        done += chunk
-    return len(pairs), len(near_ref)
+N_OBS_BIAS = 12          # mensuel sur T = 1
+M_RUN = {"optimal": N_OBS_BIAS * N_BIAS, "pilot": N_OBS_BIAS * (N_BIAS + N_PILOT)}
+REF_OFFSET = N_SEEDS * max(M_RUN.values())                 # 66 000 000
+SCAN_LIMIT = REF_OFFSET + N_OBS_BIAS * N_BIAS_REF           # 114 000 000
 
 
-def beta_bias(ref):
+def bias_layout():
+    """Seeds des runs (par mode) et de la référence, et vérification du flux par paquets."""
+    seeds = {mode: [state_after(SEED, i * M) for i in range(N_SEEDS)] for mode, M in M_RUN.items()}
+    ref_seed = state_after(SEED, REF_OFFSET)
+    positions = [i * M for M in M_RUN.values() for i in range(N_SEEDS)] + [REF_OFFSET]
+    first, states = scan_stream(SEED, positions, SCAN_LIMIT, chunk=SCAN_CHUNK)
+    if first is not None:
+        raise RuntimeError(f"x0 revient à la position {first} : des fenêtres se recouvrent")
+    for mode, M in M_RUN.items():
+        if any(states[i * M] != s for i, s in enumerate(seeds[mode])):
+            raise RuntimeError(f"{mode} : seeds sautées différentes du flux séquentiel")
+    if states[REF_OFFSET] != ref_seed:
+        raise RuntimeError("seed de la référence différente du flux séquentiel")
+    return seeds, ref_seed, first
+
+
+def bias_reference(ref_seed):
+    return price_asian(**PARAMS, K=K0, T=T0, option="call", obs="monthly", n_paths=N_BIAS_REF,
+                       seed=ref_seed, rng_method=RNG, control="geometric")
+
+
+def beta_bias():
+    t_scan = time.perf_counter()
+    all_seeds, ref_seed, first = bias_layout()
+    print(f"flux verifie : {SCAN_LIMIT} etats, x0 ne revient pas "
+          f"({time.perf_counter() - t_scan:.1f} s)", flush=True)
+    ref = bias_reference(ref_seed)
+    if ref.n_uniforms != N_OBS_BIAS * N_BIAS_REF:
+        raise RuntimeError("référence : nombre d'uniformes inattendu")
+    print(f"reference biais {ref.price:.6f} +- {ref.std_error:.6f} (seed {ref.seed})", flush=True)
     summary, runs = [], []
-    seeds = [SEED + i for i in range(N_SEEDS)]
     for mode in ("optimal", "pilot"):
+        seeds = all_seeds[mode]
         t0 = time.perf_counter()
         res = [price_asian(**PARAMS, K=K0, T=T0, option="call", obs="monthly", n_paths=N_BIAS,
                            seed=s, rng_method=RNG, control="geometric", beta=mode)
                for s in seeds]
         elapsed = time.perf_counter() - t0
+        if any(x.n_uniforms != M_RUN[mode] for x in res):
+            raise RuntimeError(f"{mode} : un run ne consomme pas exactement M uniformes")
         prices = np.array([x.price for x in res])
         betas = np.array([x.beta for x in res])
         sd_mean = prices.std(ddof=1) / math.sqrt(N_SEEDS)
         bias = float(prices.mean()) - ref.price
         inside = [x.ci_low <= ref.price <= x.ci_high for x in res]
-        window = res[0].n_uniforms
-        n_pairs, n_ref = _overlaps(seeds, window, ref.seed, ref.n_uniforms)
         summary.append({
             "beta_mode": mode, "n_seeds": N_SEEDS, "seed_first": seeds[0], "seed_last": seeds[-1],
             "n_paths": N_BIAS, "n_pilot": res[0].n_pilot, **PARAMS, "K": K0, "T": T0,
@@ -158,16 +187,17 @@ def beta_bias(ref):
             "ref_seed": ref.seed, "bias": bias, "bias_in_sd_of_mean": bias / sd_mean,
             "bias_in_combined_se": bias / math.hypot(sd_mean, ref.std_error),
             "ci95_coverage": sum(inside) / N_SEEDS, "mean_beta": float(betas.mean()),
-            "sd_beta": float(betas.std(ddof=1)), "n_uniforms_per_run": window,
-            "n_seed_pairs_overlapping": n_pairs, "n_seeds_overlapping_ref": n_ref,
-            "time_total_s": elapsed})
+            "sd_beta": float(betas.std(ddof=1)), "n_uniforms_per_run": M_RUN[mode],
+            "n_seed_pairs_overlapping": 0, "n_seeds_overlapping_ref": 0,   # vérifié par bias_layout
+            "stream_x0": SEED, "ref_offset_uniforms": REF_OFFSET,
+            "stream_states_scanned": SCAN_LIMIT, "first_return_of_x0": _blank(first),
+            "scan_chunk": SCAN_CHUNK, "time_total_s": elapsed})
         runs += [{"beta_mode": mode, "seed": s, "price": x.price, "std_error": x.std_error,
                   "ci_low": x.ci_low, "ci_high": x.ci_high, "beta": x.beta, "ref_in_ci": ok}
                  for s, x, ok in zip(seeds, res, inside)]
         print(f"beta {mode:<7} moyenne {prices.mean():.6f}  ref {ref.price:.6f}  "
               f"biais {bias:+.6f} = {bias / sd_mean:+.2f} sd  couverture IC95 "
-              f"{sum(inside) / N_SEEDS:.3f}  recouvrements {n_pairs} paires, {n_ref} avec ref",
-              flush=True)
+              f"{sum(inside) / N_SEEDS:.3f}", flush=True)
     return summary, runs
 
 
@@ -254,13 +284,21 @@ def grid_cv():
     return rows
 
 
-def main() -> None:
+def main(argv=None) -> None:
+    argv = sys.argv[1:] if argv is None else argv
+    only_beta = argv == ["--only", "beta"]
+    if argv and not only_beta:
+        raise SystemExit("usage : p4_sensibilites.py [--only beta]")
     t0 = time.perf_counter()
-    ref = reference()
-    print(f"reference {ref.price:.6f} +- {ref.std_error:.6f} (seed {ref.seed})", flush=True)
-    summary, runs = beta_bias(ref)
+    summary, runs = beta_bias()
     _write(OUT_BIAS, FIELDS_BIAS, summary)
     _write(OUT_BIAS_RUNS, FIELDS_RUNS, runs)
+    t1 = time.perf_counter()
+    if only_beta:
+        print(f"temps : biais beta {t1 - t0:.1f} s (--only beta)")
+        return
+    ref = reference()
+    print(f"reference {ref.price:.6f} +- {ref.std_error:.6f} (seed {ref.seed})", flush=True)
     t1 = time.perf_counter()
     _write(OUT_RNG, FIELDS_RNG, rng_methods(ref))
     t2 = time.perf_counter()

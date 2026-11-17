@@ -81,6 +81,19 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
   - Q7 ligne « actif théorique » gardée (dérive nulle notée ci-dessus).
 - 17/11/2026, P4 : IC au niveau `confidence` (défaut 0,95), z = Φ^{-1}((1 + c)/2) calculé par l'inverse
   AS241 du projet (z(0,95) = 1,959964 au lieu du 1,96 arrondi du cours).
+- 17/11/2026, réponses aux questions P4 (tranchées par Cowork, validées par Loup en lançant P5a) :
+  - Q1 slide 77 : les deux colonnes sont montrées, nommées « Exact (géométrique, formule fermée) » et
+    « Référence arithmétique (contrôle, N = 4 000 000) ».
+  - Q2 slide 78 : « Variance MC » = variance de l'estimateur (σ̂²/N), comparable d'un N à l'autre ; la
+    variance des payoffs reste dans le CSV.
+  - Q3 seed 20261117 gardée sur le slide 78, avec la phrase sur la variance 1,0105 des 50 000 premières
+    normales (changer de seed serait de l'ajustement).
+  - Q4 les temps seront remesurés une fois, machine au repos, en P5b.
+  - Q5 flux disjoints : les 500 runs du biais de β sont pris bout à bout dans un flux LCG unique
+    (run i à l'état a^(i·M)·x0 mod m, saut exact `pricer.rng.state_after`), la référence après eux ;
+    vérifié par `scan_stream` (P5a, étape 0).
+- 17/11/2026, Loup (15:21) : maquette retenue `docs/maquettes/2026-11-17-maquette-F-nuit-profonde.html`,
+  palette Plasma (« Plasma validé pour moi »).
 
 ## Coquilles du cours relevées (citées au rapport final)
 1. Slide 9 : « c = 0 ».

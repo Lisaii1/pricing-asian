@@ -165,3 +165,51 @@ class LCG:
     def __repr__(self) -> str:
         kind = "mixte" if self.mixed else "pur"
         return f"LCG({kind}, a={self.a}, m={self.m}, c={self.c}, x={self._x}, count={self.count})"
+
+
+# --- flux disjoints (hors cours : saut exact, utilisé pour des runs indépendants) -------------------
+
+def state_after(seed, n: int, a: int = PARK_MILLER_A, m: int = PARK_MILLER_M, c: int = 0) -> int:
+    """État x_n du LCG parti de x_0 = seed, par le saut exact x_n = (A_n·x_0 + C_n) mod m
+    (A_n = a^n mod m ; C_n = 0 pour un LCG pur). Un générateur LCG(state_after(seed, n)) produit
+    exactement les uniformes n + 1, n + 2, … du flux parti de seed."""
+    n = _as_int(n, "n")
+    if n < 0:
+        raise ValueError("n doit être ≥ 0")
+    g = LCG(seed, a=a, m=m, c=c)
+    if n == 0:
+        return g.state
+    A, C = g._jump(n)
+    return (A * g.state + C) % g.m
+
+
+def scan_stream(seed, positions, limit: int, chunk: int = 1_000_000, a: int = PARK_MILLER_A,
+                m: int = PARK_MILLER_M, c: int = 0) -> tuple[int | None, dict[int, int]]:
+    """Parcourt les états x_1, …, x_limit du flux parti de seed, par paquets de chunk états
+    (mémoire ~ 8·chunk octets), et renvoie
+        (premier k ∈ [1, limit] tel que x_k = x_0, ou None ;  {p: x_p pour p dans positions}).
+    Pour un LCG pur de module premier (Park-Miller), x ↦ a·x mod m est une bijection : la suite est
+    purement périodique, et x_1, …, x_L sont deux à deux distincts si et seulement si x_0 n'apparaît
+    pas parmi x_1, …, x_{L−1}. Des fenêtres prises bout à bout dans ce flux sont alors disjointes."""
+    limit, chunk = _as_int(limit, "limit"), _as_int(chunk, "chunk")
+    if limit < 0 or chunk < 1:
+        raise ValueError("limit doit être ≥ 0 et chunk ≥ 1")
+    wanted = sorted({_as_int(p, "position") for p in positions})
+    if wanted and (wanted[0] < 0 or wanted[-1] > limit):
+        raise ValueError(f"positions hors de [0, limit] = [0, {limit}]")
+    g = LCG(seed, a=a, m=m, c=c)
+    x0 = g.state
+    states = {0: x0} if wanted and wanted[0] == 0 else {}
+    first, done = None, 0
+    while done < limit:
+        n = min(chunk, limit - done)
+        block = g.integers(n)                  # états x_{done+1}, …, x_{done+n}
+        if first is None:
+            hit = np.flatnonzero(block == np.uint64(x0))
+            if hit.size:
+                first = done + 1 + int(hit[0])
+        for p in wanted:
+            if done < p <= done + n:
+                states[p] = int(block[p - done - 1])
+        done += n
+    return first, states

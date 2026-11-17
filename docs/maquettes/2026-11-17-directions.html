@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pricing asiatique — 4 directions de design</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;700&family=Chakra+Petch:wght@500;700&family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{margin:0;font:14px/1.5 'Inter Tight',system-ui,sans-serif;background:#111;color:#eee}
+nav{position:sticky;top:0;z-index:20;display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px;background:rgba(15,15,18,.85);backdrop-filter:blur(12px);border-bottom:1px solid #2a2a30}
+nav b{font-weight:700;margin-right:10px;align-self:center;color:#ddd}
+nav button{border:1px solid #3a3a42;background:#1b1b20;color:#bbb;font:600 12px 'Inter Tight';padding:7px 12px;border-radius:8px;cursor:pointer}
+nav button.on{background:#fff;color:#111;border-color:#fff}
+.dir{display:none;min-height:100vh;position:relative;overflow:hidden}.dir.on{display:block}
+.wrap{position:relative;z-index:2;max-width:1160px;margin:0 auto;padding:30px 22px 50px}
+.g{display:grid;grid-template-columns:1.25fr 1fr;gap:18px}.g .full{grid-column:1/-1}
+canvas,svg{width:100%;display:block}
+.note{font-size:11.5px;opacity:.65;margin-top:8px}
+.ref{font-size:12px;opacity:.7;margin-top:2px}
+@media(max-width:860px){.g{grid-template-columns:1fr}}
+
+/* A — Terminal phosphore */
+#A{background:#050805;color:#ffb000;font-family:'IBM Plex Mono',monospace}
+#A:after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 1px,transparent 1px 3px)}
+#A h1{font:400 46px/1 VT323,monospace;margin:0;letter-spacing:.02em;text-shadow:0 0 12px rgba(255,176,0,.55)}
+#A h1 i{color:#33ff99;font-style:normal;text-shadow:0 0 12px rgba(51,255,153,.6)}
+#A .box{border:1px solid rgba(255,176,0,.45);padding:14px;position:relative;background:rgba(255,176,0,.025)}
+#A .box h2{font:400 24px VT323;margin:0 0 6px;color:#33ff99}
+#A .box:before{content:attr(data-k);position:absolute;top:-9px;left:10px;background:#050805;padding:0 6px;font-size:11px;color:#ffb000}
+#A .tick{display:flex;gap:28px;font:400 22px VT323;border-top:1px dashed rgba(255,176,0,.4);border-bottom:1px dashed rgba(255,176,0,.4);padding:6px 0;margin:16px 0;white-space:nowrap;overflow:hidden}
+#A .tick span b{color:#33ff99;font-weight:400}
+
+/* B — HUD néon */
+#B{background:#060914;color:#dbe7ff;font-family:'Space Grotesk',sans-serif}
+#B .mesh{position:absolute;inset:-20%;z-index:0;filter:blur(70px);opacity:.75;animation:spin 40s linear infinite;
+ background:radial-gradient(30% 30% at 25% 30%,#0e7490,transparent),radial-gradient(28% 28% at 75% 25%,#7e22ce,transparent),radial-gradient(35% 30% at 55% 80%,#1d4ed8,transparent)}
+@keyframes spin{to{transform:rotate(360deg)}}
+#B .grid{position:absolute;inset:0;z-index:1;background-image:linear-gradient(rgba(34,211,238,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.06) 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(ellipse at center,#000 40%,transparent 80%)}
+#B h1{font:700 40px/1.05 'Chakra Petch';margin:0;text-transform:uppercase;letter-spacing:.04em;background:linear-gradient(90deg,#22d3ee,#e879f9);-webkit-background-clip:text;color:transparent}
+#B .box{position:relative;padding:16px;background:rgba(8,14,32,.55);border:1px solid rgba(34,211,238,.18);backdrop-filter:blur(10px);clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px))}
+#B .box h2{font:500 13px 'Chakra Petch';letter-spacing:.18em;text-transform:uppercase;color:#22d3ee;margin:0 0 8px}
+#B .kp{display:flex;gap:14px;margin:18px 0}
+#B .kp div{flex:1;padding:12px 14px;border-left:2px solid #e879f9;background:rgba(232,121,249,.06)}
+#B .kp b{display:block;font:700 26px 'Chakra Petch';color:#fff;text-shadow:0 0 18px rgba(34,211,238,.6)}
+
+/* C — Éditorial suisse */
+#C{background:#f6f4ef;color:#111;font-family:'Inter Tight',sans-serif}
+#C h1{font:400 64px/0.95 'Instrument Serif',serif;margin:0;letter-spacing:-.01em}
+#C h1 em{color:#d7261e}
+#C .rule{height:2px;background:#111;margin:18px 0 6px}
+#C .box{border-top:1px solid #111;padding-top:10px}
+#C .box h2{font:400 26px/1.1 'Instrument Serif',serif;margin:0 0 4px}
+#C .big{display:flex;gap:40px;margin:14px 0 26px}
+#C .big b{display:block;font:400 72px/0.9 'Instrument Serif',serif}
+#C .big b sup{font-size:.35em;color:#d7261e}
+#C .big span{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:#555}
+
+/* D — Bento verre */
+#D{background:linear-gradient(135deg,#1e1b4b 0%,#4c1d95 45%,#0f766e 100%);color:#f5f3ff;font-family:Manrope,sans-serif}
+#D .blob{position:absolute;width:520px;height:520px;border-radius:50%;filter:blur(90px);opacity:.5;z-index:0}
+#D h1{font:800 42px/1.05 Manrope;margin:0;letter-spacing:-.02em}
+#D .g{grid-template-columns:repeat(4,1fr)}#D .s2{grid-column:span 2}#D .s4{grid-column:1/-1}
+#D .box{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);border-radius:26px;padding:18px;backdrop-filter:blur(18px);box-shadow:0 20px 50px -25px rgba(0,0,0,.6)}
+#D .box h2{font:600 14px Manrope;margin:0 0 6px;opacity:.85}
+#D .stat b{display:block;font:800 40px Manrope;background:linear-gradient(90deg,#fde68a,#f9a8d4);-webkit-background-clip:text;color:transparent}
+@media(max-width:860px){#D .g{grid-template-columns:1fr}#D .s2{grid-column:auto}}
+</style>
+</head>
+<body>
+<nav><b>4 directions</b>
+<button data-d="A" class="on">A · Terminal phosphore</button><button data-d="B">B · HUD néon</button><button data-d="C">C · Éditorial suisse</button><button data-d="D">D · Bento verre</button></nav>
+
+<section class="dir on" id="A"><div class="wrap">
+ <h1>&gt; ASIAN_PRICER <i>v1.0</i>_</h1>
+ <div class="ref">Inspiration Designeer : Departure Mono (police pixel pour terminaux), 8bitcn. Esprit Bloomberg / écran ambré, clin d'œil aux VFD de Pulse Quant.</div>
+ <div class="tick" id="tA"></div>
+ <div class="g">
+  <div class="box full" data-k="[F1] FAN.EURUSD"><h2>MOYENNE vs COURS FINAL</h2><canvas data-fig="fan" height="300"></canvas></div>
+  <div class="box" data-k="[F2] RATIO.ASIAN/EURO"><h2>CALL : K × T</h2><svg data-fig="heat" viewBox="0 0 520 300"></svg></div>
+  <div class="box" data-k="[F3] VAR.REDUCTION"><h2>GAIN D'EFFICACITÉ · T=1</h2><svg data-fig="bars" viewBox="0 0 520 300"></svg></div>
+ </div>
+ <div class="note">Usage : soutenance (effet « terminal de trading »). Mauvais choix pour un rapport imprimé.</div>
+</div></section>
+
+<section class="dir" id="B"><div class="mesh"></div><div class="grid"></div><div class="wrap">
+ <h1>Monte-Carlo // Option asiatique</h1>
+ <div class="ref">Inspiration Designeer : Paper Shaders, shadercn, Book of Shaders (fond en dégradé animé), Orbkit. Coins coupés, lueurs, grille de visée.</div>
+ <div class="kp" id="kB"></div>
+ <div class="g">
+  <div class="box full"><h2>F1 · Éventail EUR/USD</h2><canvas data-fig="fan" height="300"></canvas></div>
+  <div class="box"><h2>F2 · Asiatique / européen</h2><svg data-fig="heat" viewBox="0 0 520 300"></svg></div>
+  <div class="box"><h2>F3 · Gain d'efficacité</h2><svg data-fig="bars" viewBox="0 0 520 300"></svg></div>
+ </div>
+ <div class="note">Usage : soutenance, page d'accueil d'une démo. Le fond animé ne passe pas à l'impression.</div>
+</div></section>
+
+<section class="dir" id="C"><div class="wrap">
+ <h1>L'option asiatique,<br><em>jusqu'à 5 000 fois</em> moins de variance.</h1>
+ <div class="rule"></div>
+ <div class="ref" style="color:#555">Inspiration Designeer : Klim, Fontshare (typographie éditoriale), OKLCH / Huetone (une seule couleur, contrastes vérifiés). Esprit Financial Times / revue scientifique.</div>
+ <div class="big" id="bC"></div>
+ <div class="g">
+  <div class="box full"><h2>Figure 1 — La moyenne disperse moins que le cours final</h2><canvas data-fig="fan" height="300"></canvas></div>
+  <div class="box"><h2>Figure 2 — Prix asiatique / européen (call)</h2><svg data-fig="heat" viewBox="0 0 520 300"></svg></div>
+  <div class="box"><h2>Figure 3 — Gain d'efficacité, T = 1</h2><svg data-fig="bars" viewBox="0 0 520 300"></svg></div>
+ </div>
+ <div class="note">Usage : le rapport de 2 pages (imprimable, sobre, lisible en noir et blanc), et des slides cohérentes.</div>
+</div></section>
+
+<section class="dir" id="D"><div class="blob" style="background:#f472b6;left:-120px;top:-120px"></div><div class="blob" style="background:#22d3ee;right:-140px;top:280px"></div><div class="wrap">
+ <h1>Pricer asiatique ✦ résultats</h1>
+ <div class="ref">Inspiration Designeer : Magic UI, Aceternity UI, Cult UI (bento, verre dépoli), Evil Charts et BoardUI (graphiques à remplissage dégradé), NumberFlow (chiffres animés).</div>
+ <div class="g" style="margin-top:18px">
+  <div class="box stat"><h2>Gain max (variance × temps)</h2><b id="d1"></b></div>
+  <div class="box stat"><h2>Corrélation A / G</h2><b id="d2"></b></div>
+  <div class="box stat"><h2>Asiatique / européen (ATM, T=1)</h2><b id="d3"></b></div>
+  <div class="box stat"><h2>Tests verts</h2><b>421</b></div>
+  <div class="box s4"><h2>F1 · Éventail EUR/USD</h2><canvas data-fig="fan" height="280"></canvas></div>
+  <div class="box s2"><h2>F2 · Asiatique / européen</h2><svg data-fig="heat" viewBox="0 0 520 300"></svg></div>
+  <div class="box s2"><h2>F3 · Gain d'efficacité</h2><svg data-fig="bars" viewBox="0 0 520 300"></svg></div>
+ </div>
+ <div class="note">Usage : tableau de bord de démo (et piste pour AlphaDesk). Moins adapté à l'impression.</div>
+</div></section>
+
+<script>
+const GRID=[{"K": "80.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.9908416667408464"}, {"K": "80.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "0.04644212819668125"}, {"K": "90.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.9449208753535001"}, {"K": "90.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "0.29104998486114103"}, {"K": "100.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.7179810183293966"}, {"K": "100.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "0.7216305403375167"}, {"K": "110.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.34740550474870957"}, {"K": "110.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "0.9497883762280797"}, {"K": "120.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.10288054720939435"}, {"K": "120.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "1.000243577436391"}, {"K": "80.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.968109262555812"}, {"K": "80.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.06008685278491403"}, {"K": "90.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.8776896176782361"}, {"K": "90.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.29654977558793366"}, {"K": "100.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.6408130416315482"}, {"K": "100.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.654389458349957"}, {"K": "110.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.3411317707965435"}, {"K": "110.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.8943299847907755"}, {"K": "120.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.13085066711999552"}, {"K": "120.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.9849591923499553"}, {"K": "80.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.9214187557745849"}, {"K": "80.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.11039503635993961"}, {"K": "90.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.8033194384087553"}, {"K": "90.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.34082100915316016"}, {"K": "100.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.6024182366022997"}, {"K": "100.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.6213450686655612"}, {"K": "110.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.37775412802922925"}, {"K": "110.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.8309722214681972"}, {"K": "120.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.20041546591852263"}, {"K": "120.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.9445760539571696"}, {"K": "80.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.8499424092996566"}, {"K": "80.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.19029857751369086"}, {"K": "90.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.7311207073071566"}, {"K": "90.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.3935328551978879"}, {"K": "100.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.5772089838444838"}, {"K": "100.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.6066680638981087"}, {"K": "110.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.41821831541826865"}, {"K": "110.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.7761906208871509"}, {"K": "120.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.2821969071040642"}, {"K": "120.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.8898076731622163"}],VR=[{"T": "0.25", "option": "call", "estimator": "plain", "corr": "", "efficiency_gain_vs_plain": "1.0"}, {"T": "0.25", "option": "call", "estimator": "antithetic", "corr": "", "efficiency_gain_vs_plain": "3.683893309549271"}, {"T": "0.25", "option": "call", "estimator": "control_beta_optimal", "corr": "0.9999027660389407", "efficiency_gain_vs_plain": "5205.147219134835"}, {"T": "0.25", "option": "call", "estimator": "antithetic_control", "corr": "0.9998275230555471", "efficiency_gain_vs_plain": "10317.385470604038"}, {"T": "0.25", "option": "call", "estimator": "control_beta_1", "corr": "0.9999027660389407", "efficiency_gain_vs_plain": "4549.880036885196"}, {"T": "0.25", "option": "put", "estimator": "plain", "corr": "", "efficiency_gain_vs_plain": "1.0"}, {"T": "0.25", "option": "put", "estimator": "antithetic", "corr": "", "efficiency_gain_vs_plain": "3.6524261582609037"}, {"T": "0.25", "option": "put", "estimator": "control_beta_optimal", "corr": "0.9999066971421303", "efficiency_gain_vs_plain": "3917.9062223335604"}, {"T": "0.25", "option": "put", "estimator": "antithetic_control", "corr": "0.9998318314813285", "efficiency_gain_vs_plain": "6684.780869090189"}, {"T": "0.25", "option": "put", "estimator": "control_beta_1", "corr": "0.9999066971421303", "efficiency_gain_vs_plain": "3103.534300221338"}, {"T": "1.0", "option": "call", "estimator": "plain", "corr": "", "efficiency_gain_vs_plain": "1.0"}, {"T": "1.0", "option": "call", "estimator": "antithetic", "corr": "", "efficiency_gain_vs_plain": "3.4281755363759077"}, {"T": "1.0", "option": "call", "estimator": "control_beta_optimal", "corr": "0.9996385663617008", "efficiency_gain_vs_plain": "1454.213190239618"}, {"T": "1.0", "option": "call", "estimator": "antithetic_control", "corr": "0.9993635511338304", "efficiency_gain_vs_plain": "2564.7760363347643"}, {"T": "1.0", "option": "call", "estimator": "control_beta_1", "corr": "0.9996385663617008", "efficiency_gain_vs_plain": "686.5678337646299"}, {"T": "1.0", "option": "put", "estimator": "plain", "corr": "", "efficiency_gain_vs_plain": "1.0"}, {"T": "1.0", "option": "put", "estimator": "antithetic", "corr": "", "efficiency_gain_vs_plain": "3.507133132658646"}, {"T": "1.0", "option": "put", "estimator": "control_beta_optimal", "corr": "0.999669618108156", "efficiency_gain_vs_plain": "1392.1227068540863"}, {"T": "1.0", "option": "put", "estimator": "antithetic_control", "corr": "0.9994152485105332", "efficiency_gain_vs_plain": "2654.434701552462"}, {"T": "1.0", "option": "put", "estimator": "control_beta_1", "corr": "0.999669618108156", "efficiency_gain_vs_plain": "739.6184978507215"}, {"T": "2.0", "option": "call", "estimator": "plain", "corr": "", "efficiency_gain_vs_plain": "1.0"}, {"T": "2.0", "option": "call", "estimator": "antithetic", "corr": "", "efficiency_gain_vs_plain": "3.286867653247314"}, {"T": "2.0", "option": "call", "estimator": "control_beta_optimal", "corr": "0.9992501943018967", "efficiency_gain_vs_plain": "635.525806109335"}, {"T": "2.0", "option": "call", "estimator": "antithetic_control", "corr": "0.9986768712018056", "efficiency_gain_vs_plain": "1111.5352601321067"}, {"T": "2.0", "option": "call", "estimator": "control_beta_1", "corr": "0.9992501943018967", "efficiency_gain_vs_plain": "265.9484565202569"}, {"T": "2.0", "option": "put", "estimator": "plain", "corr": "", "efficiency_gain_vs_plain": "1.0"}, {"T": "2.0", "option": "put", "estimator": "antithetic", "corr": "", "efficiency_gain_vs_plain": "3.741664153699452"}, {"T": "2.0", "option": "put", "estimator": "control_beta_optimal", "corr": "0.9993529182952406", "efficiency_gain_vs_plain": "769.6045446049039"}, {"T": "2.0", "option": "put", "estimator": "antithetic_control", "corr": "0.9988476739934514", "efficiency_gain_vs_plain": "1464.8246912818329"}, {"T": "2.0", "option": "put", "estimator": "control_beta_1", "corr": "0.9993529182952406", "efficiency_gain_vs_plain": "369.4613694909983"}];
+const TH={
+ A:{ink:'#ffb000',muted:'rgba(255,176,0,.6)',line:'rgba(255,176,0,.14)',a1:'#33ff99',a2:'#ffb000',mean:'#ffffff',font:'IBM Plex Mono',glow:10,heat:'51,255,153',bar:'#33ff99'},
+ B:{ink:'#dbe7ff',muted:'rgba(219,231,255,.55)',line:'rgba(34,211,238,.12)',a1:'#e879f9',a2:'#22d3ee',mean:'#ffffff',font:'Space Grotesk',glow:14,heat:'34,211,238',bar:'url(#gB)'},
+ C:{ink:'#111111',muted:'#666',line:'rgba(0,0,0,.10)',a1:'#d7261e',a2:'#9aa0a6',mean:'#111111',font:'Inter Tight',glow:0,heat:'215,38,30',bar:'#d7261e'},
+ D:{ink:'#f5f3ff',muted:'rgba(245,243,255,.65)',line:'rgba(255,255,255,.12)',a1:'#f9a8d4',a2:'#67e8f9',mean:'#fde68a',font:'Manrope',glow:6,heat:'253,230,138',bar:'url(#gD)'}};
+let seed;const U=()=>(seed=(seed*16807)%2147483647)/2147483647;let sp=null;
+const Z=()=>{if(sp!==null){const s=sp;sp=null;return s}const r=Math.sqrt(-2*Math.log(U())),v=2*Math.PI*U();sp=r*Math.sin(v);return r*Math.cos(v)};
+function sim(n,st,S0,s){seed=20261117;sp=null;const dt=1/st,P=[];for(let i=0;i<n;i++){let x=S0;const p=[x];for(let k=0;k<st;k++){x*=Math.exp(-s*s/2*dt+s*Math.sqrt(dt)*Z());p.push(x)}P.push(p)}return P}
+const PATHS=sim(160,252,1.0996,.0555);
+const fr=(v,d)=>v.toFixed(d).replace('.',',');
+function fan(c,t){const r=devicePixelRatio||1,w=c.clientWidth,h=+c.getAttribute('height');c.width=w*r;c.height=h*r;c.style.height=h+'px';const x=c.getContext('2d');x.setTransform(r,0,0,r,0,0);
+ const st=252,L=44,R=w-170,T=8,B=h-22,all=PATHS.flat(),lo=Math.min(...all),hi=Math.max(...all),X=k=>L+(R-L)*k/st,Y=v=>B-(B-T)*(v-lo)/(hi-lo);
+ x.font=`11px ${t.font}`;x.fillStyle=t.muted;x.strokeStyle=t.line;
+ for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4;x.beginPath();x.moveTo(L,Y(v));x.lineTo(R,Y(v));x.stroke();x.fillText(v.toFixed(3),2,Y(v)+3)}
+ ['0','3m','6m','9m','1a'].forEach((s,i)=>x.fillText(s,X(st*i/4)-6,h-6));
+ const fin=PATHS.map(p=>p[st]),f0=Math.min(...fin),f1=Math.max(...fin);
+ PATHS.forEach(p=>{const u=(p[st]-f0)/(f1-f0);x.strokeStyle=u>.5?t.a1:t.a2;x.globalAlpha=t===TH.C?.12+.3*Math.abs(u-.5):.12+.35*Math.abs(u-.5);x.lineWidth=1;x.beginPath();p.forEach((v,k)=>k?x.lineTo(X(k),Y(v)):x.moveTo(X(k),Y(v)));x.stroke()});
+ x.globalAlpha=1;x.shadowColor=t.mean;x.shadowBlur=t.glow;x.strokeStyle=t.mean;x.lineWidth=2.2;const m=PATHS[0].map((_,k)=>PATHS.reduce((a,p)=>a+p[k],0)/PATHS.length);x.beginPath();m.forEach((v,k)=>k?x.lineTo(X(k),Y(v)):x.moveTo(X(k),Y(v)));x.stroke();x.shadowBlur=0;
+ const A=PATHS.map(p=>{let s=0;for(let j=1;j<=12;j++)s+=p[Math.round(st*j/12)];return s/12}),nb=22,bw=(hi-lo)/nb,hS=Array(nb).fill(0),hA=Array(nb).fill(0);
+ fin.forEach(v=>hS[Math.min(nb-1,((v-lo)/bw)|0)]++);A.forEach(v=>hA[Math.min(nb-1,((v-lo)/bw)|0)]++);const mx=Math.max(...hS,...hA),H0=R+14,HW=140;
+ for(let i=0;i<nb;i++){const y0=Y(lo+bw*(i+1)),bh=Y(lo+bw*i)-y0-1;x.fillStyle=t.a2;x.globalAlpha=.4;x.fillRect(H0,y0,HW*hS[i]/mx,bh);x.globalAlpha=.95;x.fillStyle=t.a1;x.shadowColor=t.a1;x.shadowBlur=t.glow;x.fillRect(H0,y0+bh*.25,HW*hA[i]/mx,bh*.5);x.shadowBlur=0}
+ x.globalAlpha=1;x.fillStyle=t.a2;x.fillText('S_T',H0,T+10);x.fillStyle=t.a1;x.fillText('moyenne A',H0+30,T+10)}
+function heat(el,t){const g=GRID.filter(r=>r.option==='call'),Ks=[80,90,100,110,120],Ts=['0.25','0.5','1.0','2.0'],L=64,T0=22,cw=90,ch=62;let s='';
+ const tx=(x,y,str,a='middle',st='')=>`<text x="${x}" y="${y}" text-anchor="${a}" style="font-family:${t.font};font-size:11px;fill:${t.muted};${st}">${str}</text>`;
+ Ks.forEach((k,i)=>s+=tx(L+i*cw+cw/2,14,'K '+k));
+ Ts.forEach((tt,j)=>{s+=tx(L-8,T0+j*ch+ch/2+4,'T '+tt.replace('.',','),'end');Ks.forEach((k,i)=>{const v=+g.find(z=>+z.K===k&&z.T===tt).ratio_asian_over_euro_bs,o=(.06+.8*(1-Math.min(v,1))).toFixed(2);
+  s+=`<rect x="${L+i*cw+3}" y="${T0+j*ch+3}" width="${cw-6}" height="${ch-6}" rx="${t===TH.D?12:t===TH.C?0:2}" fill="rgba(${t.heat},${o})" stroke="${t.line}"/>`;
+  s+=tx(L+i*cw+cw/2,T0+j*ch+ch/2+5,fr(v,2),'middle',`font-size:14px;font-weight:600;fill:${t.ink}`)})});el.innerHTML=s}
+function bars(el,t){const nm={plain:'Sans réduction',antithetic:'Antithétique',control_beta_1:'Contrôle β = 1',control_beta_optimal:'Contrôle β opt.',antithetic_control:'Anti + contrôle'},L=150,W=310,rh=52;
+ let s=`<defs><linearGradient id="gB"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#e879f9"/></linearGradient><linearGradient id="gD"><stop offset="0" stop-color="#fde68a"/><stop offset="1" stop-color="#f9a8d4"/></linearGradient></defs>`;
+ const lg=v=>Math.log10(v)/4,tx=(x,y,str,a,st='')=>`<text x="${x}" y="${y}" text-anchor="${a}" style="font-family:${t.font};font-size:11px;fill:${t.muted};${st}">${str}</text>`;
+ [1,10,100,1000,10000].forEach(v=>{const xx=L+W*lg(v);s+=`<line x1="${xx}" x2="${xx}" y1="8" y2="${8+rh*5}" stroke="${t.line}"/>`+tx(xx,rh*5+24,'×'+v.toLocaleString('fr-FR'),'middle')});
+ Object.keys(nm).forEach((e,i)=>{const r=VR.find(z=>z.T==='1.0'&&z.option==='call'&&z.estimator===e),gn=+r.efficiency_gain_vs_plain,y=12+i*rh,bw=Math.max(3,W*lg(gn));
+  s+=tx(L-10,y+21,nm[e],'end',`fill:${t.ink}`)+`<rect x="${L}" y="${y+8}" width="${bw}" height="18" rx="${t===TH.D?9:t===TH.C?0:2}" fill="${t.bar}" ${t.glow?`style="filter:drop-shadow(0 0 ${t.glow/2}px ${t.a1})"`:''}/>`+tx(L+bw+6,y+21,'×'+Math.round(gn).toLocaleString('fr-FR'),'start',`fill:${t.ink};font-weight:600`)});el.innerHTML=s}
+function render(id){const t=TH[id],sec=document.getElementById(id);sec.querySelectorAll('[data-fig=fan]').forEach(c=>fan(c,t));sec.querySelectorAll('[data-fig=heat]').forEach(e=>heat(e,t));sec.querySelectorAll('[data-fig=bars]').forEach(e=>bars(e,t))}
+const gmax=Math.max(...VR.map(r=>+r.efficiency_gain_vs_plain)),cors=VR.filter(r=>r.corr).map(r=>+r.corr),atm=+GRID.find(r=>+r.K===100&&r.T==='1.0'&&r.option==='call').ratio_asian_over_euro_bs;
+document.getElementById('tA').innerHTML=`<span>EURUSD <b>1,0996</b></span><span>VOL_252J <b>5,55%</b></span><span>GAIN_MAX <b>×${Math.round(gmax).toLocaleString('fr-FR')}</b></span><span>CORR_A/G <b>${fr(Math.min(...cors),4)}</b></span><span>ASIAN/EURO_ATM <b>${fr(atm,4)}</b></span>`;
+document.getElementById('kB').innerHTML=`<div><b>×${Math.round(gmax).toLocaleString('fr-FR')}</b>gain d'efficacité max</div><div><b>${fr(Math.min(...cors),4)}</b>corrélation A / G min.</div><div><b>${fr(atm,2)}</b>asiatique / européen ATM</div>`;
+document.getElementById('bC').innerHTML=`<div><b>×${Math.round(gmax).toLocaleString('fr-FR')}<sup>*</sup></b><span>gain d'efficacité maximal</span></div><div><b>${fr(Math.min(...cors),4)}</b><span>corrélation A / G minimale</span></div><div><b>${fr(atm,2)}</b><span>asiatique / européen à la monnaie</span></div>`;
+document.getElementById('d1').textContent='×'+Math.round(gmax).toLocaleString('fr-FR');document.getElementById('d2').textContent=fr(Math.min(...cors),4);document.getElementById('d3').textContent=fr(atm,2);
+let cur='A';document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{cur=b.dataset.d;document.querySelectorAll('nav button').forEach(z=>z.classList.toggle('on',z===b));document.querySelectorAll('.dir').forEach(s=>s.classList.toggle('on',s.id===cur));render(cur)});
+addEventListener('resize',()=>render(cur));(document.fonts?document.fonts.ready:Promise.resolve()).then(()=>render(cur));
+</script>
+</body></html>

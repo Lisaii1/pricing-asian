@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pricing asiatique — maquette F · Nuit profonde (rapport PDF)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{--a1:#22d3ee;--a2:#a855f7;--a3:#f472b6;--pos:#34d399;--neg:#fb7185;--ink:#f4f5fb;--sub:#a3a6b8;--mut:#5c6075;--hair:rgba(255,255,255,.07)}
+body[data-p=plasma]{--a1:#00ffa3;--a2:#7c3aed;--a3:#ffd60a;--pos:#00ffa3;--neg:#ff4d6d}
+body[data-p=braise]{--a1:#60a5fa;--a2:#f43f5e;--a3:#fbbf24;--pos:#34d399;--neg:#f43f5e}
+*{box-sizing:border-box}
+body{margin:0;background:#000;color:var(--ink);font:12px/1.55 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.bar{position:sticky;top:0;z-index:30;display:flex;gap:8px;align-items:center;justify-content:center;padding:10px;background:rgba(0,0,0,.7);backdrop-filter:blur(14px);border-bottom:1px solid var(--hair);color:var(--sub);font-size:12px}
+.bar button{border:1px solid var(--hair);background:none;color:var(--sub);font:500 12px Inter;padding:6px 12px;border-radius:999px;cursor:pointer}
+.bar button.on{color:#000;background:var(--ink)}
+.bar .sw{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:3px;vertical-align:0}
+.page{width:794px;height:1123px;margin:26px auto;position:relative;overflow:hidden;background:#030306;border-radius:4px;box-shadow:0 0 0 1px rgba(255,255,255,.04),0 40px 120px -40px rgba(0,0,0,1)}
+.glow{position:absolute;border-radius:50%;filter:blur(110px);pointer-events:none}
+.grain{position:absolute;inset:0;pointer-events:none;opacity:.10;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.in{position:relative;z-index:2;padding:38px 42px}
+.eyebrow{font:400 10px 'JetBrains Mono';letter-spacing:.28em;text-transform:uppercase;color:var(--sub);display:flex;justify-content:space-between}
+.eyebrow b{color:var(--a1);font-weight:600}
+h1{font:800 38px/1.02 Inter;letter-spacing:-.035em;margin:18px 0 0;max-width:640px}
+h1 span{background:linear-gradient(90deg,var(--a1),var(--a2) 55%,var(--a3));-webkit-background-clip:text;color:transparent}
+.lead{color:var(--sub);font-weight:300;font-size:12.5px;max-width:560px;margin:10px 0 0}
+.beam{height:1px;margin:22px 0;background:linear-gradient(90deg,transparent,var(--a1),var(--a2),transparent);opacity:.7}
+.row{display:flex;gap:26px}
+.rail{width:150px;flex:none;display:flex;flex-direction:column;gap:20px;padding-top:4px}
+.k span{display:block;font:400 9.5px 'JetBrains Mono';letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.k b{display:block;font:300 30px/1.1 'JetBrains Mono';letter-spacing:-.04em;margin-top:4px}
+.k b.g{background:linear-gradient(180deg,#fff,var(--a1));-webkit-background-clip:text;color:transparent}
+.k small{font:400 10.5px 'JetBrains Mono';color:var(--pos)}
+.fig{flex:1;min-width:0}
+.ft{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.ft i{font:600 10px 'JetBrains Mono';color:var(--a1);font-style:normal}
+.ft h2{font:600 13px Inter;margin:0;letter-spacing:-.01em}
+.cap{color:var(--mut);font-size:10.3px;margin-top:4px}
+.cap em{color:var(--sub);font-style:normal}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+.fade{-webkit-mask-image:linear-gradient(90deg,#000 0,#000 94%,transparent);mask-image:linear-gradient(90deg,#000 0,#000 94%,transparent)}
+.txt{color:var(--sub);font-weight:300;border-left:1px solid var(--a1);padding:2px 0 2px 14px;font-size:11px;margin-top:18px}
+table{width:100%;border-collapse:collapse;font:400 11px 'JetBrains Mono'}
+th{font:400 9.5px 'JetBrains Mono';letter-spacing:.12em;text-transform:uppercase;color:var(--mut);text-align:right;padding:6px 8px;border-bottom:1px solid var(--hair)}
+td{padding:7px 8px;text-align:right;border-bottom:1px solid var(--hair)}
+th:first-child,td:first-child{text-align:left;font-family:Inter}
+tr.best td{background:rgba(255,255,255,.045);color:#fff}
+tr.best td:first-child{box-shadow:inset 2px 0 0 var(--a1)}
+.foot{position:absolute;left:42px;right:42px;bottom:20px;z-index:2;display:flex;justify-content:space-between;font:400 9.5px 'JetBrains Mono';color:var(--mut);letter-spacing:.06em}
+canvas,svg{width:100%;display:block}
+svg text{font-family:'JetBrains Mono',monospace;font-size:9.5px;fill:var(--mut)}
+.note{max-width:794px;margin:18px auto 0;color:var(--mut);font-size:12px;padding:0 10px}
+</style>
+</head>
+<body data-p="plasma">
+<div class="bar">Palette :
+ <button data-p="nebuleuse">Nébuleuse <i class="sw" style="background:#22d3ee"></i><i class="sw" style="background:#a855f7"></i></button>
+ <button data-p="plasma" class="on">Plasma <i class="sw" style="background:#00ffa3"></i><i class="sw" style="background:#7c3aed"></i></button>
+ <button data-p="braise">Braise froide <i class="sw" style="background:#60a5fa"></i><i class="sw" style="background:#f43f5e"></i></button></div>
+<div class="note">Maquette F · rapport PDF A4. Noir profond, lueurs et grain en fond, aucune carte grise : les figures flottent. Chiffres-clés, disques, gains et tableau = CSV réels (P2, P3) ; éventail et nuage illustratifs ; convergence projetée (P4 la remplacera).</div>
+
+<section class="page">
+ <div class="glow" style="width:520px;height:420px;left:-180px;top:-160px;background:var(--a2);opacity:.35"></div>
+ <div class="glow" style="width:460px;height:380px;right:-200px;top:330px;background:var(--a1);opacity:.22"></div>
+ <div class="glow" style="width:420px;height:300px;left:120px;bottom:-200px;background:var(--a3);opacity:.16"></div>
+ <div class="grain"></div>
+ <div class="in">
+  <div class="eyebrow"><span><b>●</b>&nbsp; Projet pricing · énoncé 2</span><span>ECE Paris · ING4 · 2026 — 01</span></div>
+  <h1>L'option asiatique,<br><span>pricée par Monte-Carlo</span></h1>
+  <p class="lead">Moyenne arithmétique sous Black-Scholes avec dividende continu. Aléa produit par un générateur congruentiel (Park-Miller) et la transformée inverse, sans générateur de bibliothèque.</p>
+  <div class="beam"></div>
+  <div class="row">
+   <div class="rail" id="rail"></div>
+   <div class="fig">
+    <div class="ft"><i>01</i><h2>La moyenne disperse moins que le cours final</h2></div>
+    <canvas id="fan" class="fade" data-w="534" data-h="300"></canvas>
+    <div class="cap"><em>EUR/USD, 1 an, moyenne mensuelle.</em> S0 = 1,0996 (16/11/2026), σ = 5,55 % (historique 252 j). Illustratif.</div>
+   </div>
+  </div>
+  <div class="beam" style="opacity:.35"></div>
+  <div class="two">
+   <div><div class="ft"><i>02</i><h2>Asiatique / européen — call</h2></div><svg id="dotsC" viewBox="0 0 330 250"></svg></div>
+   <div><div class="ft"><i>&nbsp;</i><h2>— put</h2></div><svg id="dotsP" viewBox="0 0 330 250"></svg></div>
+  </div>
+  <div class="cap"><em>Ratio prix asiatique / prix européen (Black-Scholes) ; taille du disque = remise de l'asiatique.</em> S0 = 100, σ = 20 %, r = 3 %, q = 1 %, mensuel, N = 200 000.</div>
+  <div class="txt">Texte 1 · méthode : générateur, schéma exact, estimateur, IC à 95 % (≈ 6 lignes, P6)</div>
+ </div>
+ <div class="foot"><span>Projet Pricing ING4 · ECE Paris</span><span>github.com/Lisaii1/pricing-asian</span></div>
+</section>
+
+<section class="page">
+ <div class="glow" style="width:500px;height:400px;right:-180px;top:-150px;background:var(--a1);opacity:.28"></div>
+ <div class="glow" style="width:480px;height:380px;left:-220px;top:520px;background:var(--a2);opacity:.3"></div>
+ <div class="grain"></div>
+ <div class="in">
+  <div class="eyebrow"><span><b>●</b>&nbsp; Résultats · réduction de variance</span><span>02</span></div>
+  <div class="two" style="margin-top:22px">
+   <div><div class="ft"><i>03</i><h2>Gain d'efficacité par méthode</h2></div><svg id="beams" viewBox="0 0 330 250"></svg>
+    <div class="cap"><em>Gain = (variance × temps) de référence / méthode, K = 100.</em> Point plein : call ; anneau : put ; taille : T = 0,25 / 1 / 2.</div></div>
+   <div><div class="ft"><i>04</i><h2>Marge d'erreur (IC 95 %) selon N</h2></div><svg id="conv" viewBox="0 0 330 250"></svg>
+    <div class="cap"><em>Projection 1,96·σ̂/√N</em> (call, T = 1) ; P4 tracera les points mesurés.</div></div>
+  </div>
+  <div class="two" style="margin-top:14px">
+   <div><div class="ft"><i>05</i><h2>Payoffs arithmétique / géométrique</h2></div><canvas id="scat" data-w="340" data-h="200"></canvas>
+    <div class="cap"><em>Corrélation mesurée 0,9987 à 0,9999</em> selon T. Nuage illustratif.</div></div>
+   <div class="txt" style="margin-top:22px">Texte 3 · contrôle géométrique (E[G] connu en formule fermée), β, antithétiques : pourquoi la corrélation de 0,999 divise la variance par plus de 600 (≈ 10 lignes, P6)</div>
+  </div>
+  <div class="beam"></div>
+  <div class="ft"><i>T1</i><h2>Cinq estimateurs à la monnaie — T = 1, N = 200 000</h2></div>
+  <table id="tab"></table>
+  <div class="cap"><em>Seed 20261117, transformée inverse AS241.</em> Ligne surlignée : meilleur gain d'efficacité.</div>
+  <div class="txt">Texte 2 · comparaison asiatique / européen (Q2, sous la fig. 2) — Texte 4 · gain de temps et de précision (Q4) — Application EUR/USD et limites (≈ 15 lignes, P6)</div>
+ </div>
+ <div class="foot"><span>Sources : Alpha Vantage (EUR/USD, 16/11/2026) · cours Pricing Monte-Carlo 2026 (A. W. Sanoussi Mani)</span><span>02</span></div>
+</section>
+
+<script>
+const GRID=[{"K": "80.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.9908416667408464"}, {"K": "80.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "0.04644212819668125"}, {"K": "90.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.9449208753535001"}, {"K": "90.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "0.29104998486114103"}, {"K": "100.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.7179810183293966"}, {"K": "100.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "0.7216305403375167"}, {"K": "110.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.34740550474870957"}, {"K": "110.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "0.9497883762280797"}, {"K": "120.0", "T": "0.25", "option": "call", "ratio_asian_over_euro_bs": "0.10288054720939435"}, {"K": "120.0", "T": "0.25", "option": "put", "ratio_asian_over_euro_bs": "1.000243577436391"}, {"K": "80.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.968109262555812"}, {"K": "80.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.06008685278491403"}, {"K": "90.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.8776896176782361"}, {"K": "90.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.29654977558793366"}, {"K": "100.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.6408130416315482"}, {"K": "100.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.654389458349957"}, {"K": "110.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.3411317707965435"}, {"K": "110.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.8943299847907755"}, {"K": "120.0", "T": "0.5", "option": "call", "ratio_asian_over_euro_bs": "0.13085066711999552"}, {"K": "120.0", "T": "0.5", "option": "put", "ratio_asian_over_euro_bs": "0.9849591923499553"}, {"K": "80.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.9214187557745849"}, {"K": "80.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.11039503635993961"}, {"K": "90.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.8033194384087553"}, {"K": "90.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.34082100915316016"}, {"K": "100.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.6024182366022997"}, {"K": "100.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.6213450686655612"}, {"K": "110.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.37775412802922925"}, {"K": "110.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.8309722214681972"}, {"K": "120.0", "T": "1.0", "option": "call", "ratio_asian_over_euro_bs": "0.20041546591852263"}, {"K": "120.0", "T": "1.0", "option": "put", "ratio_asian_over_euro_bs": "0.9445760539571696"}, {"K": "80.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.8499424092996566"}, {"K": "80.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.19029857751369086"}, {"K": "90.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.7311207073071566"}, {"K": "90.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.3935328551978879"}, {"K": "100.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.5772089838444838"}, {"K": "100.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.6066680638981087"}, {"K": "110.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.41821831541826865"}, {"K": "110.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.7761906208871509"}, {"K": "120.0", "T": "2.0", "option": "call", "ratio_asian_over_euro_bs": "0.2821969071040642"}, {"K": "120.0", "T": "2.0", "option": "put", "ratio_asian_over_euro_bs": "0.8898076731622163"}],VR=[{"T": "0.25", "option": "call", "estimator": "plain", "price": "3.031023341810034", "std_error": "0.010044461110700025", "efficiency_gain_vs_plain": "1.0"}, {"T": "0.25", "option": "call", "estimator": "antithetic", "price": "3.0207678373974183", "std_error": "0.007383119139180117", "efficiency_gain_vs_plain": "3.683893309549271"}, {"T": "0.25", "option": "call", "estimator": "control_beta_optimal", "price": "3.0249316969948095", "std_error": "0.0001400683688787422", "efficiency_gain_vs_plain": "5205.147219134835"}, {"T": "0.25", "option": "call", "estimator": "antithetic_control", "price": "3.0248655993362585", "std_error": "0.00013712027387551226", "efficiency_gain_vs_plain": "10317.385470604038"}, {"T": "0.25", "option": "call", "estimator": "control_beta_1", "price": "3.0249896774554066", "std_error": "0.00016958006132150239", "efficiency_gain_vs_plain": "4549.880036885196"}, {"T": "0.25", "option": "put", "estimator": "plain", "price": "2.687414066375501", "std_error": "0.00865963269595004", "efficiency_gain_vs_plain": "1.0"}, {"T": "0.25", "option": "put", "estimator": "antithetic", "price": "2.6906711327258908", "std_error": "0.006233423405247754", "efficiency_gain_vs_plain": "3.6524261582609037"}, {"T": "0.25", "option": "put", "estimator": "control_beta_optimal", "price": "2.693201271489114", "std_error": "0.00011829102965435515", "efficiency_gain_vs_plain": "3917.9062223335604"}, {"T": "0.25", "option": "put", "estimator": "antithetic_control", "price": "2.6931250259730537", "std_error": "0.00011431302439244973", "efficiency_gain_vs_plain": "6684.780869090189"}, {"T": "0.25", "option": "put", "estimator": "control_beta_1", "price": "2.693251293534296", "std_error": "0.00013997946587329565", "efficiency_gain_vs_plain": "3103.534300221338"}, {"T": "1.0", "option": "call", "estimator": "plain", "price": "5.317739286498677", "std_error": "0.017849506993033764", "efficiency_gain_vs_plain": "1.0"}, {"T": "1.0", "option": "call", "estimator": "antithetic", "price": "5.327482779850004", "std_error": "0.013382867090815953", "efficiency_gain_vs_plain": "3.4281755363759077"}, {"T": "1.0", "option": "call", "estimator": "control_beta_optimal", "price": "5.324176267146406", "std_error": "0.0004798618921913345", "efficiency_gain_vs_plain": "1454.213190239618"}, {"T": "1.0", "option": "call", "estimator": "antithetic_control", "price": "5.324493475701731", "std_error": "0.00047739383767371924", "efficiency_gain_vs_plain": "2564.7760363347643"}, {"T": "1.0", "option": "call", "estimator": "control_beta_1", "price": "5.323986893828822", "std_error": "0.0007112134333521805", "efficiency_gain_vs_plain": "686.5678337646299"}, {"T": "1.0", "option": "put", "estimator": "plain", "price": "4.266708987467453", "std_error": "0.013668753722692306", "efficiency_gain_vs_plain": "1.0"}, {"T": "1.0", "option": "put", "estimator": "antithetic", "price": "4.268367037886536", "std_error": "0.009789149705785566", "efficiency_gain_vs_plain": "3.507133132658646"}, {"T": "1.0", "option": "put", "estimator": "control_beta_optimal", "price": "4.265860875564554", "std_error": "0.0003513307482438455", "efficiency_gain_vs_plain": "1392.1227068540863"}, {"T": "1.0", "option": "put", "estimator": "antithetic_control", "price": "4.265868691935509", "std_error": "0.0003347203666351614", "efficiency_gain_vs_plain": "2654.434701552462"}, {"T": "1.0", "option": "put", "estimator": "control_beta_1", "price": "4.265839742626439", "std_error": "0.000489244527018958", "efficiency_gain_vs_plain": "739.6184978507215"}, {"T": "2.0", "option": "call", "estimator": "plain", "price": "7.409254294677302", "std_error": "0.025293271141877377", "efficiency_gain_vs_plain": "1.0"}, {"T": "2.0", "option": "call", "estimator": "antithetic", "price": "7.432407700806825", "std_error": "0.019142686313298993", "efficiency_gain_vs_plain": "3.286867653247314"}, {"T": "2.0", "option": "call", "estimator": "control_beta_optimal", "price": "7.4442575416905035", "std_error": "0.000979293656560343", "efficiency_gain_vs_plain": "635.525806109335"}, {"T": "2.0", "option": "call", "estimator": "antithetic_control", "price": "7.444009775370302", "std_error": "0.000984408232843794", "efficiency_gain_vs_plain": "1111.5352601321067"}, {"T": "2.0", "option": "call", "estimator": "control_beta_1", "price": "7.4426476995377575", "std_error": "0.00151992800039952", "efficiency_gain_vs_plain": "265.9484565202569"}, {"T": "2.0", "option": "put", "estimator": "plain", "price": "5.455724729036241", "std_error": "0.01736443245611399", "efficiency_gain_vs_plain": "1.0"}, {"T": "2.0", "option": "put", "estimator": "antithetic", "price": "5.445523373803734", "std_error": "0.012352287208218937", "efficiency_gain_vs_plain": "3.741664153699452"}, {"T": "2.0", "option": "put", "estimator": "control_beta_optimal", "price": "5.4525831969793614", "std_error": "0.0006245754135949136", "efficiency_gain_vs_plain": "769.6045446049039"}, {"T": "2.0", "option": "put", "estimator": "antithetic_control", "price": "5.453216915958412", "std_error": "0.0005928228192406562", "efficiency_gain_vs_plain": "1464.8246912818329"}, {"T": "2.0", "option": "put", "estimator": "control_beta_1", "price": "5.452468773389107", "std_error": "0.0008885862620650262", "efficiency_gain_vs_plain": "369.4613694909983"}];
+const V=n=>getComputedStyle(document.body).getPropertyValue(n).trim(),fr=(v,d)=>v.toFixed(d).replace('.',',');
+let seed;const U=()=>(seed=(seed*16807)%2147483647)/2147483647;let sp=null;
+const Z=()=>{if(sp!==null){const s=sp;sp=null;return s}const r=Math.sqrt(-2*Math.log(U())),v=2*Math.PI*U();sp=r*Math.sin(v);return r*Math.cos(v)};
+function sim(n,st,S0,s,mu){seed=20261117;sp=null;const dt=1/st,P=[];for(let i=0;i<n;i++){let x=S0;const p=[x];for(let k=0;k<st;k++){x*=Math.exp((mu-s*s/2)*dt+s*Math.sqrt(dt)*Z());p.push(x)}P.push(p)}return P}
+function cv(c){const r=Math.max(2,devicePixelRatio||1),w=+c.dataset.w,h=+c.dataset.h;c.width=w*r;c.height=h*r;c.style.aspectRatio=w+'/'+h;c.style.height='auto';const x=c.getContext('2d');x.setTransform(r,0,0,r,0,0);x.font='9.5px JetBrains Mono';return[x,w,h]}
+const PATHS=sim(220,252,1.0996,.0555,0);
+function fan(){const c=document.getElementById('fan'),[x,w,h]=cv(c),st=252,L=36,R=w-118,T=6,B=h-16,a1=V('--a1'),a2=V('--a2'),a3=V('--a3');
+ const all=PATHS.flat(),lo=Math.min(...all),hi=Math.max(...all),X=k=>L+(R-L)*k/st,Y=v=>B-(B-T)*(v-lo)/(hi-lo);
+ for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4;x.fillStyle=V('--mut');x.fillText(v.toFixed(3),0,Y(v)+3);x.fillStyle='rgba(255,255,255,.06)';for(let xx=L;xx<R;xx+=6)x.fillRect(xx,Y(v),1.5,1)}
+ const fin=PATHS.map(p=>p[st]),f0=Math.min(...fin),f1=Math.max(...fin);
+ x.globalCompositeOperation='lighter';PATHS.forEach(p=>{const u=(p[st]-f0)/(f1-f0);x.strokeStyle=u>.5?a1:a2;x.globalAlpha=.08+.14*Math.abs(u-.5);x.lineWidth=1;x.beginPath();p.forEach((v,k)=>k?x.lineTo(X(k),Y(v)):x.moveTo(X(k),Y(v)));x.stroke()});
+ x.globalCompositeOperation='source-over';x.globalAlpha=1;
+ const ex=PATHS[17];x.shadowColor=a3;x.shadowBlur=12;x.strokeStyle='#fff';x.lineWidth=1.5;x.beginPath();ex.forEach((v,k)=>k?x.lineTo(X(k),Y(v)):x.moveTo(X(k),Y(v)));x.stroke();
+ x.fillStyle=a3;for(let m=1;m<=12;m++){const k=Math.round(st*m/12);x.beginPath();x.arc(X(k),Y(ex[k]),3,0,7);x.fill()}x.shadowBlur=0;
+ const A=PATHS.map(p=>{let s=0;for(let m=1;m<=12;m++)s+=p[Math.round(st*m/12)];return s/12}),nb=26,bw=(hi-lo)/nb,hS=Array(nb).fill(0),hA=Array(nb).fill(0);
+ fin.forEach(v=>hS[Math.min(nb-1,((v-lo)/bw)|0)]++);A.forEach(v=>hA[Math.min(nb-1,((v-lo)/bw)|0)]++);const mx=Math.max(...hS,...hA),H0=R+10,HW=104;
+ x.lineWidth=2;x.lineCap='round';for(let i=0;i<nb;i++){const yc=(Y(lo+bw*(i+1))+Y(lo+bw*i))/2;x.strokeStyle=a2;x.globalAlpha=.6;x.beginPath();x.moveTo(H0,yc-1.5);x.lineTo(H0+HW*hS[i]/mx,yc-1.5);x.stroke();
+  x.globalAlpha=1;x.strokeStyle=a3;x.shadowColor=a3;x.shadowBlur=8;x.beginPath();x.moveTo(H0,yc+1.5);x.lineTo(H0+HW*hA[i]/mx,yc+1.5);x.stroke();x.shadowBlur=0}
+ x.fillStyle=a2;x.fillText('S_T',H0,T+8);x.fillStyle=a3;x.fillText('moyenne A',H0+28,T+8)}
+function dots(opt,id){const g=GRID.filter(r=>r.option===opt),Ks=[80,90,100,110,120],Ts=['0.25','0.5','1.0','2.0'],L=44,T0=20,cw=56,ch=54;let s=`<defs><radialGradient id="rg${id}"><stop offset="0" stop-color="${V('--a1')}"/><stop offset="1" stop-color="${V('--a2')}"/></radialGradient></defs>`;
+ Ks.forEach((k,i)=>s+=`<text x="${L+i*cw+cw/2}" y="10" text-anchor="middle">K ${k}</text>`);
+ Ts.forEach((t,j)=>{s+=`<text x="${L-6}" y="${T0+j*ch+ch/2+3}" text-anchor="end">T ${t.replace('.',',')}</text>`;Ks.forEach((k,i)=>{const v=+g.find(z=>+z.K===k&&z.T===t).ratio_asian_over_euro_bs,r=4+20*(1-Math.min(v,1)),cx=L+i*cw+cw/2,cy=T0+j*ch+ch/2;
+  s+=`<circle cx="${cx}" cy="${cy}" r="24" fill="none" stroke="rgba(255,255,255,.07)"/><circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="url(#rg${id})" opacity=".9" style="filter:drop-shadow(0 0 6px ${V('--a1')})"/><text x="${cx}" y="${cy+3}" text-anchor="middle" style="fill:#fff;font-size:10px;font-weight:600">${fr(v,2)}</text>`})});
+ document.getElementById(id).innerHTML=s}
+function beams(){const nm={plain:'Sans réduction',antithetic:'Antithétique',control_beta_1:'Contrôle β = 1',control_beta_optimal:'Contrôle β opt.',antithetic_control:'Anti + contrôle'},L=96,W=178,rh=44,lg=v=>Math.log10(v)/4,a1=V('--a1'),a2=V('--a2');
+ let s=`<defs><linearGradient id="bg" gradientUnits="userSpaceOnUse" x1="${L}" x2="${L+W}" y1="0" y2="0"><stop offset="0" stop-color="${a2}" stop-opacity="0"/><stop offset="1" stop-color="${a2}" stop-opacity=".6"/></linearGradient></defs>`;
+ [1,10,100,1000,10000].forEach(v=>{const xx=L+W*lg(v);s+=`<line x1="${xx}" x2="${xx}" y1="6" y2="${6+rh*5}" stroke="rgba(255,255,255,.06)" stroke-dasharray="2 4"/><text x="${xx}" y="${rh*5+20}" text-anchor="middle">×${v>=1000?v/1000+'k':v}</text>`});
+ Object.keys(nm).forEach((e,i)=>{const y=16+i*rh,rs=VR.filter(z=>z.estimator===e),mx=Math.max(...rs.map(z=>+z.efficiency_gain_vs_plain));
+  s+=`<text x="${L-10}" y="${y+4}" text-anchor="end" style="fill:${V('--sub')};font-family:Inter;font-size:10.5px">${nm[e]}</text><line x1="${L}" x2="${L+Math.max(2,W*lg(mx))}" y1="${y}" y2="${y}" stroke="url(#bg)" stroke-width="2"/>`;
+  [['0.25',2.5],['1.0',4],['2.0',5.5]].forEach(([T,r])=>{const c=rs.find(z=>z.T===T&&z.option==='call'),p=rs.find(z=>z.T===T&&z.option==='put');
+   s+=`<circle cx="${L+W*lg(+p.efficiency_gain_vs_plain)}" cy="${y}" r="${r+1.5}" fill="none" stroke="${a2}" stroke-width="1.3"/><circle cx="${L+W*lg(+c.efficiency_gain_vs_plain)}" cy="${y}" r="${r}" fill="${a1}" style="filter:drop-shadow(0 0 5px ${a1})"/>`});
+  s+=`<text x="${L+W*lg(mx)+12}" y="${y+4}" style="fill:#fff;font-size:10px">×${Math.round(mx).toLocaleString('fr-FR')}</text>`});
+ document.getElementById('beams').innerHTML=s}
+function conv(){const L=40,R=322,T0=8,B=196,pick=e=>VR.find(r=>r.T==='1.0'&&r.option==='call'&&r.estimator===e),X=n=>L+(R-L)*(Math.log10(n)-3)/3,Y=v=>T0+(B-T0)*(Math.log10(.5)-Math.log10(v))/(Math.log10(.5)+4);
+ let s=`<defs><linearGradient id="ar1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${V('--a2')}" stop-opacity=".35"/><stop offset="1" stop-color="${V('--a2')}" stop-opacity="0"/></linearGradient><linearGradient id="ar2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${V('--a1')}" stop-opacity=".35"/><stop offset="1" stop-color="${V('--a1')}" stop-opacity="0"/></linearGradient></defs>`;
+ [1e3,1e4,1e5,1e6].forEach(n=>s+=`<text x="${X(n)}" y="${B+16}" text-anchor="middle">10^${Math.log10(n)}</text>`);
+ [.1,.01,.001,.0001].forEach(v=>s+=`<line x1="${L}" x2="${R}" y1="${Y(v)}" y2="${Y(v)}" stroke="rgba(255,255,255,.06)" stroke-dasharray="2 4"/><text x="${L-5}" y="${Y(v)+3}" text-anchor="end">${String(v).replace('.',',')}</text>`);
+ s+=`<line x1="${L}" x2="${R}" y1="${Y(.01)}" y2="${Y(.01)}" stroke="${V('--a3')}" stroke-dasharray="4 4" opacity=".7"/><text x="${R}" y="${Y(.01)-5}" text-anchor="end" style="fill:${V('--a3')}">±0,01</text>`;
+ [['plain','--a2','ar1','sans réduction'],['antithetic_control','--a1','ar2','anti + contrôle']].forEach(([e,c,ar,lab])=>{const sig=+pick(e).std_error*Math.sqrt(200000);let d='';for(let i=0;i<=40;i++){const N=10**(3+3*i/40);d+=(i?'L':'M')+X(N).toFixed(1)+','+Y(1.96*sig/Math.sqrt(N)).toFixed(1)}
+  s+=`<path d="${d}L${R},${B}L${L},${B}Z" fill="url(#${ar})"/><path d="${d}" fill="none" stroke="${V(c)}" stroke-width="2" style="filter:drop-shadow(0 0 5px ${V(c)})"/><text x="${X(3e4)}" y="${Y(1.96*sig/Math.sqrt(3e4))-8}" style="fill:${V(c)}">${lab}</text>`});
+ document.getElementById('conv').innerHTML=s}
+function scat(){const c=document.getElementById('scat'),[x,w,h]=cv(c),P=sim(1400,12,100,.2,.02),pts=P.map(p=>{const o=p.slice(1),A=o.reduce((a,b)=>a+b)/12,G=Math.exp(o.reduce((a,b)=>a+Math.log(b),0)/12);return[Math.max(G-100,0),Math.max(A-100,0)]});
+ const m=Math.max(...pts.flat()),L=26,B=h-14,X=v=>L+(w-L-4)*v/m,Y=v=>B-(B-6)*v/m;x.fillStyle=V('--mut');for(let i=0;i<=4;i++){const v=m*i/4;x.fillText(v.toFixed(0),2,Y(v)+3)}
+ x.globalCompositeOperation='lighter';pts.forEach(([g,a])=>{const t=Math.min(1,a/m*1.4);x.fillStyle=t>.5?V('--a1'):V('--a2');x.globalAlpha=.55;x.beginPath();x.arc(X(g),Y(a),1.8,0,7);x.fill()});
+ x.globalCompositeOperation='source-over';x.globalAlpha=1;x.fillStyle=V('--mut');x.fillText('géométrique →',w-82,B-4);x.fillText('↑ arithmétique',L+4,12)}
+function rail(){const g=r=>VR.find(z=>z.T==='1.0'&&z.option==='call'&&z.estimator===r),pl=g('plain'),cvv=g('control_beta_optimal'),atm=+GRID.find(r=>+r.K===100&&r.T==='1.0'&&r.option==='call').ratio_asian_over_euro_bs,gmax=Math.max(...VR.map(r=>+r.efficiency_gain_vs_plain));
+ document.getElementById('rail').innerHTML=`<div class="k"><span>Call asiatique ATM</span><b class="g">${fr(+cvv.price,4)}</b><small>± ${fr(1.96*+cvv.std_error,4)}</small></div>`+
+ `<div class="k"><span>Asiatique / européen</span><b>${fr(atm,2)}</b><small style="color:var(--neg)">−${fr((1-atm)*100,1)} %</small></div>`+
+ `<div class="k"><span>Écart-type</span><b>${fr(+pl.std_error,4)}</b><small>→ ${fr(+cvv.std_error,4)}</small></div>`+
+ `<div class="k"><span>Gain max</span><b class="g">×${Math.round(gmax).toLocaleString('fr-FR')}</b><small>anti + contrôle</small></div>`}
+function tab(){const nm={plain:'Sans réduction',antithetic:'Antithétique',control_beta_1:'Contrôle β = 1',control_beta_optimal:'Contrôle β optimal',antithetic_control:'Antithétique + contrôle'},f=(e,o)=>VR.find(z=>z.T==='1.0'&&z.option===o&&z.estimator===e);
+ const best=Math.max(...Object.keys(nm).map(e=>+f(e,'call').efficiency_gain_vs_plain));
+ let s='<tr><th>Estimateur</th><th>Call</th><th>± IC 95 %</th><th>Put</th><th>± IC 95 %</th><th>Gain call / put</th></tr>';
+ Object.keys(nm).forEach(e=>{const c=f(e,'call'),p=f(e,'put'),b=+c.efficiency_gain_vs_plain===best;
+  s+=`<tr class="${b?'best':''}"><td>${nm[e]}</td><td>${fr(+c.price,4)}</td><td>${fr(1.96*+c.std_error,4)}</td><td>${fr(+p.price,4)}</td><td>${fr(1.96*+p.std_error,4)}</td><td style="color:var(--a1)">×${Math.round(+c.efficiency_gain_vs_plain).toLocaleString('fr-FR')} / ×${Math.round(+p.efficiency_gain_vs_plain).toLocaleString('fr-FR')}</td></tr>`});
+ document.getElementById('tab').innerHTML=s}
+function all(){fan();dots('call','dotsC');dots('put','dotsP');beams();conv();scat();rail();tab()}
+document.querySelectorAll('.bar button').forEach(b=>b.onclick=()=>{document.body.dataset.p=b.dataset.p;document.querySelectorAll('.bar button').forEach(z=>z.classList.toggle('on',z===b));all()});
+function fit(){const z=Math.min(1,(innerWidth-24)/794);document.querySelectorAll('.page').forEach(p=>p.style.zoom=z)}fit();addEventListener('resize',fit);
+(document.fonts?document.fonts.ready:Promise.resolve()).then(all);setTimeout(all,600);
+</script>
+</body></html>

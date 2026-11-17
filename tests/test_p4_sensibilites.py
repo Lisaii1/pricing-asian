@@ -117,8 +117,8 @@ def test_beta_bias_csv():
         sd_mean = prices.std(ddof=1) / math.sqrt(500)
         assert float(r["sd_of_mean"]) == pytest.approx(sd_mean, rel=1e-10)
         assert float(r["bias"]) == pytest.approx(prices.mean() - float(r["ref_price"]), abs=1e-14)
-    seeds = sorted({int(x["seed"]) for x in runs})
-    assert seeds == list(range(SEED, SEED + 500))
+    # seeds : saut exact sur un flux unique (P5a, étape 0), voir
+    # test_beta_bias_runs_use_disjoint_jumped_streams
 
 
 def test_p4_csv_values_have_no_numpy_repr():
@@ -169,3 +169,27 @@ def test_grid_cv_csv():
         assert float(r["ratio"]) == pytest.approx(float(r["price"]) / bs, rel=1e-12)
         assert float(r["ratio_ci_low"]) == pytest.approx(float(r["ci_low"]) / bs, rel=1e-12)
         assert float(r["ratio_ci_high"]) == pytest.approx(float(r["ci_high"]) / bs, rel=1e-12)
+
+
+# --- P5a étape 0 : 500 runs sur flux LCG disjoints (saut exact) -----------------------------------
+
+def test_beta_bias_runs_use_disjoint_jumped_streams():
+    """Run i démarre à l'état a^(i·M)·x0 mod m, M = uniformes consommées par run ; la référence
+    démarre après tous les runs des deux modes ; aucun état n'est réutilisé (balayage vérifié)."""
+    from pricer.rng import state_after
+    rows = {r["beta_mode"]: r for r in _rows("p4_beta_bias.csv")}
+    runs = _rows("p4_beta_bias_runs.csv")
+    m_max = max(int(r["n_uniforms_per_run"]) for r in rows.values())
+    for mode, r in rows.items():
+        M = int(r["n_uniforms_per_run"])
+        assert M == 12 * (1_000 + int(r["n_pilot"]))          # 1 uniforme par normale (AS241)
+        seeds = [int(x["seed"]) for x in runs if x["beta_mode"] == mode]
+        assert seeds == [state_after(SEED, i * M) for i in range(500)]
+        assert int(r["stream_x0"]) == SEED
+        assert int(r["n_seed_pairs_overlapping"]) == 0
+        assert int(r["n_seeds_overlapping_ref"]) == 0
+        assert int(r["ref_offset_uniforms"]) == 500 * m_max
+        assert int(r["ref_seed"]) == state_after(SEED, 500 * m_max)
+        total = 500 * m_max + int(r["ref_n_paths"]) * 12
+        assert int(r["stream_states_scanned"]) == total
+        assert r["first_return_of_x0"] == ""                   # x0 ne revient pas : pas de cycle
