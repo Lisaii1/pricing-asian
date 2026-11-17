@@ -66,6 +66,13 @@ def test_error_format_is_scientific_below_1e_4():
     assert ps.fmt_err(0.0179) == "0,0179"
 
 
+def test_superscript_and_significant_tick_formats():
+    assert ps.sup(-3) == "⁻³" and ps.sup(6) == "⁶"
+    assert ps.fmt_sig(0.001) == "0,001"                   # graduations log : chiffres utiles
+    assert ps.fmt_sig(0.1) == "0,1"
+    assert ps.fmt_sig(1.0) == "1"
+
+
 def test_axes_have_no_box_transparent_face_and_dashed_grid():
     ps.apply_style()
     fig, ax = plt.subplots()

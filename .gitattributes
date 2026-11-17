@@ -1,2 +1,7 @@
 # Relevés bruts : octets conservés tels que reçus (aucune conversion de fin de ligne)
 data/raw/** -text
+
+# Figures et classeur : octets exacts (le test de régénération compare les fichiers)
+*.png binary
+*.pdf binary
+*.xlsx binary

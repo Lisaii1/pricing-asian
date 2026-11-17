@@ -149,3 +149,95 @@ def test_fig3_max_gain_labels_are_p3_values():
         best = max(float(r["efficiency_gain_vs_plain"]) for r in rows if r["estimator"] == est)
         assert f"×{ps.fmt_int(best)}" in labels, est
     plt.close(fig)
+
+
+# --- figure 4 : convergence mesurée -----------------------------------------------------------------
+
+def test_fig4_points_are_measured_half_widths_and_slopes_written():
+    fig = pf.fig4_convergence()
+    conv, slopes = _rows("p4_convergence.csv"), _rows("p4_convergence_slopes.csv")
+    coll = {c.get_gid(): c for c in fig.findobj(lambda o: bool(getattr(o, "get_gid", None)
+                                                              and o.get_gid()))}
+    texts = " ".join(_texts(fig))
+    for s in slopes:
+        est = s["estimator"]
+        pts = [(float(r["n_paths"]), float(r["half_width_95"])) for r in conv if r["estimator"] == est]
+        assert np.allclose(coll[f"points:{est}"].get_offsets(), pts, rtol=1e-15)
+        x, y = coll[f"fit:{est}"].get_data()
+        assert np.allclose(y, np.exp(float(s["intercept"])) * np.asarray(x) ** float(s["slope"]))
+        assert f"pente {ps.fmt_num(float(s['slope']), 2)}" in texts
+    eps = max(float(r["epsilon"]) for r in _rows("p4_n_required.csv"))
+    assert f"±{ps.fmt_num(eps, 2)}" in texts
+    plt.close(fig)
+
+
+# --- figure 5 : nuage payoff arithmétique / géométrique ---------------------------------------------
+
+def test_fig5_scatter_uses_pricer_paths_and_writes_correlation():
+    d = pf.scatter_data()
+    row = next(r for r in _rows("p3_vr_atm.csv") if float(r["T"]) == 1.0 and r["option"] == "call"
+               and r["estimator"] == "control_beta_optimal")
+    assert d["n"] == pf.N_SCATTER == 2_000 and d["arith"].size == d["geo"].size == 2_000
+    assert (d["S0"], d["K"], d["sigma"], d["r"], d["q"], d["T"]) == tuple(
+        float(row[k]) for k in ("S0", "K", "sigma", "r", "q", "T"))
+    assert d["corr"] == pytest.approx(np.corrcoef(d["arith"], d["geo"])[0, 1], rel=1e-15)
+    assert np.all(d["arith"] >= d["geo"] - 1e-12)              # A ≥ G (moyennes)
+    se = d["geo"].std(ddof=1) / math.sqrt(d["n"])               # E[payoff G] = formule fermée
+    assert abs(d["geo"].mean() - float(row["geometric_closed_form"])) < 4 * se
+    fig = pf.fig5_scatter(d)
+    assert ps.fmt_num(d["corr"], 4) in " ".join(_texts(fig))
+    plt.close(fig)
+
+
+# --- figure 6 : cas réel, prix contre σ --------------------------------------------------------------
+
+def test_fig6_curves_come_from_sensitivity_csv_at_strike_s0():
+    fig = pf.fig6_eurusd_sigma()
+    rows = [r for r in _rows("p5_eurusd_sensitivity.csv") if r["strike_type"] == "spot"]
+    lines = {l.get_gid(): l for l in fig.findobj(lambda o: bool(getattr(o, "get_gid", None)
+                                                               and o.get_gid()))}
+    for option in ("call", "put"):
+        sub = sorted((r for r in rows if r["option"] == option), key=lambda r: float(r["sigma"]))
+        for kind, col in (("asian", "asian_pct_S0"), ("euro", "euro_bs_pct_S0")):
+            x, y = lines[f"{kind}:{option}"].get_data()
+            assert np.allclose(x, [100 * float(r["sigma"]) for r in sub], rtol=1e-15)
+            assert np.allclose(y, [float(r[col]) for r in sub], rtol=1e-15)
+    measured = next(r for r in rows if r["sigma_label"] == "mesuré")
+    texts = " ".join(_texts(fig))
+    assert ps.fmt_pct(float(measured["sigma"]), 2) in texts
+    plt.close(fig)
+
+
+# --- tableaux en image --------------------------------------------------------------------------------
+
+def test_table1_estimators_at_T1_from_p3():
+    fig = pf.table1_estimators()
+    texts = _texts(fig)
+    rows = [r for r in _rows("p3_vr_atm.csv") if float(r["T"]) == 1.0]
+    assert len(rows) == 10
+    for r in rows:
+        assert ps.fmt_num(float(r["price"]), 4) in texts
+        assert ps.fmt_err((float(r["ci_high"]) - float(r["ci_low"])) / 2) in texts
+    for est in {r["estimator"] for r in rows}:
+        c, p = (next(float(r["efficiency_gain_vs_plain"]) for r in rows
+                     if r["estimator"] == est and r["option"] == o) for o in ("call", "put"))
+        assert f"×{ps.fmt_int(c)} / ×{ps.fmt_int(p)}" in texts
+    plt.close(fig)
+
+
+def test_table2_real_case_from_p5_eurusd():
+    fig = pf.table2_eurusd()
+    texts = _texts(fig)
+    for r in _rows("p5_eurusd.csv"):
+        assert ps.fmt_num(float(r["K"]), 4) in texts
+        assert ps.fmt_num(float(r["asian_price"]), 4) in texts
+        assert ps.fmt_err((float(r["asian_ci_high"]) - float(r["asian_ci_low"])) / 2) in texts
+        assert ps.fmt_num(float(r["euro_bs_price"]), 4) in texts
+        assert ps.fmt_num(float(r["ratio_asian_euro_bs"]), 2) in texts
+    plt.close(fig)
+
+
+def test_all_expected_figures_declared():
+    assert set(pf.FIGURES) == {"fig1_eventail_eurusd", "fig2_disques_ratio", "fig3_gain_efficacite",
+                               "fig4_convergence", "fig5_nuage_payoffs", "fig6_eurusd_sigma",
+                               "tab1_estimateurs", "tab2_eurusd"}

@@ -72,6 +72,18 @@ def fmt_pct(x: float, decimals: int) -> str:
     return f"{fmt_num(100 * x, decimals)}{NBSP}%"
 
 
+def sup(n: int) -> str:
+    """Entier en exposant Unicode : sup(−3) = « ⁻³ »."""
+    return str(int(n)).translate(_SUPERSCRIPT)
+
+
+def fmt_sig(v: float) -> str:
+    """Graduation : nombre de décimales juste suffisant (0,001 ; 0,1 ; 1), virgule décimale."""
+    v = float(v)
+    decimals = max(0, -math.floor(math.log10(abs(v)))) if v else 0
+    return fmt_num(v, decimals)
+
+
 def fmt_err(v: float) -> str:
     """Écart-type ou demi-largeur d'IC (réponse Q5, P5b) : arrondi à 10^-4, sauf sous 10^-4 :
     notation scientifique à 2 chiffres significatifs, « 4,2 × 10⁻⁷ »."""

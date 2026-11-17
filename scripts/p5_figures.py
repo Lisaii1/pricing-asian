@@ -16,6 +16,19 @@ fig2_disques_ratio     results/p4_grid_cv.csv : ratio asiatique / européen BS, 
                        K × T ; rayon du disque = remise 1 − ratio (ratio > 1 compté 1).
 fig3_gain_efficacite   results/p3_vr_atm.csv : gain d'efficacité / sans réduction, par méthode ;
                        point plein = call, anneau = put, taille selon T.
+fig4_convergence       results/p4_convergence.csv : demi-largeur d'IC à 95 % mesurée contre N
+                       (log-log), 4 estimateurs, droite ajustée de p4_convergence_slopes.csv
+                       (ln demi-largeur = intercept + pente·ln N), ligne ±ε (plus grand ε de
+                       p4_n_required.csv). Couleur = contrôle ou non, anneau = antithétique.
+fig5_nuage_payoffs     2 000 trajectoires mensuelles du pricer (paramètres, K, T = 1 et seed de la
+                       ligne call T = 1 de p3_vr_atm.csv) : payoff actualisé arithmétique contre
+                       géométrique ; corrélation calculée ici, celle de P3 (N = 200 000) rappelée.
+fig6_eurusd_sigma      results/p5_eurusd_sensitivity.csv, K = S0 : prix asiatique (MC) et européen
+                       (BS) en % de S0 contre σ de 4 % à 8 %, call et put ; σ mesuré marqué.
+tab1_estimateurs       results/p3_vr_atm.csv, T = 1 : 5 estimateurs, call et put, prix, demi-IC
+                       à 95 % ((ci_high − ci_low)/2), gain d'efficacité ; meilleur gain call surligné.
+tab2_eurusd            results/p5_eurusd.csv : K = S0 et K = forward, call et put, prix
+                       asiatique, demi-IC, européen BS, ratio, ratio de variance du contrôle.
 
 Usage : .venv/Scripts/python.exe scripts/p5_figures.py [nom …]
 """
@@ -37,7 +50,7 @@ import numpy as np  # noqa: E402
 from matplotlib import patheffects  # noqa: E402
 from matplotlib.collections import LineCollection  # noqa: E402
 from matplotlib.lines import Line2D  # noqa: E402
-from matplotlib.patches import Circle  # noqa: E402
+from matplotlib.patches import Circle, Rectangle  # noqa: E402
 from matplotlib.ticker import FixedLocator, FuncFormatter  # noqa: E402
 
 from pricer import plotstyle as ps  # noqa: E402
@@ -284,10 +297,251 @@ def fig3_efficiency():
     return fig
 
 
+# --- figure 4 : convergence mesurée -------------------------------------------------------------
+
+CONV_STYLE = {          # couleur = famille (contrôle ou non), anneau = antithétique
+    "plain": ("a2", True, "-"),
+    "antithetic": ("a2", False, "--"),
+    "control": ("a1", True, "-"),
+    "antithetic_control": ("a1", False, "--"),
+}
+CONV_NAMES = {"plain": "sans réduction", "antithetic": "antithétique", "control": "contrôle",
+              "antithetic_control": "anti + contrôle"}
+
+
+def fig4_convergence():
+    conv, slopes = _rows("p4_convergence.csv"), _rows("p4_convergence_slopes.csv")
+    eps = max(float(r["epsilon"]) for r in _rows("p4_n_required.csv"))
+    fig = ps.new_figure(COL_PX, 270)
+    _glows(fig, (0.95, 0.9, "a1", 0.2), (0.05, 0.2, "a2", 0.3))
+    ax = fig.add_axes((0.15, 0.33, 0.8, 0.62))
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    handles, labels = [], []
+    for s in slopes:
+        est = s["estimator"]
+        color, filled, ls = CONV_STYLE[est]
+        pts = np.array([(float(r["n_paths"]), float(r["half_width_95"]))
+                        for r in conv if r["estimator"] == est])
+        x = np.geomspace(pts[:, 0].min(), pts[:, 0].max(), 50)
+        ax.plot(x, np.exp(float(s["intercept"])) * x ** float(s["slope"]), color=P[color],
+                lw=1.1, ls=ls, alpha=0.75, gid=f"fit:{est}")
+        ax.scatter(pts[:, 0], pts[:, 1], s=14, lw=1.0, zorder=4, gid=f"points:{est}",
+                   facecolors=P[color] if filled else P["bg"], edgecolors=P[color])
+        handles.append(Line2D([], [], color=P[color], ls=ls, lw=1.1, marker="o", ms=3.6,
+                              mfc=P[color] if filled else P["bg"], mec=P[color]))
+        labels.append(f"{CONV_NAMES[est]} · pente {ps.fmt_num(float(s['slope']), 2)}")
+    ax.axhline(eps, color=P["a3"], ls=(0, (4, 4)), lw=0.9, alpha=0.8)
+    ax.annotate(f"±{ps.fmt_num(eps, 2)}", (1, eps), xycoords=("axes fraction", "data"),
+                xytext=(0, -3), textcoords="offset points", ha="right", va="top",
+                color=P["a3"], fontfamily=ps.FONT_MONO, fontsize=6.5)
+    ns = sorted({float(r["n_paths"]) for r in conv})
+    ax.xaxis.set_major_locator(FixedLocator(
+        [10 ** k for k in range(math.ceil(math.log10(ns[0])), math.floor(math.log10(ns[-1])) + 1)]))
+    ax.xaxis.set_minor_locator(FixedLocator([]))
+    ax.xaxis.set_major_formatter(FuncFormatter(lambda v, _: f"10{ps.sup(round(math.log10(v)))}"))
+    ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: ps.fmt_sig(v)))
+    ax.yaxis.set_minor_formatter(FuncFormatter(lambda v, _: ""))
+    ax.set_xlabel("N (trajectoires)", color=P["mut"], labelpad=2)
+    ps.style_axes(ax)
+    ax.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.45, -0.17), ncol=2,
+              labelcolor=P["sub"], fontsize=6.5, handlelength=2.2, columnspacing=1.0,
+              borderaxespad=0)
+    first = conv[0]
+    ps.source(fig, f"p4_convergence.csv · call K = {ps.fmt_num(float(first['K']), 0)}, "
+                   f"T = {_fr_T(float(first['T']))} · demi-largeur de l'IC à 95 %")
+    return fig
+
+
+# --- figure 5 : nuage payoff arithmétique / géométrique ------------------------------------------
+
+def scatter_data() -> dict:
+    """N_SCATTER trajectoires du pricer, paramètres de la ligne call T = 1 de p3_vr_atm.csv."""
+    row = next(r for r in _rows("p3_vr_atm.csv") if r["option"] == "call"
+               and r["estimator"] == "control_beta_optimal" and float(r["T"]) == 1)
+    S0, K, sigma, r, q, T = (float(row[k]) for k in ("S0", "K", "sigma", "r", "q", "T"))
+    paths = np.concatenate(list(gbm_paths(S0, sigma, r, T, q, obs=row["obs"], n_paths=N_SCATTER,
+                                          seed=int(row["seed"]))))
+    disc = math.exp(-r * T)
+    arith = disc * np.maximum(paths.mean(axis=1) - K, 0.0)
+    geo = disc * np.maximum(np.exp(np.log(paths).mean(axis=1)) - K, 0.0)
+    return dict(S0=S0, K=K, sigma=sigma, r=r, q=q, T=T, seed=int(row["seed"]), n=N_SCATTER,
+                arith=arith, geo=geo, corr=float(np.corrcoef(arith, geo)[0, 1]),
+                corr_p3=float(row["corr"]), n_p3=int(row["n_paths"]))
+
+
+def fig5_scatter(d: dict | None = None):
+    d = scatter_data() if d is None else d
+    fig = ps.new_figure(COL_PX, 240)
+    _glows(fig, (0.85, 0.85, "a1", 0.18), (0.1, 0.15, "a2", 0.3))
+    ax = fig.add_axes((0.12, 0.17, 0.84, 0.63))
+    top = max(d["arith"].max(), d["geo"].max())
+    ax.plot([0, top], [0, top], color=P["mut"], lw=0.8, ls=(0, (4, 4)))
+    cols = [P["a1"] if v > top / 2 else P["a2"] for v in d["arith"]]
+    ax.scatter(d["geo"], d["arith"], s=4, c=cols, alpha=0.6, lw=0, zorder=3)
+    ax.set_xlim(0, top)
+    ax.set_ylim(0, top)
+    ax.set_xlabel("payoff géométrique", color=P["mut"], labelpad=2)
+    ax.set_ylabel("payoff arithmétique", color=P["mut"], labelpad=2)
+    ax.xaxis.set_major_formatter(FuncFormatter(lambda v, _: ps.fmt_num(v, 0)))
+    ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: ps.fmt_num(v, 0)))
+    ps.style_axes(ax)
+    mono = dict(fontfamily=ps.FONT_MONO)
+    fig.text(0.12, 0.9, f"corrélation {ps.fmt_num(d['corr'], 4)}", color=P["ink"], fontsize=9,
+             **mono)
+    fig.text(0.12, 0.84, f"N = {ps.fmt_int(d['n'])} · P3 avec N = {ps.fmt_int(d['n_p3'])} : "
+             f"{ps.fmt_num(d['corr_p3'], 4)}", color=P["sub"], fontsize=6.5, **mono)
+    ps.source(fig, f"pricer, seed {d['seed']} · S0 = K = {ps.fmt_num(d['K'], 0)}, "
+                   f"T = {_fr_T(d['T'])}, mensuel")
+    return fig
+
+
+# --- figure 6 : cas réel, prix contre σ ----------------------------------------------------------
+
+def fig6_eurusd_sigma():
+    rows = [r for r in _rows("p5_eurusd_sensitivity.csv") if r["strike_type"] == "spot"]
+    measured = {r["option"]: r for r in rows if r["sigma_label"] == "mesuré"}
+    s_meas = float(next(iter(measured.values()))["sigma"])
+    fig = ps.new_figure(COL_PX, 260)
+    _glows(fig, (0.9, 0.9, "a1", 0.2), (0.1, 0.1, "a2", 0.3))
+    ax = fig.add_axes((0.13, 0.15, 0.6, 0.72))
+    ax.axvline(100 * s_meas, color=P["a3"], lw=0.8, ls=(0, (2, 3)), alpha=0.8)
+    style = {("asian", "call"): ("a1", "-"), ("euro", "call"): ("a2", "-"),
+             ("asian", "put"): ("a1", "--"), ("euro", "put"): ("a2", "--")}
+    names = {"asian": "asiatique", "euro": "européen BS"}
+    ends = []                                   # étiquettes directes en bout de courbe
+    for (kind, option), (color, ls) in style.items():
+        sub = sorted((r for r in rows if r["option"] == option), key=lambda r: float(r["sigma"]))
+        col = "asian_pct_S0" if kind == "asian" else "euro_bs_pct_S0"
+        x = [100 * float(r["sigma"]) for r in sub]
+        y = [float(r[col]) for r in sub]
+        ax.plot(x, y, color=P[color], ls=ls, lw=1.3, marker="o", ms=2.6, gid=f"{kind}:{option}")
+        ym = float(measured[option][col])
+        ax.scatter([100 * s_meas], [ym], s=22, color=P["a3"], lw=0, zorder=5)
+        ends.append([y[-1], x[-1], f"{names[kind]} {option}"])
+        if kind == "asian":
+            ax.annotate(ps.fmt_num(ym, 2), (100 * s_meas, ym), xytext=(-4, 5),
+                        textcoords="offset points", ha="right", color=P["ink"],
+                        fontfamily=ps.FONT_MONO, fontsize=6.5)
+    lo, hi = ax.get_ylim()
+    gap = (hi - lo) / 16                        # écart minimal entre deux étiquettes
+    ends.sort()
+    for k in range(1, len(ends)):
+        ends[k][0] = max(ends[k][0], ends[k - 1][0] + gap)
+    for y_lab, x_end, text in ends:
+        ax.annotate(text, (x_end, y_lab), xytext=(6, 0), textcoords="offset points",
+                    va="center", color=P["sub"], fontsize=6.5, annotation_clip=False)
+    ax.set_xlabel("σ (%)", color=P["mut"], labelpad=2)
+    ax.set_ylabel("prix (% de S0)", color=P["mut"], labelpad=2)
+    ax.xaxis.set_major_formatter(FuncFormatter(lambda v, _: ps.fmt_num(v, 0)))
+    ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: ps.fmt_num(v, 1)))
+    ps.style_axes(ax)
+    m = measured["call"]
+    fig.text(0.13, 0.92, f"σ mesuré {ps.fmt_pct(s_meas, 2)} · K = S0 = "
+             f"{ps.fmt_num(float(m['S0']), 4)} · T = {_fr_T(float(m['T']))} an",
+             color=P["a3"], fontfamily=ps.FONT_MONO, fontsize=6.5)
+    ps.source(fig, f"p5_eurusd_sensitivity.csv · N = {ps.fmt_int(m['n_paths'])}")
+    return fig
+
+
+# --- tableaux en image ---------------------------------------------------------------------------
+
+def _table(width_px, header, aligns, cells, best=None, accent_last=False, foot=None):
+    """Tableau de la maquette : en-têtes monospace discrets en capitales, filets fins, chiffres
+    en monospace, première colonne en sans-serif ; ligne best surlignée (fond + barre a1)."""
+    head_px, row_px = 26, 24
+    H = head_px + row_px * len(cells) + (26 if foot else 8)
+    fig = ps.new_figure(width_px, H)
+    _glows(fig, (0.05, 0.5, "a2", 0.22), (0.95, 0.5, "a1", 0.12))
+    left, right, first_w = 0.02, 0.98, 0.27
+    n = len(header)
+    edges = np.concatenate(([left], np.linspace(left + first_w, right, n)))
+
+    def y(px):                                  # pixels depuis le haut → fraction de figure
+        return 1 - px / H
+
+    def put(i, yy, text, **kw):
+        r = aligns[i] == "r"
+        fig.text(edges[i + 1] - 0.008 if r else edges[i] + 0.008, yy, text,
+                 ha="right" if r else "left", va="center", **kw)
+
+    for i, h in enumerate(header):
+        put(i, y(head_px / 2), h.upper(), color=P["mut"], fontfamily=ps.FONT_MONO, fontsize=6)
+    fig.add_artist(Line2D([left, right], [y(head_px)] * 2, color="white", alpha=0.12, lw=0.6))
+    for k, row in enumerate(cells):
+        top = head_px + k * row_px
+        if k == best:
+            fig.add_artist(Rectangle((left, y(top + row_px)), right - left, row_px / H,
+                                     color="white", alpha=0.045, lw=0))
+            fig.add_artist(Rectangle((left, y(top + row_px)), 2 / width_px, row_px / H,
+                                     color=P["a1"], lw=0))
+        for i, cell in enumerate(row):
+            if i == 0:
+                put(i, y(top + row_px / 2), cell, fontfamily=ps.FONT_SANS, fontsize=7.5,
+                    color=P["ink"] if k == best else P["sub"])
+            else:
+                put(i, y(top + row_px / 2), cell, fontfamily=ps.FONT_MONO, fontsize=7,
+                    color=P["a1"] if accent_last and i == n - 1 else P["ink"])
+        fig.add_artist(Line2D([left, right], [y(top + row_px)] * 2, color="white", alpha=0.07,
+                              lw=0.6))
+    if foot:
+        ps.source(fig, foot, x=left, ha="left")
+    return fig
+
+
+def table1_estimators():
+    rows = [r for r in _rows("p3_vr_atm.csv") if float(r["T"]) == 1]
+    by = {(r["estimator"], r["option"]): r for r in rows}
+    order = sorted({r["estimator"] for r in rows},
+                   key=lambda e: float(by[(e, "call")]["efficiency_gain_vs_plain"]))
+
+    def half(r):
+        return ps.fmt_err((float(r["ci_high"]) - float(r["ci_low"])) / 2)
+
+    cells = []
+    for e in order:
+        c, p = by[(e, "call")], by[(e, "put")]
+        cells.append([ESTIMATOR_NAMES[e], ps.fmt_num(float(c["price"]), 4), half(c),
+                      ps.fmt_num(float(p["price"]), 4), half(p),
+                      f"×{ps.fmt_int(float(c['efficiency_gain_vs_plain']))} / "
+                      f"×{ps.fmt_int(float(p['efficiency_gain_vs_plain']))}"])
+    f = rows[0]
+    foot = (f"p3_vr_atm.csv · T = 1 · K = S0 = {ps.fmt_num(float(f['K']), 0)} · "
+            f"N = {ps.fmt_int(f['n_paths'])} · seed {f['seed']} · AS241")
+    return _table(FULL_PX, ["Estimateur", "Call", "± IC 95 %", "Put", "± IC 95 %",
+                            "Gain call / put"], "lrrrrr", cells, best=len(cells) - 1,
+                  accent_last=True, foot=foot)
+
+
+def table2_eurusd():
+    rows = _rows("p5_eurusd.csv")
+    label = {"spot": "K = S0", "forward": "K = forward 1 an"}
+    cells = []
+    for r in rows:
+        half = (float(r["asian_ci_high"]) - float(r["asian_ci_low"])) / 2
+        cells.append([f"{label[r['strike_type']]} · {r['option']}", ps.fmt_num(float(r["K"]), 4),
+                      ps.fmt_num(float(r["asian_price"]), 4), ps.fmt_err(half),
+                      ps.fmt_num(float(r["euro_bs_price"]), 4),
+                      ps.fmt_num(float(r["ratio_asian_euro_bs"]), 2),
+                      f"×{ps.fmt_int(float(r['variance_ratio']))}"])
+    f = rows[0]
+    foot = (f"p5_eurusd.csv · S0 = {ps.fmt_num(float(f['S0']), 4)} · "
+            f"σ = {ps.fmt_pct(float(f['sigma']), 2)} · r = {ps.fmt_pct(float(f['r']), 2)} · "
+            f"q = {ps.fmt_pct(float(f['q']), 2)} · N = {ps.fmt_int(f['n_paths'])} · "
+            f"contrôle β optimal + antithétique · USD pour 1 EUR")
+    return _table(FULL_PX, ["Cas", "K", "Asiatique", "± IC 95 %", "Européen BS", "Ratio",
+                            "Variance ÷"], "lrrrrrr", cells, foot=foot)
+
+
 FIGURES = {
     "fig1_eventail_eurusd": fig1_fan,
     "fig2_disques_ratio": fig2_disks,
     "fig3_gain_efficacite": fig3_efficiency,
+    "fig4_convergence": fig4_convergence,
+    "fig5_nuage_payoffs": fig5_scatter,
+    "fig6_eurusd_sigma": fig6_eurusd_sigma,
+    "tab1_estimateurs": table1_estimators,
+    "tab2_eurusd": table2_eurusd,
 }
 
 
