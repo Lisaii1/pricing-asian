@@ -3,7 +3,8 @@
 Contrainte du sujet : les normales sont produites uniquement par les méthodes du cours
 (LCG + transformée inverse / Box-Muller / acceptation-rejet). Ce test échoue dès qu'un
 fichier de src/ mentionne numpy.random, le module random de la bibliothèque standard
-ou une méthode .rvs( de scipy.stats.
+ou une méthode .rvs( de scipy.stats, ni n'importe SciPy (CLAUDE.md : SciPy permis dans tests/ et
+scripts/ seulement ; Φ est codée sans SciPy dans src/).
 """
 from __future__ import annotations
 
@@ -18,6 +19,7 @@ FORBIDDEN = {
     "import random": re.compile(r"^\s*import\s+(?:[\w.]+\s*,\s*)*random\b", re.MULTILINE),
     "from random import": re.compile(r"^\s*from\s+random\s+import\b", re.MULTILINE),
     ".rvs(": re.compile(r"\.\s*rvs\s*\("),
+    "import scipy": re.compile(r"^\s*(?:import|from)\s+scipy\b", re.MULTILINE),
 }
 
 
@@ -51,11 +53,14 @@ def test_detector_catches_each_forbidden_pattern(tmp_path):
         "d.py": "import random\n",
         "e.py": "from random import gauss\n",
         "f.py": "from scipy import stats\nx = stats.norm.rvs(size=3)\n",
+        "g.py": "from scipy.special import ndtr\n",
+        "h.py": "import scipy.stats as st\n",
         "ok.py": "# randomness comes from LCG only\nimport numpy as np\n",
+        "ok2.py": "import scipyish_not_scipy\n# from scipy import nothing (commentaire)\n",
     }
     pkg = tmp_path / "src"
     pkg.mkdir()
     for name, body in samples.items():
         (pkg / name).write_text(body, encoding="utf-8")
     flagged = {v.split(":")[0].replace("\\", "/").split("/")[-1] for v in find_violations(pkg)}
-    assert flagged == {"a.py", "b.py", "c.py", "d.py", "e.py", "f.py"}
+    assert flagged == {"a.py", "b.py", "c.py", "d.py", "e.py", "f.py", "g.py", "h.py"}

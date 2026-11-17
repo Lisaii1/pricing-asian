@@ -17,7 +17,8 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
   (fréquence d'observation du spot).
 - Normales générées **uniquement** par les méthodes du cours : générateur congruentiel linéaire (LCG) +
   transformée inverse / Box-Muller / acceptation-rejet. **Interdit dans `src/` : `numpy.random`, `random`,
-  `scipy.stats.*.rvs`** (un test le vérifie). SciPy n'est permis que dans `tests/` comme référence.
+  `scipy`** (un test le vérifie). SciPy est permis dans `tests/` et `scripts/` (références, diagnostics),
+  jamais dans `src/` (Φ y est codée avec `math.erfc`).
 - Actif réel et actif théorique : théorique d'abord (validation), réel ensuite (application), choix justifié.
 - Rapport Word ou PDF, 2 pages maximum hors page de garde.
 
@@ -42,5 +43,22 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
 | P5 | Actif réel calibré, graphiques, classeur Excel |
 | P6 | Rapport 2 pages + support de présentation |
 
+## Décisions
+- 17/11/2026, Loup : actif réel = **EUR/USD** (q = taux euro, r = taux dollar), « même si possible que ça
+  puisse changer » ; utilisé en P5.
+- 17/11/2026, Loup : actif théorique d'abord pour valider, réel ensuite.
+- 17/11/2026, réponses aux questions P1 (tranchées par Cowork, **à valider par Loup**) :
+  - Q1 Hastings : t = √(−2 ln p) est la forme d'Abramowitz-Stegun 26.2.23 ; on la garde. Si le slide dit
+    autre chose, c'est une coquille listée avec les autres (slide 9 « c = 0 », slide 23 Marsaglia,
+    dénominateur de Hastings).
+  - Q2 SciPy permis dans `tests/` et `scripts/`, jamais dans `src/`.
+  - Q3 dépendances transitives figées par `pip freeze` : conforme (« jamais latest » = toujours épinglé).
+  - Q4 rejet : version lisible conservée ; coût (3,95 uniformes par normale) cité tel quel au rapport final.
+  - Q5 méthode par défaut du pricer : transformée inverse AS241 (méthode phare du cours, 1 uniforme par
+    normale, monotone en U : l'antithétique U ↔ 1 − U du cours est exact). Les autres méthodes restent un
+    paramètre ; leur coût sur le prix est mesuré en P4.
+  - Q6 seed de référence du projet : **20261117**.
+
 ## État court
-- Prochain : P1 (prompt `prompts/2026-11-17-p1-socle-alea.md`).
+- P1 fait (4 commits). P2 : prompt `prompts/2026-11-17-p2-pricer.md`.
+- Prochain : P3.
