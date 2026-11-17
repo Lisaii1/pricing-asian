@@ -101,10 +101,26 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
     σ de 4 % à 8 %.
   - Cas : exportateur français qui encaisse des USD chaque mois pendant 1 an et couvre son taux moyen :
     call asiatique sur EUR/USD, à la monnaie, 12 observations mensuelles, T = 1.
-  - Taux (Garman-Kohlhagen, q joue le dividende) : r = Trésor américain 1 an, r = ln(1 + y) ;
-    q = BCE courbe AAA spot 1 an, publiée en composition continue (« continuous compounding »,
-    réponse BCE) donc q = y (écart avec le ln(1 + y) du prompt P5a, à confirmer par Loup).
+  - Taux (Garman-Kohlhagen, q joue le dividende) : r = Trésor américain 1 an, r = 2·ln(1 + y/2)
+    depuis P5b (Q2 ci-dessous ; ln(1 + y) en P5a) ; q = BCE courbe AAA spot 1 an, publiée en
+    composition continue (« continuous compounding », réponse BCE) donc q = y (Q1 ci-dessous).
   - Relevés bruts dans `data/raw/` (octets conservés, `-text`), décrits par `data/raw/MANIFEST.md`.
+- 17/11/2026, réponses aux questions P5a (Cowork ; validées par Loup en lançant P5b) :
+  - Q1 q = y / 100 (déjà continu) : TITLE_COMPL de la série BCE « … Svensson model - continuous
+    compounding … », vérifié par Cowork dans le fichier brut ; l'écart au prompt P5a était justifié.
+  - Q2 r en base SEMESTRIELLE, r = 2·ln(1 + y/2) : rendements « bond-equivalent » du Trésor (FAQ du
+    Trésor : APY = (1 + i/2)² − 1 ; Fed FEDS 2006-28, éq. (4)), URL lues le 17/11/2026 dans
+    `pricer.market.TREASURY_SOURCES` et `results/p5_market.csv` ; ln(1 + y) gardé en comparaison.
+  - Q3 biais du pilot : relancé à 2 000 runs à flux disjoints avant de conclure (P5b, étape 1) ;
+    rien n'est ajusté.
+  - Q4 strike central K = S0 (taux budget = cours du jour pour l'exportateur) ; la ligne K = forward
+    reste dans les tableaux.
+  - Q5 prix arrondis à 10^-4 ; écarts-types et demi-largeurs d'IC sous 10^-4 en notation
+    scientifique à 2 chiffres significatifs (ex. 4,2 × 10⁻⁷), `pricer.plotstyle.fmt_err`.
+- 17/11/2026, P5b : figures en Segoe UI (texte) et Consolas (chiffres), polices Windows installées
+  (Inter et JetBrains Mono de la maquette absentes) ; `results/figures/` (PNG 300 dpi + PDF) et
+  `results/pricing_asian_resultats.xlsx` sont générés par `scripts/p5_figures.py` et
+  `scripts/p5_excel.py`, jamais édités à la main.
 
 ## Coquilles du cours relevées (citées au rapport final)
 1. Slide 9 : « c = 0 ».
@@ -118,4 +134,5 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
 ## État court
 - P1 fait (4 commits). P2 fait (4 commits). P3 fait (4 commits). P4 fait (6 commits).
   P5a fait (5 commits) : prompt `prompts/2026-11-17-p5a-eurusd.md`.
-- Prochain : P5b figures et Excel.
+  P5b fait (5 commits) : prompt `prompts/2026-11-17-p5b-figures-excel.md`.
+- Prochain : P6 rapport et soutenance.
