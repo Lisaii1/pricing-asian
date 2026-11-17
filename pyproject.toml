@@ -2,3 +2,6 @@
 pythonpath = ["src"]
 testpaths = ["tests"]
 addopts = "-ra"
+# matplotlib 3.10.3 appelle des noms dépréciés de pyparsing 3.3.3 (versions épinglées) : bruit tiers
+filterwarnings = ["ignore::DeprecationWarning:matplotlib._fontconfig_pattern",
+                  "ignore::DeprecationWarning:matplotlib._mathtext"]
