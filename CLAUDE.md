@@ -172,6 +172,9 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
   = champs `orateur_*` (`p6_build.ORATEURS`, « [à attribuer] » d'ici la répartition). Ces PDF et
   le paquet équipe (`p6_package.py --equipe`) sont internes au groupe : jamais dans le paquet de
   rendu ; l'oral, la grille et le LISEZ-MOI équipe restent sans mot de l'outillage (testé).
+- 17/11/2026, Loup (22:30) : « Il n'y a pas de soutenance orale. Que des rendus à faire ». Les PDF du
+  groupe (dont l'oral) restent tels quels, « au cas où » ; le rapport rendu ne promet plus de soutenance
+  (le rapport renvoie au LISEZMOI du code pour les coquilles).
 
 ## Coquilles du cours relevées (citées au rapport final)
 1. Slide 9 : « c = 0 ».
@@ -199,4 +202,7 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
   `docs/pdf/` (oral en fiches, grille, dossier) par `scripts/p6_build.py --pdf-groupe` ; paquet
   équipe `rendu/Dossier_Equipe_Pricing_Asiatique.zip` par `scripts/p6_package.py --equipe` ;
   `README.md` « Par où commencer ».
-- Prochain : relecture humaine, répartition de l'oral, envoi.
+  P6e fait (3 commits) : prompt `prompts/2026-11-17-p6e-sans-soutenance.md` ; pas de soutenance :
+  le rapport renvoie au LISEZMOI du code pour les 6 coquilles (section ajoutée au LISEZMOI du paquet
+  professeur), LISEZ-MOI équipe et grille (partie C : « sans objet ») mis à jour, deux zips régénérés.
+- Prochain : relecture du groupe, envoi du paquet professeur avant le 22/11.
