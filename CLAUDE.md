@@ -121,6 +121,29 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
   (Inter et JetBrains Mono de la maquette absentes) ; `results/figures/` (PNG 300 dpi + PDF) et
   `results/pricing_asian_resultats.xlsx` sont générés par `scripts/p5_figures.py` et
   `scripts/p5_excel.py`, jamais édités à la main.
+- 17/11/2026, réponses aux questions P5b (Cowork ; validées par Loup en lançant P6) :
+  - Q1 palette Plasma gardée telle quelle (le rendu est un PDF lu à l'écran).
+  - Q2 pas d'installation de polices : Segoe UI + Consolas partout, figures et rapport.
+  - Q3 biais du pilot non détecté à 2 000 runs ; le −2,51 de P5a (500 runs) est présenté comme une
+    fluctuation, avec les deux chiffres.
+  - Q4 gains d'efficacité cités à l'ordre de grandeur (« environ ×1 400 »), avec la dispersion
+    mesurée entre deux mesures du temps.
+  - Q5 pas de grain.
+- 17/11/2026, Loup (19:19) : documents rendus au professeur (rapport PDF, `docs/ORAL.md`) : aucune
+  mention de notre outillage de travail (noms des assistants, consignes, numéros de lots, « tranché
+  par… », `reports/`, `prompts/`, `CLAUDE.md`), première personne du pluriel, étapes nommées par leur
+  contenu. `docs/DOSSIER_GROUPE.md` reste interne au groupe et peut les citer. Un test le vérifie
+  (liste des mots : `scripts/p6_build.FORBIDDEN`). Pas de lien GitHub dans le rapport.
+- 17/11/2026, Loup : noms du groupe pour la page de garde dans `scripts/p6_build.GROUP` ; le nom de
+  famille de Loup reste à fournir (`p6_build.LOUP`, affiché « [Loup — nom] » d'ici là).
+- 17/11/2026, P6 : règle des chiffres. Dossier, oral et rapport sont des gabarits
+  (`docs/templates/*.md`, `rapport/rapport_template.html`) à champs {{nom}} remplis par
+  `scripts/p6_build.py` depuis les CSV de `results/` ; aucun décimal tapé (testé) ; les fichiers
+  produits ne s'éditent pas à la main. Gain d'efficacité « à l'ordre de grandeur » = moyenne des deux
+  mesures du temps, arrondie à 2 chiffres significatifs ; les deux anciennes mesures utiles sont dans
+  `results/historique/` (recopiées de git, commits 01dca19 et beb2bb2). Rapport : page de garde +
+  2 pages A4, figures 1, 2, 4, 3 de `results/figures/`, tableaux 1 et 2 en HTML depuis les CSV ;
+  figures 5 et 6 réservées à l'oral ; PDF produit par Chrome en mode headless.
 
 ## Coquilles du cours relevées (citées au rapport final)
 1. Slide 9 : « c = 0 ».
@@ -135,4 +158,6 @@ Actif Black-Scholes : dS_t/S_t = (r − q)dt + σ dW_t.
 - P1 fait (4 commits). P2 fait (4 commits). P3 fait (4 commits). P4 fait (6 commits).
   P5a fait (5 commits) : prompt `prompts/2026-11-17-p5a-eurusd.md`.
   P5b fait (5 commits) : prompt `prompts/2026-11-17-p5b-figures-excel.md`.
-- Prochain : P6 rapport et soutenance.
+  P6 fait (4 commits) : prompt `prompts/2026-11-17-p6-dossier-oral-rapport-v2.md` ; dossier
+  `docs/DOSSIER_GROUPE.md`, oral `docs/ORAL.md`, rapport `rapport/Rapport_Pricing_Asiatique.pdf`.
+- Prochain : relecture de Loup et du groupe, soutenance.
