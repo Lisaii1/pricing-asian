@@ -23,11 +23,10 @@ Sommaire : [A. Ce que le sujet demande](#a-ce-que-le-sujet-demande) ·
 
 ## A. Ce que le sujet demande
 
-Bilan : 15 exigences ; 11 ✅ faites, 4 ⚠️ partielles, 0 ❌ non faite.
+Bilan : 15 exigences ; 12 ✅ faites, 3 ⚠️ partielles, 0 ❌ non faite.
 
-Les quatre exigences partielles ne touchent pas au calcul : il manque une confirmation (le mail du
-groupe), un envoi (le rendu), une phrase dans le rapport (la justification de l'actif théorique) et
-un nom sur la page de garde.
+Les trois exigences partielles ne touchent pas au calcul : il manque une confirmation (le mail du
+groupe), un envoi (le rendu, dont le paquet est prêt) et une relecture humaine du rapport final.
 
 ### Consignes générales
 
@@ -35,14 +34,14 @@ un nom sur la page de garde.
 |---|---|---|---|---|
 | « Constituez des groupes de 7 à 10 personnes » | ✅ fait | page de garde du [rapport](../rapport/Rapport_Pricing_Asiatique.pdf) | `test_p6_build.py::test_report_has_a_cover_and_two_pages` (les noms sont sur la page de garde) | Nous sommes 8, dans la fourchette demandée. |
 | « Chaque groupe doit envoyer un mail à […] avec liste des membres et en copie les membres du groupe au plus tard le 08 novembre 2026 » | ⚠️ partiel | hors du dépôt (messagerie du groupe) | aucune dans le dépôt : un mail n'y est pas conservé | Nous ne pouvons pas le prouver ici : le groupe doit confirmer que le mail est parti à temps (partie C). |
-| « Date limite pour rendre le projet le 22 novembre 2026 » | ⚠️ partiel | [rapport](../rapport/Rapport_Pricing_Asiatique.pdf), code (`src/pricer/`), [classeur Excel](../results/pricing_asian_resultats.xlsx) | les fichiers sont prêts ; l'envoi n'est pas fait | Tout est prêt avant le 22 novembre 2026, il reste à compléter la page de garde puis à envoyer (partie C). |
+| « Date limite pour rendre le projet le 22 novembre 2026 » | ⚠️ partiel | [rapport](../rapport/Rapport_Pricing_Asiatique.pdf), code (`src/pricer/`), [classeur Excel](../results/pricing_asian_resultats.xlsx) | les fichiers sont prêts ; l'envoi n'est pas fait | Tout est prêt avant le 22 novembre 2026 : le paquet de rendu (rapport, code, résultats, classeur) est construit, il reste à le relire puis à l'envoyer (partie C). |
 | « Choix entre l’un des 2 énoncés » | ✅ fait | énoncé 2, annoncé sur la page de garde et dans le titre du rapport | `test_p6_build.py::test_report_has_a_cover_and_two_pages` (« Projet Pricing Monte-Carlo, énoncé 2 ») | Nous traitons l'énoncé 2 : l'option asiatique et la réduction de variance. |
 | « Partie code uniquement VBA Excel ou python » | ✅ fait | Python, dossier `src/pricer/` ([asian.py](../src/pricer/asian.py)) ; versions fixées dans [requirements.txt](../requirements.txt) | `test_no_forbidden_rng.py::test_src_exists_and_has_python_files` | Tout le calcul est en Python ; Excel ne sert qu'à présenter les résultats, sans aucune formule. |
 | « L’interface du code est une fonction qui prend en comptes les paramètres : […] généraux: Spot, Strike, Volatilité, taux sans-risque, Maturité, dividende, … » | ✅ fait | `pricer.asian.price_asian` (S0, K, sigma, r, T, q, option, …) dans [asian.py](../src/pricer/asian.py) ; même signature pour `pricer.asian.price_european_mc` | `test_asian.py::test_result_fields_and_ci`, `test_asian.py::test_invalid_inputs_raise`, `test_black_scholes.py::test_dividend_lowers_call_raises_put` | Une seule fonction reçoit spot, strike, volatilité, taux, maturité et dividende continu q, et rend le prix avec son écart-type et son intervalle de confiance. |
 | « spécifiques : […] option asiatique (fréquence de constatation des observations du spot) » | ✅ fait | paramètre `obs` de `pricer.asian.price_asian` : un nombre de dates, ou une fréquence (« daily », « weekly », « monthly », « quarterly ») convertie par `pricer.paths.n_obs_from` | `test_paths.py::test_n_obs_from_frequency_string`, `test_paths.py::test_n_obs_frequency_rounds_half_up_with_minimum_one`, `test_asian.py::test_asian_one_observation_equals_european_bitwise`, `p4_frequency.csv` | Avec une seule observation l'asiatique redevient l'européenne (ratio 1,0000), avec 252 observations le ratio tombe à 0,5683 ; la partie « option américaine » du même paragraphe concerne l'énoncé 1. |
 | « la génération de variables aléatoires normales doit se faire soit à partir de l’une des méthodes suivantes vu en cours : Générateur congruentiel linéaire + transformée inverse/Box-Muller/Acceptation-Rejet » | ✅ fait | `pricer.rng.LCG` (Park-Miller, [rng.py](../src/pricer/rng.py)) ; `pricer.normals.normals` ([normals.py](../src/pricer/normals.py)) : transformée inverse par défaut, Box-Muller, acceptation-rejet, et la méthode polaire du cours | `test_no_forbidden_rng.py::test_no_forbidden_rng_in_src`, `test_rng.py::test_course_example_1_slide_7`, `test_normals.py::test_kolmogorov_smirnov`, `p1_rng_diagnostics.csv` (plus petite p-value de Kolmogorov-Smirnov : 0,60) | Aucun nombre aléatoire ne vient d'une bibliothèque : un test refuse `numpy.random`, `random` et SciPy dans le code du pricer. |
-| « Vous avez le choix de choisir des actifs réels et théoriques. Dans l’un ou l’autre des cas, vous devez justifier votre choix. » | ⚠️ partiel | actif théorique (S0 = 100, σ = 20 %, r = 3 %, q = 1 %) pour valider ; actif réel EUR/USD ([market.py](../src/pricer/market.py), `p5_market.csv`, `p5_eurusd.csv`) pour appliquer | rapport, page 2 (« Un exportateur français encaisse des dollars chaque mois… ») ; [oral](ORAL.md), partie EUR/USD ; `test_p5_market.py::test_s0_is_last_ecb_fixing` | Le choix de l'actif réel est justifié dans le rapport ; celui de l'actif théorique (valider le pricer contre des formules exactes avant de l'appliquer) ne l'est qu'à l'oral et dans le dossier, il manque une phrase au rapport (partie C). |
-| « Document word ou pdf de présentation des résultats sur 2 pages maximum (sauf la page de garde) » | ⚠️ partiel | [Rapport_Pricing_Asiatique.pdf](../rapport/Rapport_Pricing_Asiatique.pdf) : page de garde et 2 pages A4 | `test_p6_build.py::test_pdf_has_a_cover_and_two_pages`, `test_p6_build.py::test_pdf_text_has_the_names_no_tooling_word_and_the_figures_of_the_html` | Le format est respecté, mais la page de garde porte encore « [Loup — nom] » à la place d'un nom de famille, et le PDF n'a pas encore été relu à l'écran (partie C). |
+| « Vous avez le choix de choisir des actifs réels et théoriques. Dans l’un ou l’autre des cas, vous devez justifier votre choix. » | ✅ fait | actif théorique (S0 = 100, σ = 20 %, r = 3 %, q = 1 %) pour valider ; actif réel EUR/USD ([market.py](../src/pricer/market.py), `p5_market.csv`, `p5_eurusd.csv`) pour appliquer | rapport, page 1 (« Pourquoi un actif théorique d'abord. ») et page 2 (« Un exportateur français encaisse des dollars chaque mois… ») ; [oral](ORAL.md), partie EUR/USD ; `test_p6_build.py::test_pdf_text_has_the_names_no_tooling_word_and_the_figures_of_the_html`, `test_p5_market.py::test_s0_is_last_ecb_fixing` | Les deux choix sont justifiés dans le rapport : l'actif théorique pour valider le pricer contre des formules exactes, l'actif réel pour l'appliquer à un vrai besoin de couverture. |
+| « Document word ou pdf de présentation des résultats sur 2 pages maximum (sauf la page de garde) » | ⚠️ partiel | [Rapport_Pricing_Asiatique.pdf](../rapport/Rapport_Pricing_Asiatique.pdf) : page de garde et 2 pages A4 | `test_p6_build.py::test_pdf_has_a_cover_and_two_pages`, `test_p6_build.py::test_pdf_text_has_the_names_no_tooling_word_and_the_figures_of_the_html` | Le format est respecté et la page de garde est complète ; il manque une relecture humaine du PDF final à l'écran (partie C). |
 
 ### Énoncé 2
 
@@ -86,15 +85,10 @@ Ce que le sujet ne demandait pas. Ce qui dépasse le cours est signalé « hors 
 
 ## C. Ce qui reste à faire
 
-- **Nom de famille sur la page de garde** : remplacer « [Loup — nom] », puis refaire le PDF du rapport.
 - **Regarder le PDF à l'écran**, au moins une fois, en entier : fonds, coupures de texte, lisibilité
-  des figures. Aucune relecture humaine du PDF n'a encore été faite.
-- **Justifier l'actif théorique dans le rapport** : une phrase manque (ligne « actifs réels et
-  théoriques » de la partie A). L'ajouter demande de refaire le PDF, en restant sur 2 pages.
-- **Figure 5** : l'image porte encore un nom d'étape de travail. La refaire sans cette mention, ou ne
-  pas la projeter à l'oral.
+  des figures. Aucune relecture humaine du PDF final n'a encore été faite.
 - **Mail de constitution du groupe** (08 novembre) : confirmer qu'il est bien parti.
-- **Envoi du rendu** avant le 22 novembre 2026 : décider ce qui part (rapport PDF, code, classeur Excel)
-  et sous quelle forme.
+- **Relire puis envoyer le paquet de rendu** avant le 22 novembre 2026 : rapport PDF, code, tests,
+  résultats (CSV, figures, classeur Excel) et notice, dans une archive zip.
 - **Relecture par le groupe** du texte de l'oral, du dossier et de cette grille, puis répétition
   chronométrée de la soutenance.

@@ -30,7 +30,7 @@ RESULTS = ROOT / "results"
 OUTPUTS = sorted(pb.DOCUMENTS)
 RENDUS = sorted(pb.RENDUS)
 NAMES = ["Zoe HUBERT", "Arthur LOURENCO", "Matthieu DEHNEL", "Pierre DUPLESSIS",
-         "Charlotte PONTCHATEAU", "Thomas GALLOIS", "Sacha BEAUQUESNES"]
+         "Charlotte PONTCHATEAU", "Thomas GALLOIS", "Sacha BEAUQUESNES", "Loup FLORENTIN"]
 
 
 def _rows(name: str) -> list[dict]:
@@ -188,8 +188,8 @@ def test_history_files_are_the_bytes_of_their_commit(name, commit, path):
 
 
 def test_group_names_are_those_given_by_loup(fields):
-    assert [fields[f"membre_{i}"].text for i in range(1, 8)] == NAMES
-    assert fields["loup"].text == "[Loup — nom]"
+    assert [fields[f"membre_{i}"].text for i in range(1, 9)] == NAMES
+    assert "loup" not in fields and not hasattr(pb, "LOUP")          # plus de nom à compléter
 
 
 def test_no_result_is_typed_in_the_build_script():
@@ -437,7 +437,7 @@ def test_conformite_fields_read_independently(fields):
     assert fields["grid_maturites"].text == " ; ".join(pb.plain(t) for t in maturities)
     assert fields["grid_n_strikes"].text == str(len(strikes))
     assert fields["grid_n_maturites"].text == str(len(maturities))
-    assert fields["n_membres"].text == str(len(NAMES) + 1)          # les 7 noms et Loup
+    assert fields["n_membres"].text == str(len(NAMES))              # les 8 noms, Loup compris
     crn = _one("p4_greeks.csv", kind="asian", option="call", K=100, crn="True", control="geometric")
     sans = _one("p4_greeks.csv", kind="asian", option="call", K=100, crn="False",
                 control="geometric")
@@ -488,7 +488,8 @@ def test_report_html_loads_nothing_from_the_network():
 def test_report_has_a_cover_and_two_pages():
     html = (ROOT / "rapport/rapport.html").read_text(encoding="utf-8")
     assert len(re.findall(r'<section class="page[ "]', html)) == 3
-    for name in (*NAMES, "[Loup — nom]", "Projet Pricing Monte-Carlo, énoncé 2", "ECE Paris",
+    assert "[Loup" not in html
+    for name in (*NAMES, "Projet Pricing Monte-Carlo, énoncé 2", "ECE Paris",
                  "ING4", "A. W. Sanoussi Mani"):
         assert name in html, name
     for source in ("ours", "olycopié", "BCE", "Trésor", "FEDS 2006-28", "Alpha Vantage"):
@@ -511,7 +512,8 @@ def test_pdf_text_has_the_names_no_tooling_word_and_the_figures_of_the_html():
         pytest.skip("pdftotext introuvable : texte du PDF non extrait")
     flat = re.sub(r"\s+", " ", text)
     assert pb.forbidden_hits(text) == []
-    for name in (*NAMES, "[Loup — nom]", "A. W. Sanoussi Mani"):
+    assert "[Loup" not in flat
+    for name in (*NAMES, "A. W. Sanoussi Mani", "Pourquoi un actif théorique d'abord"):
         assert name in flat, name
     f = pb.fields()
     for name in ("vr_call_T1_ctrl_prix", "fx_spot_call_prix", "ratio_call_K100_T1_4"):
@@ -534,7 +536,7 @@ def test_pdf_prints_the_dark_background_and_the_four_figures():
     assert pages == 3
     assert len(re.findall(rb"/Subtype\s*/Image", raw)) == 4
     html = (ROOT / "rapport/rapport.html").read_text(encoding="utf-8")
-    assert re.findall(r'src="\.\./results/figures/(\w+)\.png"', html) == [
+    assert re.findall(r'src="\.\./results/figures/rendu/(\w+)\.png"', html) == [
         "fig1_eventail_eurusd", "fig2_disques_ratio", "fig4_convergence", "fig3_gain_efficacite"]
 
 

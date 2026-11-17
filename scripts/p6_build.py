@@ -66,8 +66,8 @@ HISTORY = [                                     # (fichier de results/historique
 ]
 
 GROUP = ["Zoe HUBERT", "Arthur LOURENCO", "Matthieu DEHNEL", "Pierre DUPLESSIS",
-         "Charlotte PONTCHATEAU", "Thomas GALLOIS", "Sacha BEAUQUESNES"]   # Loup, 17/11/2026
-LOUP = "[Loup — nom]"                           # nom de famille : à demander à Loup
+         "Charlotte PONTCHATEAU", "Thomas GALLOIS", "Sacha BEAUQUESNES",   # Loup, 17/11/2026
+         "Loup FLORENTIN"]                      # Loup, 17/11/2026, 20:13 ; dernier sur la page
 
 PLACEHOLDER = re.compile(r"\{\{\s*([A-Za-z0-9_]+)\s*\}\}")
 DECIMAL = re.compile(r"\d+[.,]\d+")
@@ -680,7 +680,7 @@ def _conformite(f: _Fields) -> None:
     f.put("grid_n_strikes", fmt_int(len(strikes)), f"{file} · nombre de valeurs de K")
     f.put("grid_maturites", " ; ".join(plain(t) for t in maturities), f"{file} · valeurs de T")
     f.put("grid_n_maturites", fmt_int(len(maturities)), f"{file} · nombre de valeurs de T")
-    f.put("n_membres", fmt_int(len(GROUP) + 1), "p6_build.GROUP (noms donnés par Loup) et Loup")
+    f.put("n_membres", fmt_int(len(GROUP)), "p6_build.GROUP (noms donnés par Loup, Loup compris)")
     file = "p4_greeks.csv"
     at = {"kind": "asian", "option": "call", "K": 100, "control": "geometric"}
     crn = float(one(table(file), crn="True", **at)["delta_se"])
@@ -710,7 +710,6 @@ def _decisions(f: _Fields) -> None:
 
     for i, name in enumerate(GROUP, start=1):
         f.put(f"membre_{i}", name, "noms du groupe donnés par Loup le 17/11/2026 (p6_build.GROUP)")
-    f.put("loup", LOUP, "nom de famille à demander à Loup (p6_build.LOUP)")
 
 
 @functools.lru_cache(maxsize=None)

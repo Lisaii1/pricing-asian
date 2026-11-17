@@ -44,7 +44,7 @@ nombres aléatoires sont fabriqués par nos soins avec les méthodes du cours. �
 **Ce qu'on montre.** La figure 1 : des trajectoires simulées, et à droite la répartition du cours
 final et celle de la moyenne.
 
-![Figure 1](../results/figures/fig1_eventail_eurusd.png)
+![Figure 1](../results/figures/rendu/fig1_eventail_eurusd.png)
 
 **Ce qu'on dit.**
 
@@ -81,7 +81,7 @@ r = 3 %, q = 1 %, N = 200 000).
 **Ce qu'on montre.** La figure 2 : le prix asiatique divisé par le prix européen, pour 5 strikes et
 4 maturités. Plus le disque est gros, plus l'asiatique est en dessous.
 
-![Figure 2](../results/figures/fig2_disques_ratio.png)
+![Figure 2](../results/figures/rendu/fig2_disques_ratio.png)
 
 **Ce qu'on dit.**
 
@@ -110,9 +110,9 @@ l'européenne : 40 % de moins.
 **Ce qu'on montre.** La figure 5 (chaque point est une trajectoire : gain géométrique en abscisse,
 gain arithmétique en ordonnée), puis le tableau 1.
 
-![Figure 5](../results/figures/fig5_nuage_payoffs.png)
+![Figure 5](../results/figures/rendu/fig5_nuage_payoffs.png)
 
-![Tableau 1](../results/figures/tab1_estimateurs.png)
+![Tableau 1](../results/figures/rendu/tab1_estimateurs.png)
 
 **Ce qu'on dit.**
 
@@ -150,9 +150,9 @@ maturité.
 **Ce qu'on montre.** La figure 4 (marge d'erreur en fonction du nombre de trajectoires), puis la
 figure 3 (gain d'efficacité par méthode).
 
-![Figure 4](../results/figures/fig4_convergence.png)
+![Figure 4](../results/figures/rendu/fig4_convergence.png)
 
-![Figure 3](../results/figures/fig3_gain_efficacite.png)
+![Figure 3](../results/figures/rendu/fig3_gain_efficacite.png)
 
 **Ce qu'on dit.**
 
@@ -184,9 +184,9 @@ réduction, 1 748 avec le contrôle. Environ 1 400 fois moins.
 
 **Ce qu'on montre.** La figure 6 (prix selon la volatilité), puis le tableau 2.
 
-![Figure 6](../results/figures/fig6_eurusd_sigma.png)
+![Figure 6](../results/figures/rendu/fig6_eurusd_sigma.png)
 
-![Tableau 2](../results/figures/tab2_eurusd.png)
+![Tableau 2](../results/figures/rendu/tab2_eurusd.png)
 
 **Ce qu'on dit.**
 

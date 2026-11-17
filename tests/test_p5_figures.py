@@ -8,6 +8,7 @@ from __future__ import annotations
 import csv
 import io
 import math
+import re
 import sys
 import tokenize
 from pathlib import Path
@@ -48,6 +49,14 @@ def fan():
 
 # --- fichiers ------------------------------------------------------------------------------------
 
+# Le paquet remis au professeur ne contient que les figures du mode rendu (results/figures/rendu/) :
+# les deux tests des figures internes ne s'y appliquent pas.
+INTERNES = any(FIG_DIR.glob("*.png"))
+needs_internal = pytest.mark.skipif(not INTERNES and pf.RENDU_DIR.is_dir(),
+                                    reason="paquet de rendu : seules les figures du mode rendu y sont")
+
+
+@needs_internal
 def test_every_figure_has_png_300_dpi_and_pdf():
     assert pf.FIGURES, "aucune figure déclarée"
     for name in pf.FIGURES:
@@ -58,11 +67,83 @@ def test_every_figure_has_png_300_dpi_and_pdf():
         assert pdf.read_bytes().startswith(b"%PDF")
 
 
+@needs_internal
 def test_figures_regenerate_identically(tmp_path):
     written = pf.build(out_dir=tmp_path)
     assert {p.stem for p in written} == set(pf.FIGURES)
     for p in written:
         assert p.read_bytes() == (FIG_DIR / p.name).read_bytes(), p.name
+
+
+# --- mode rendu : figures remises au lecteur ----------------------------------------------------------
+
+def test_rendu_figures_exist_png_300_dpi_and_pdf():
+    for name in pf.FIGURES:
+        png, pdf = pf.RENDU_DIR / f"{name}.png", pf.RENDU_DIR / f"{name}.pdf"
+        assert png.exists() and pdf.exists(), name
+        with Image.open(png) as im:
+            assert im.info["dpi"] == pytest.approx((300, 300), abs=0.5)
+        assert pdf.read_bytes().startswith(b"%PDF")
+
+
+def test_rendu_figures_regenerate_identically(tmp_path):
+    written = pf.build(out_dir=tmp_path, rendu=True)
+    assert {p.stem for p in written} == set(pf.FIGURES)
+    for p in written:
+        assert p.read_bytes() == (pf.RENDU_DIR / p.name).read_bytes(), p.name
+
+
+def _rendu_texts(name):
+    fn = pf.FIGURES[name]
+    fig = fn(rendu=True)
+    texts = _texts(fig)
+    plt.close(fig)
+    return texts
+
+
+@pytest.mark.parametrize("name", sorted(pf.FIGURES))
+def test_rendu_figures_say_the_source_in_clear(name):
+    """Pied de figure en clair : ni nom de fichier, ni « seed », ni étape de travail ; la source
+    (simulation Monte-Carlo et sa graine, ou les données officielles) est écrite."""
+    joined = " ".join(_rendu_texts(name))
+    assert ".csv" not in joined and "seed" not in joined and "pricer" not in joined
+    assert not re.search(r"\bP[1-6][ab]?\b|prompt|cowork|claude", joined, re.I), joined
+    assert "Simulation Monte-Carlo" in joined
+    assert re.search(r"graine \d+", joined)
+    if name in ("fig1_eventail_eurusd", "tab2_eurusd"):
+        assert "Données : BCE, Trésor américain" in joined
+
+
+def test_rendu_fig3_gains_at_order_of_magnitude():
+    labels = _rendu_texts("fig3_gain_efficacite")
+    rows = _rows("p3_vr_atm.csv")
+    for est in {r["estimator"] for r in rows}:
+        best = max(float(r["efficiency_gain_vs_plain"]) for r in rows if r["estimator"] == est)
+        assert f"×{pf._og(best)}" in labels, est
+        if best >= 100:
+            assert f"×{ps.fmt_int(best)}" not in labels, est        # plus de gain à l'unité
+    gains = [t for t in labels if t.startswith("×") and t not in ("×1", "×10", "×100")]
+    assert all(len(re.sub(r"\D", "", t).rstrip("0")) <= 2 for t in gains), gains
+
+
+def test_order_of_magnitude_helper():
+    assert pf._og(4021.5) == ps.fmt_int(4000) and pf._og(5079.4) == ps.fmt_int(5100)
+    assert pf._og(9124.9) == ps.fmt_int(9100) and pf._og(1349.6) == ps.fmt_int(1300)
+    assert pf._og(3.86) == "3,9" and pf._og(9.96) == "10"
+
+
+def test_rendu_table1_gives_variance_ratios_not_timed_gains():
+    texts = _rendu_texts("tab1_estimateurs")
+    rows = [r for r in _rows("p3_vr_atm.csv") if float(r["T"]) == 1.0]
+    assert "VARIANCE ÷" in texts and any("variance ÷ : call / put" in t for t in texts)
+
+    def fmt(v):
+        return ps.fmt_num(v, 2) if v < 10 else ps.fmt_int(v)
+
+    for est in {r["estimator"] for r in rows}:
+        c, p = (next(float(r["var_ratio_vs_plain"]) for r in rows
+                     if r["estimator"] == est and r["option"] == o) for o in ("call", "put"))
+        assert f"×{fmt(c)} / ×{fmt(p)}" in texts
 
 
 def test_no_hardcoded_values_in_figure_script():

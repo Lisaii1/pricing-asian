@@ -30,7 +30,13 @@ tab1_estimateurs       results/p3_vr_atm.csv, T = 1 : 5 estimateurs, call et put
 tab2_eurusd            results/p5_eurusd.csv : K = S0 et K = forward, call et put, prix
                        asiatique, demi-IC, européen BS, ratio, ratio de variance du contrôle.
 
-Usage : .venv/Scripts/python.exe scripts/p5_figures.py [nom …]
+Deux modes. « interne » (par défaut) : results/figures/, pied de figure avec le nom du CSV lu.
+« rendu » (--rendu) : results/figures/rendu/, figures remises au lecteur : pied de figure qui dit la
+source en clair (« Simulation Monte-Carlo, N = …, graine … », « Données : BCE, Trésor américain »),
+gains d'efficacité à l'ordre de grandeur (2 chiffres significatifs) et, dans tab1, ratio de
+variance à la place du gain d'efficacité (un gain dépend d'un temps mesuré, un ratio non).
+
+Usage : .venv/Scripts/python.exe scripts/p5_figures.py [--rendu] [nom …]
 """
 from __future__ import annotations
 
@@ -58,7 +64,9 @@ from pricer.paths import FREQUENCIES, gbm_paths  # noqa: E402
 
 RESULTS = ROOT / "results"
 FIG_DIR = RESULTS / "figures"
+RENDU_DIR = FIG_DIR / "rendu"
 P = ps.PALETTE
+MC = "Simulation Monte-Carlo"          # source écrite en clair sur les figures du mode rendu
 
 # Mise en page (pixels de la maquette A4)
 PAGE_PX, PAD_PX, GAP_PX = 794, 42, 30
@@ -100,6 +108,17 @@ def _fr_T(T: float) -> str:
     return f"{T:g}".replace(".", ",")
 
 
+def _og(v: float, sig: int = 2) -> str:
+    """Ordre de grandeur : sig chiffres significatifs (4 021,5 → « 4 000 » ; 3,85 → « 3,9 »)."""
+    v = float(v)
+    exp = math.floor(math.log10(abs(v)))
+    r = round(v / 10 ** (exp - sig + 1)) * 10 ** (exp - sig + 1)
+    if abs(r) >= 10 ** (exp + 1):               # 9,96 → 10
+        exp += 1
+    decimals = max(0, sig - 1 - exp)
+    return ps.fmt_num(r, decimals) if decimals else ps.fmt_int(r)
+
+
 def _glows(fig, *spots) -> None:
     """Lueurs de la maquette : (cx, cy, couleur, opacité), taille relative fixe."""
     ps.add_glows(fig, [(cx, cy, 0.32, 0.38, c, a) for cx, cy, c, a in spots])
@@ -131,7 +150,7 @@ def fan_data() -> dict:
                 highlight=highlight, ST=np.concatenate(ST), A=np.concatenate(A))
 
 
-def fig1_fan(d: dict | None = None):
+def fig1_fan(d: dict | None = None, rendu: bool = False):
     d = fan_data() if d is None else d
     fig = ps.new_figure(*FIG1_PX)
     _glows(fig, (0.05, 0.95, "a2", 0.35), (0.95, 0.3, "a1", 0.16))
@@ -184,14 +203,18 @@ def fig1_fan(d: dict | None = None):
     fig.text(HIST_X, 0.035, f"écart-type\nS(T) {ps.fmt_num(ST.std(ddof=1), 4)}\n"
              f"A    {ps.fmt_num(A.std(ddof=1), 4)}", color=P["ink"], va="bottom", **mono)
     fig.text(HIST_X, 0.89, f"N = {ps.fmt_int(d['n_paths'])}", color=P["sub"], **mono)
-    ps.source(fig, f"BCE, Trésor US · p5_market.csv · pricer, seed {d['seed']}", x=0.01,
-              ha="left")
+    if rendu:
+        ps.source(fig, f"Données : BCE, Trésor américain · {MC}, graine {d['seed']}", x=0.01,
+                  ha="left")
+    else:
+        ps.source(fig, f"BCE, Trésor US · p5_market.csv · pricer, seed {d['seed']}", x=0.01,
+                  ha="left")
     return fig
 
 
 # --- figure 2 : disques asiatique / européen -----------------------------------------------------
 
-def fig2_disks():
+def fig2_disks(rendu: bool = False):
     rows = _rows("p4_grid_cv.csv")
     Ks = sorted({float(r["K"]) for r in rows})
     Ts = sorted({float(r["T"]) for r in rows})
@@ -227,15 +250,18 @@ def fig2_disks():
     first = rows[0]
     fig.text(0.07, 0.015, "ratio asiatique / européen (Black-Scholes) · taille = remise",
              color=P["sub"], fontsize=6.5)
-    ps.source(fig, f"p4_grid_cv.csv · S0 = {ps.fmt_num(float(first['S0']), 0)} · "
-                   f"σ = {ps.fmt_pct(float(first['sigma']), 0)} · N = {ps.fmt_int(first['n_paths'])}"
-                   f" · contrôle géométrique")
+    params = (f"S0 = {ps.fmt_num(float(first['S0']), 0)} · "
+              f"σ = {ps.fmt_pct(float(first['sigma']), 0)} · N = {ps.fmt_int(first['n_paths'])}")
+    if rendu:
+        ps.source(fig, f"{MC} · N = {ps.fmt_int(first['n_paths'])} · graine {first['seed']}")
+    else:
+        ps.source(fig, f"p4_grid_cv.csv · {params} · contrôle géométrique")
     return fig
 
 
 # --- figure 3 : gain d'efficacité ------------------------------------------------------------------
 
-def fig3_efficiency():
+def fig3_efficiency(rendu: bool = False):
     rows = _rows("p3_vr_atm.csv")
     gains = {}
     for r in rows:
@@ -280,7 +306,8 @@ def fig3_efficiency():
                 ax.scatter(g, y, s=area[T] * 3, color=P["a1"], alpha=0.18, lw=0, zorder=4,
                            clip_on=False)
                 ax.scatter(g, y, s=area[T], color=P["a1"], lw=0, zorder=5, clip_on=False)
-        ax.annotate(f"×{ps.fmt_int(top)}", (top, y), xytext=(10, 0), textcoords="offset points",
+        label = f"×{_og(top)}" if rendu else f"×{ps.fmt_int(top)}"
+        ax.annotate(label, (top, y), xytext=(10, 0), textcoords="offset points",
                     va="center", color=P["ink"], fontfamily=ps.FONT_MONO, fontsize=7,
                     annotation_clip=False)
     handles = [Line2D([], [], ls="", marker="o", color=P["a1"], ms=4.5),
@@ -292,8 +319,11 @@ def fig3_efficiency():
     ax.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.32, -0.11), ncol=5,
               labelcolor=P["sub"], handletextpad=0.2, columnspacing=0.9, borderaxespad=0)
     first = rows[0]
-    ps.source(fig, f"p3_vr_atm.csv · K = {ps.fmt_num(float(first['K']), 0)} · "
-                   f"N = {ps.fmt_int(first['n_paths'])}")
+    params = f"K = {ps.fmt_num(float(first['K']), 0)} · N = {ps.fmt_int(first['n_paths'])}"
+    if rendu:
+        ps.source(fig, f"{MC} · {params} · graine {first['seed']}")
+    else:
+        ps.source(fig, f"p3_vr_atm.csv · {params}")
     return fig
 
 
@@ -309,7 +339,7 @@ CONV_NAMES = {"plain": "sans réduction", "antithetic": "antithétique", "contro
               "antithetic_control": "anti + contrôle"}
 
 
-def fig4_convergence():
+def fig4_convergence(rendu: bool = False):
     conv, slopes = _rows("p4_convergence.csv"), _rows("p4_convergence_slopes.csv")
     eps = max(float(r["epsilon"]) for r in _rows("p4_n_required.csv"))
     fig = ps.new_figure(COL_PX, 270)
@@ -348,8 +378,11 @@ def fig4_convergence():
               labelcolor=P["sub"], fontsize=6.5, handlelength=2.2, columnspacing=1.0,
               borderaxespad=0)
     first = conv[0]
-    ps.source(fig, f"p4_convergence.csv · call K = {ps.fmt_num(float(first['K']), 0)}, "
-                   f"T = {_fr_T(float(first['T']))} · demi-largeur de l'IC à 95 %")
+    case = f"call K = {ps.fmt_num(float(first['K']), 0)}, T = {_fr_T(float(first['T']))}"
+    if rendu:
+        ps.source(fig, f"{MC}, graine {first['seed']} · {case}")
+    else:
+        ps.source(fig, f"p4_convergence.csv · {case} · demi-largeur de l'IC à 95 %")
     return fig
 
 
@@ -370,7 +403,7 @@ def scatter_data() -> dict:
                 corr_p3=float(row["corr"]), n_p3=int(row["n_paths"]))
 
 
-def fig5_scatter(d: dict | None = None):
+def fig5_scatter(d: dict | None = None, rendu: bool = False):
     d = scatter_data() if d is None else d
     fig = ps.new_figure(COL_PX, 240)
     _glows(fig, (0.85, 0.85, "a1", 0.18), (0.1, 0.15, "a2", 0.3))
@@ -389,17 +422,21 @@ def fig5_scatter(d: dict | None = None):
     mono = dict(fontfamily=ps.FONT_MONO)
     fig.text(0.12, 0.9, f"corrélation {ps.fmt_num(d['corr'], 4)}", color=P["ink"], fontsize=9,
              **mono)
-    fig.text(0.12, 0.84, f"N = {ps.fmt_int(d['n'])} · P3 avec N = {ps.fmt_int(d['n_p3'])} : "
+    ref = "estimation complète" if rendu else "P3"
+    fig.text(0.12, 0.84, f"N = {ps.fmt_int(d['n'])} · {ref} avec N = {ps.fmt_int(d['n_p3'])} : "
              f"{ps.fmt_num(d['corr_p3'], 4)}", color=P["sub"], fontsize=6.5, **mono)
-    ps.source(fig, f"pricer, seed {d['seed']} · S0 = K = {ps.fmt_num(d['K'], 0)}, "
-                   f"T = {_fr_T(d['T'])}, mensuel")
+    case = f"S0 = K = {ps.fmt_num(d['K'], 0)}, T = {_fr_T(d['T'])}, mensuel"
+    if rendu:
+        ps.source(fig, f"{MC}, graine {d['seed']} · {case}")
+    else:
+        ps.source(fig, f"pricer, seed {d['seed']} · {case}")
     return fig
 
 
 # --- figure 6 : cas réel, prix contre σ ----------------------------------------------------------
 
-def fig6_eurusd_sigma():
-    rows = [r for r in _rows("p5_eurusd_sensitivity.csv") if r["strike_type"] == "spot"]
+def fig6_eurusd_sigma(rendu: bool = False):
+    rows =[r for r in _rows("p5_eurusd_sensitivity.csv") if r["strike_type"] == "spot"]
     measured = {r["option"]: r for r in rows if r["sigma_label"] == "mesuré"}
     s_meas = float(next(iter(measured.values()))["sigma"])
     fig = ps.new_figure(COL_PX, 260)
@@ -440,7 +477,10 @@ def fig6_eurusd_sigma():
     fig.text(0.13, 0.92, f"σ mesuré {ps.fmt_pct(s_meas, 2)} · K = S0 = "
              f"{ps.fmt_num(float(m['S0']), 4)} · T = {_fr_T(float(m['T']))} an",
              color=P["a3"], fontfamily=ps.FONT_MONO, fontsize=6.5)
-    ps.source(fig, f"p5_eurusd_sensitivity.csv · N = {ps.fmt_int(m['n_paths'])}")
+    if rendu:
+        ps.source(fig, f"{MC} · N = {ps.fmt_int(m['n_paths'])} · graine {m['seed']}")
+    else:
+        ps.source(fig, f"p5_eurusd_sensitivity.csv · N = {ps.fmt_int(m['n_paths'])}")
     return fig
 
 
@@ -489,7 +529,7 @@ def _table(width_px, header, aligns, cells, best=None, accent_last=False, foot=N
     return fig
 
 
-def table1_estimators():
+def table1_estimators(rendu: bool = False):
     rows = [r for r in _rows("p3_vr_atm.csv") if float(r["T"]) == 1]
     by = {(r["estimator"], r["option"]): r for r in rows}
     order = sorted({r["estimator"] for r in rows},
@@ -498,22 +538,31 @@ def table1_estimators():
     def half(r):
         return ps.fmt_err((float(r["ci_high"]) - float(r["ci_low"])) / 2)
 
+    def last(r):            # rendu : ratio de variance (ne dépend d'aucun temps mesuré)
+        if rendu:
+            v = float(r["var_ratio_vs_plain"])
+            return ps.fmt_num(v, 2) if v < 10 else ps.fmt_int(v)
+        return ps.fmt_int(float(r["efficiency_gain_vs_plain"]))
+
     cells = []
     for e in order:
         c, p = by[(e, "call")], by[(e, "put")]
         cells.append([ESTIMATOR_NAMES[e], ps.fmt_num(float(c["price"]), 4), half(c),
-                      ps.fmt_num(float(p["price"]), 4), half(p),
-                      f"×{ps.fmt_int(float(c['efficiency_gain_vs_plain']))} / "
-                      f"×{ps.fmt_int(float(p['efficiency_gain_vs_plain']))}"])
+                      ps.fmt_num(float(p["price"]), 4), half(p), f"×{last(c)} / ×{last(p)}"])
     f = rows[0]
-    foot = (f"p3_vr_atm.csv · T = 1 · K = S0 = {ps.fmt_num(float(f['K']), 0)} · "
-            f"N = {ps.fmt_int(f['n_paths'])} · seed {f['seed']} · AS241")
-    return _table(FULL_PX, ["Estimateur", "Call", "± IC 95 %", "Put", "± IC 95 %",
-                            "Gain call / put"], "lrrrrr", cells, best=len(cells) - 1,
-                  accent_last=True, foot=foot)
+    params = (f"T = 1 · K = S0 = {ps.fmt_num(float(f['K']), 0)} · "
+              f"N = {ps.fmt_int(f['n_paths'])}")
+    if rendu:
+        foot = (f"{MC} · {params} · graine {f['seed']} · transformée inverse AS241 · "
+                f"variance ÷ : call / put")
+    else:
+        foot = f"p3_vr_atm.csv · {params} · seed {f['seed']} · AS241"
+    head = "Variance ÷" if rendu else "Gain call / put"
+    return _table(FULL_PX, ["Estimateur", "Call", "± IC 95 %", "Put", "± IC 95 %", head],
+                  "lrrrrr", cells, best=len(cells) - 1, accent_last=True, foot=foot)
 
 
-def table2_eurusd():
+def table2_eurusd(rendu: bool = False):
     rows = _rows("p5_eurusd.csv")
     label = {"spot": "K = S0", "forward": "K = forward 1 an"}
     cells = []
@@ -525,10 +574,14 @@ def table2_eurusd():
                       ps.fmt_num(float(r["ratio_asian_euro_bs"]), 2),
                       f"×{ps.fmt_int(float(r['variance_ratio']))}"])
     f = rows[0]
-    foot = (f"p5_eurusd.csv · S0 = {ps.fmt_num(float(f['S0']), 4)} · "
-            f"σ = {ps.fmt_pct(float(f['sigma']), 2)} · r = {ps.fmt_pct(float(f['r']), 2)} · "
-            f"q = {ps.fmt_pct(float(f['q']), 2)} · N = {ps.fmt_int(f['n_paths'])} · "
-            f"contrôle β optimal + antithétique · USD pour 1 EUR")
+    params = (f"S0 = {ps.fmt_num(float(f['S0']), 4)} · "
+              f"σ = {ps.fmt_pct(float(f['sigma']), 2)} · r = {ps.fmt_pct(float(f['r']), 2)} · "
+              f"q = {ps.fmt_pct(float(f['q']), 2)} · N = {ps.fmt_int(f['n_paths'])}")
+    if rendu:
+        foot = (f"Données : BCE, Trésor américain · {MC}, N = {ps.fmt_int(f['n_paths'])}, "
+                f"graine {f['seed']} · contrôle β optimal + antithétique · USD pour 1 EUR")
+    else:
+        foot = f"p5_eurusd.csv · {params} · contrôle β optimal + antithétique · USD pour 1 EUR"
     return _table(FULL_PX, ["Cas", "K", "Asiatique", "± IC 95 %", "Européen BS", "Ratio",
                             "Variance ÷"], "lrrrrrr", cells, foot=foot)
 
@@ -545,21 +598,26 @@ FIGURES = {
 }
 
 
-def build(names=None, out_dir: Path = FIG_DIR) -> list[Path]:
-    """Génère les figures demandées (toutes par défaut) ; renvoie les fichiers écrits."""
+def build(names=None, out_dir: Path | None = None, rendu: bool = False) -> list[Path]:
+    """Génère les figures demandées (toutes par défaut) ; renvoie les fichiers écrits.
+    Dossier par défaut : results/figures/ (interne) ou results/figures/rendu/ (rendu)."""
+    out_dir = (RENDU_DIR if rendu else FIG_DIR) if out_dir is None else Path(out_dir)
     ps.apply_style()
     written = []
     for name in names or FIGURES:
-        written += ps.save(FIGURES[name](), Path(out_dir) / name)
+        fig = FIGURES[name](rendu=True) if rendu else FIGURES[name]()
+        written += ps.save(fig, out_dir / name)
     return written
 
 
 def main(argv=None) -> None:
     argv = sys.argv[1:] if argv is None else argv
-    unknown = [a for a in argv if a not in FIGURES]
+    rendu = "--rendu" in argv
+    names = [a for a in argv if a != "--rendu"]
+    unknown = [a for a in names if a not in FIGURES]
     if unknown:
-        raise SystemExit(f"figures inconnues {unknown} ; choix : {list(FIGURES)}")
-    for p in build(argv or None):
+        raise SystemExit(f"figures inconnues {unknown} ; choix : {list(FIGURES)} [--rendu]")
+    for p in build(names or None, rendu=rendu):
         print(f"{p.relative_to(ROOT)}  {p.stat().st_size:,} octets")
 
 

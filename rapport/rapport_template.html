@@ -23,14 +23,16 @@ body{background:#000;color:var(--ink);font:10.8px/1.5 var(--sans);-webkit-print-
 .eyebrow{font:400 9.5px var(--mono);letter-spacing:.24em;text-transform:uppercase;color:var(--sub);display:flex;justify-content:space-between}
 .eyebrow b{color:var(--a1);font-weight:600}
 h1{font:800 46px/1.04 var(--sans);letter-spacing:-.03em;margin:0}
-h1 span{background:linear-gradient(90deg,var(--a1),var(--a2) 55%,var(--a3));-webkit-background-clip:text;background-clip:text;color:transparent}
+/* Dégradé du titre en SVG (remplissage du texte) : background-clip:text s'imprimait en rectangle plein ou cerné dans le PDF */
+h1 svg{display:block;overflow:visible;margin-top:2px}
+h1 svg text{font:800 46px var(--sans);letter-spacing:-.03em}
 .lead{color:var(--sub);font-weight:300;font-size:14px;line-height:1.55;max-width:560px;margin:18px 0 0}
 .beam{height:1px;margin:12px 0;background:linear-gradient(90deg,transparent,var(--a1),var(--a2),transparent);opacity:.7}
 .row{display:flex;gap:26px}
 .rail{width:150px;flex:none;display:flex;flex-direction:column;gap:17px;padding-top:6px}
 .k span{display:block;font:400 9px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
 .k b{display:block;font:300 27px/1.1 var(--mono);letter-spacing:-.04em;margin-top:3px}
-.k b.g{background:linear-gradient(180deg,#fff,var(--a1));-webkit-background-clip:text;background-clip:text;color:transparent}
+.k b.g{color:var(--a1)}
 .k small{font:400 10px var(--mono);color:var(--pos)}
 .k small.neg{color:var(--neg)}
 .fig{flex:1;min-width:0}
@@ -76,7 +78,7 @@ td.acc{color:var(--a1)}
  <div class="glow" style="width:640px;height:460px;left:60px;bottom:-300px;background:radial-gradient(closest-side,rgba(255,214,10,.16),rgba(255,214,10,.05) 55%,rgba(255,214,10,0))"></div>
  <div class="in">
   <div class="eyebrow"><span><b>●</b>&nbsp; Projet Pricing Monte-Carlo, énoncé 2</span><span>ECE Paris · ING4 Finance</span></div>
-  <h1>L'option asiatique,<br><span>pricée par Monte-Carlo</span></h1>
+  <h1>L'option asiatique,<svg width="560" height="50" viewBox="0 0 560 50" aria-hidden="false"><defs><linearGradient id="titre"><stop offset="0" stop-color="#00ffa3"/><stop offset=".55" stop-color="#7c3aed"/><stop offset="1" stop-color="#ffd60a"/></linearGradient></defs><text x="0" y="39" fill="url(#titre)">pricée par Monte-Carlo</text></svg></h1>
   <p class="lead">Call et put sur moyenne arithmétique sous Black-Scholes avec dividende continu. Comparaison aux options européennes, réduction de variance par une variable de contrôle géométrique, gain de temps et de précision, application au change EUR/USD.</p>
   <div class="beam" style="margin:40px 0 0"></div>
   <div class="who">
@@ -86,7 +88,7 @@ td.acc{color:var(--a1)}
      <span>{{membre_1}}</span><span>{{membre_2}}</span>
      <span>{{membre_3}}</span><span>{{membre_4}}</span>
      <span>{{membre_5}}</span><span>{{membre_6}}</span>
-     <span>{{membre_7}}</span><span>{{loup}}</span>
+     <span>{{membre_7}}</span><span>{{membre_8}}</span>
     </div>
    </div>
    <div>
@@ -120,16 +122,16 @@ td.acc{color:var(--a1)}
    </div>
    <div class="fig">
     <div class="ft"><i>01</i><h2>La moyenne disperse moins que le cours final</h2></div>
-    <img src="../results/figures/fig1_eventail_eurusd.png" alt="Figure 1 : trajectoires simulées de l'EUR/USD sur un an, histogrammes du cours final et de la moyenne">
+    <img src="../results/figures/rendu/fig1_eventail_eurusd.png" alt="Figure 1 : trajectoires simulées de l'EUR/USD sur un an, histogrammes du cours final et de la moyenne">
     <div class="cap"><em>EUR/USD simulé sur 1 an, 12 relevés mensuels (points).</em> À droite : répartition du cours final S(T) et de la moyenne A sur {{fx_N}} trajectoires.</div>
    </div>
   </div>
-  <div class="cap" style="margin-top:6px">Chiffres-clés : actif théorique S0 = K = {{th_S0}}, σ = {{th_sigma_pct}}, r = {{th_r_pct}}, q = {{th_q_pct}}, T = 1, observations mensuelles, N = {{vr_N}}, graine {{seed}}.</div>
+  <div class="cap" style="margin-top:6px"><em>Pourquoi un actif théorique d'abord.</em> S0 = K = {{th_S0}} pour lire chaque prix en % du spot ; σ = {{th_sigma_pct}}, r = {{th_r_pct}}, q = {{th_q_pct}}, des valeurs usuelles qui font jouer tous les paramètres du pricer, dividende compris. Ce cadre Black-Scholes a des formules fermées (européenne, moyenne géométrique) qui valident le pricer avant de l'appliquer à l'EUR/USD. T = 1, observations mensuelles, N = {{vr_N}}, graine {{seed}}.</div>
 
   <div class="beam" style="opacity:.35"></div>
 
   <div class="ft"><i>Q2 · 02</i><h2>Asiatique contre européenne : ratio des prix pour 5 strikes et 4 maturités</h2></div>
-  <div class="fig"><img src="../results/figures/fig2_disques_ratio.png" alt="Figure 2 : ratio du prix asiatique au prix européen, call et put, 5 strikes et 4 maturités"></div>
+  <div class="fig"><img src="../results/figures/rendu/fig2_disques_ratio.png" alt="Figure 2 : ratio du prix asiatique au prix européen, call et put, 5 strikes et 4 maturités"></div>
   <div class="cap"><em>Ratio prix asiatique / prix européen (Black-Scholes) ; taille du disque = décote de l'asiatique.</em> Asiatique : contrôle géométrique, N = {{th_N}}, graine {{seed}}.</div>
   <div class="gap"></div>
   <p class="txt">L'option asiatique vaut moins que l'européenne de mêmes caractéristiques dans <span class="n">{{grid_n_sous}}</span> cas sur <span class="n">{{grid_n}}</span>. À la monnaie et à un an, le call asiatique vaut <span class="n">{{grid_call_T1_prix}}</span> contre <span class="n">{{grid_call_T1_bs}}</span> pour l'européen, soit un ratio de <span class="n">{{ratio_call_K100_T1_4}}</span> ; le put, <span class="n">{{grid_put_T1_prix}}</span> contre <span class="n">{{grid_put_T1_bs}}</span> (<span class="n">{{ratio_put_K100_T1_4}}</span>). <b>La moyenne est moins dispersée que le cours final</b> (fig. 1) : moins d'incertitude, donc moins de valeur. La décote grandit avec la maturité (ratio du call de <span class="n">{{ratio_call_K100_T025}}</span> à 3 mois à <span class="n">{{ratio_call_K100_T2}}</span> à 2 ans) et surtout hors de la monnaie (<span class="n">{{ratio_call_K120_T1}}</span> pour K = 120, contre <span class="n">{{ratio_call_K80_T1}}</span> pour K = 80) : il faut que la moyenne, et non le seul cours final, franchisse le strike. Une exception : le put K = 120 à 3 mois (<span class="n">{{ratio_put_K120_T025_4}}</span>), très dans la monnaie alors que r &gt; q, cas où la moyenne est en espérance sous le cours final.</p>
@@ -161,10 +163,10 @@ td.acc{color:var(--a1)}
 
   <div class="ft"><i>Q4</i><h2>Gain de temps et de précision</h2></div>
   <div class="two small">
-   <div class="fig"><img src="../results/figures/fig4_convergence.png" alt="Figure 3 : demi-largeur de l'intervalle de confiance à 95 % en fonction du nombre de trajectoires, 4 estimateurs">
+   <div class="fig"><img src="../results/figures/rendu/fig4_convergence.png" alt="Figure 3 : demi-largeur de l'intervalle de confiance à 95 % en fonction du nombre de trajectoires, 4 estimateurs">
     <div class="cap"><em>03 · Marge d'erreur (IC 95 %) selon N.</em> Points mesurés, droites ajustées.</div></div>
-   <div class="fig"><img src="../results/figures/fig3_gain_efficacite.png" alt="Figure 4 : gain d'efficacité par méthode, call et put, trois maturités">
-    <div class="cap"><em>04 · Gain d'efficacité par méthode</em> (temps mesuré une fois, au repos).</div></div>
+   <div class="fig"><img src="../results/figures/rendu/fig3_gain_efficacite.png" alt="Figure 4 : gain d'efficacité par méthode, call et put, trois maturités">
+    <div class="cap"><em>04 · Gain d'efficacité par méthode</em> (temps mesuré une fois, au repos ; ordre de grandeur).</div></div>
   </div>
   <div class="gap"></div>
   <p class="txt">La marge d'erreur décroît comme 1/√N pour les quatre estimateurs : les pentes mesurées vont de <span class="n">{{pente_sans}}</span> à <span class="n">{{pente_antictrl}}</span> (fig. 3). <b>La réduction de variance abaisse la droite sans en changer la pente.</b> Pour une marge de ±<span class="n">{{eps_01}}</span>, il faut <span class="n">{{nreq_sans_eps01}}</span> trajectoires sans réduction et <span class="n">{{nreq_ctrl_eps01}}</span> avec le contrôle. En efficacité (variance × temps), le gain est d'environ ×<span class="n">{{vr_call_T1_ctrl_gain_env}}</span> pour le contrôle et ×<span class="n">{{vr_call_T1_antictrl_gain_env}}</span> avec les antithétiques ; nous le donnons à l'ordre de grandeur, un même gain ayant varié de <span class="n">{{disp_min}}</span> à <span class="n">{{disp_max}}</span> entre deux mesures du temps. À temps égal (<span class="n">{{teq_b8}}</span> s), la marge est de <span class="n">{{teq_8_sans_demi}}</span> sans réduction et environ <span class="n">{{teq_8_sans_sur_antictrl}}</span> fois plus petite avec contrôle et antithétiques.</p>
